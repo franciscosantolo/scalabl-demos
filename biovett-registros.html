@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Registros SENASA — Demo Biovett · Scalabl®</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #F7F5FC; color: #1a2332; }
+
+  .header { background: #6B3FA0; color: white; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .header-logo { font-size: .85rem; opacity: .7; }
+  .header h1 { font-size: 1.1rem; font-weight: 600; }
+  .header-badge { background: #D4177A; color: white; font-size: .72rem; font-weight: 700; padding: .3rem .7rem; border-radius: 20px; letter-spacing: .5px; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem; }
+
+  /* ALERTS BANNER */
+  .alert-critical { background: #FDECEA; border-left: 4px solid #C62828; border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+  .alert-critical h3 { color: #C62828; font-size: .9rem; margin-bottom: .4rem; }
+  .alert-warn { background: #FFF8E1; border-left: 4px solid #F57F17; border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+  .alert-warn h3 { color: #F57F17; font-size: .9rem; margin-bottom: .4rem; }
+  .alert-text { font-size: .82rem; color: #4a5568; }
+  .alert-products { font-size: .82rem; font-weight: 600; color: #1a2332; margin-top: .3rem; }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: white; border-radius: 10px; padding: 1rem 1.2rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); text-align: center; }
+  .stat-num { font-size: 1.8rem; font-weight: 700; }
+  .stat-label { font-size: .76rem; color: #6b7a8d; margin-top: .2rem; }
+  .stat-card.total .stat-num { color: #6B3FA0; }
+  .stat-card.ok .stat-num { color: #2E7D32; }
+  .stat-card.warn .stat-num { color: #F57F17; }
+  .stat-card.danger .stat-num { color: #C62828; }
+  .stat-card.bpm .stat-num { color: #D4177A; }
+
+  /* TABS */
+  .tabs { display: flex; gap: .5rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .tab { padding: .5rem 1rem; border-radius: 8px; font-size: .84rem; font-weight: 600; cursor: pointer; border: 1.5px solid #DDD0EE; background: white; color: #6b7a8d; }
+  .tab.active { background: #6B3FA0; color: white; border-color: #6B3FA0; }
+
+  /* TABLE */
+  .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(107,63,160,.07); overflow: hidden; margin-bottom: 1.5rem; }
+  .card-header { padding: .9rem 1.2rem; border-bottom: 1px solid #E5D9F5; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; }
+  .card-title { font-weight: 700; font-size: .9rem; }
+  .btn { padding: .5rem 1rem; border-radius: 8px; border: none; font-size: .82rem; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #6B3FA0; color: white; }
+  .btn-sm { padding: .35rem .8rem; font-size: .78rem; }
+  .btn-ghost { background: #F0E8F8; color: #6B3FA0; }
+  .btn-warn { background: #FFF8E1; color: #E65100; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  th { text-align: left; padding: .65rem 1rem; color: #6b7a8d; font-size: .73rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; background: #FAF8FC; border-bottom: 2px solid #E5D9F5; }
+  td { padding: .75rem 1rem; border-bottom: 1px solid #F0F4F8; color: #1a2332; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAF8FC; }
+
+  .badge { padding: .28rem .75rem; border-radius: 20px; font-size: .72rem; font-weight: 700; display: inline-block; white-space: nowrap; }
+  .badge-ok { background: #E6F4EA; color: #2E7D32; }
+  .badge-warn { background: #FFF8E1; color: #E65100; }
+  .badge-danger { background: #FDECEA; color: #C62828; }
+  .badge-blue { background: #F0E8F8; color: #6B3FA0; }
+  .badge-gray { background: #F0F0F0; color: #666; }
+
+  .dias-ok { color: #2E7D32; font-weight: 600; }
+  .dias-warn { color: #E65100; font-weight: 600; }
+  .dias-danger { color: #C62828; font-weight: 600; }
+
+  /* AI ASSISTANT */
+  .ai-panel { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(107,63,160,.07); padding: 1.2rem 1.5rem; }
+  .ai-header { display: flex; align-items: center; gap: .7rem; margin-bottom: 1rem; }
+  .ai-icon { width: 36px; height: 36px; background: #6B3FA0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  .ai-title { font-weight: 700; font-size: .95rem; }
+  .ai-sub { font-size: .78rem; color: #6b7a8d; }
+  .ai-suggestion { background: #F7F5FC; border-radius: 8px; padding: .9rem 1rem; margin-bottom: .8rem; font-size: .84rem; }
+  .ai-suggestion strong { color: #6B3FA0; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-top: .8rem; }
+  .form-group label { font-size: .75rem; color: #6b7a8d; display: block; margin-bottom: .3rem; font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: .55rem .8rem; border: 1.5px solid #DDD0EE; border-radius: 8px; font-size: .84rem; color: #1a2332; background: white; }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .form-full { grid-column: 1 / -1; }
+
+  .bpm-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+  .bpm-card { background: white; border-radius: 10px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .bpm-label { font-size: .75rem; color: #6b7a8d; margin-bottom: .3rem; }
+  .bpm-value { font-size: .92rem; font-weight: 700; color: #1a2332; }
+  .bpm-date { font-size: .76rem; color: #6b7a8d; margin-top: .2rem; }
+  .progress { height: 6px; background: #E5D9F5; border-radius: 3px; margin-top: .6rem; }
+  .progress-bar { height: 100%; border-radius: 3px; }
+
+  .footer { text-align: center; padding: 2rem; font-size: .75rem; color: #8899AA; margin-top: 1rem; }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .form-grid { grid-template-columns: 1fr; }
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(6), td:nth-child(6) { display: none; }
+  }
+
+  .hidden { display: none; }
+
+  /* FILTER PILLS */
+  .filter-pills { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .pill { padding: .3rem .85rem; border-radius: 20px; font-size: .74rem; font-weight: 700; cursor: pointer; border: 1.5px solid transparent; transition: all .15s; }
+  .pill-all   { background: #F0E8F8; color: #6B3FA0; border-color: #DDD0EE; }
+  .pill-warn  { background: #FFF8E1; color: #E65100; border-color: #F9C77A; }
+  .pill-danger{ background: #FDECEA; color: #C62828; border-color: #F5A8A8; }
+  .pill-ok    { background: #E6F4EA; color: #2E7D32; border-color: #A8D9AE; }
+  .pill.pill-active { filter: brightness(.88); box-shadow: 0 0 0 2px currentColor; }
+
+  /* STEPPER */
+  .stepper { display: flex; gap: 0; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; min-width: 80px; }
+  .step:not(:last-child)::after { content: ''; position: absolute; top: 16px; left: 60%; width: 80%; height: 2px; background: #DDD0EE; z-index: 0; }
+  .step.step-done:not(:last-child)::after { background: #6B3FA0; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; z-index: 1; }
+  .step.step-active .step-circle { background: #6B3FA0; color: white; }
+  .step.step-done .step-circle { background: #2E7D32; color: white; }
+  .step.step-pending .step-circle { background: #E5D9F5; color: #9B7CC8; }
+  .step-label { font-size: .72rem; color: #6b7a8d; margin-top: .35rem; font-weight: 600; max-width: 90px; line-height: 1.25; }
+  .step.step-active .step-label { color: #6B3FA0; }
+  .step.step-done .step-label { color: #2E7D32; }
+
+  /* DOCS CHECKLIST */
+  .docs-list { background: #F7F5FC; border-radius: 8px; padding: .9rem 1rem; margin-top: .8rem; }
+  .docs-list h4 { font-size: .82rem; color: #6B3FA0; font-weight: 700; margin-bottom: .6rem; }
+  .doc-item { display: flex; align-items: center; justify-content: space-between; padding: .45rem 0; border-bottom: 1px solid #E5D9F5; font-size: .82rem; gap: .5rem; }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-item-name { display: flex; align-items: center; gap: .4rem; flex: 1; }
+  .doc-adjuntado { color: #2E7D32; font-weight: 700; font-size: .78rem; }
+  .btn-subir { padding: .28rem .7rem; border-radius: 6px; border: 1.5px solid #6B3FA0; background: white; color: #6B3FA0; font-size: .75rem; font-weight: 700; cursor: pointer; }
+  .btn-subir:hover { background: #F0E8F8; }
+
+  /* TOAST */
+  #toast { position: fixed; top: 1.2rem; right: 1.2rem; background: #2E7D32; color: white; padding: .75rem 1.2rem; border-radius: 10px; font-size: .84rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,.18); z-index: 9999; transition: opacity .35s, transform .35s; opacity: 0; transform: translateY(-12px) scale(.97); pointer-events: none; }
+  #toast.toast-show { opacity: 1; transform: translateY(0) scale(1); }
+
+  @media (max-width: 600px) {
+    .stepper { gap: .4rem; }
+    .step:not(:last-child)::after { display: none; }
+  }
+</style>
+</head>
+<body>
+<script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
+<style>.embedded .header{display:none!important}</style>
+
+<div class="header">
+  <div>
+    <div class="header-logo">Scalabl® · Plataforma Biovett</div>
+    <h1>Gestión de Registros Regulatorios — SENASA</h1>
+  </div>
+  <span class="header-badge">📋 BPM READY</span>
+</div>
+
+<div class="container">
+
+  <!-- ALERTS -->
+  <div class="alert-critical">
+    <h3>🔴 3 registros vencidos — Comercialización suspendida</h3>
+    <div class="alert-products">Closantel 5% Oral · Tilosina 20% Inyectable · Sulfato de Neomicina tópico</div>
+    <div class="alert-text">Iniciar renovación urgente ante SENASA. Tiempo estimado de tramitación: 45–90 días hábiles.</div>
+  </div>
+  <div class="alert-warn">
+    <h3>⚠️ 6 registros vencen en los próximos 90 días</h3>
+    <div class="alert-products">Ivermectina 1% · Oxitetraciclina 200 mg/ml · Vitamina ADE · Levamisol 15% · Flunixin Meglumina · Dexametasona 2 mg/ml</div>
+    <div class="alert-text">Iniciar trámite de renovación con al menos 60 días de anticipación para evitar interrupciones de comercialización.</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card total"><div class="stat-num">47</div><div class="stat-label">Registros totales</div></div>
+    <div class="stat-card ok"><div class="stat-num">38</div><div class="stat-label">Vigentes</div></div>
+    <div class="stat-card warn"><div class="stat-num">6</div><div class="stat-label">Vencen en 90 días</div></div>
+    <div class="stat-card danger"><div class="stat-num">3</div><div class="stat-label">Vencidos</div></div>
+    <div class="stat-card bpm"><div class="stat-num">2</div><div class="stat-label">Cert. BPM activas</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('registros')">Registros CUC</div>
+    <div class="tab" onclick="showTab('bpm')">Certificaciones BPM</div>
+    <div class="tab" onclick="showTab('asistente')">✨ Asistente de Renovación</div>
+  </div>
+
+  <!-- TAB: REGISTROS -->
+  <div id="tab-registros">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Registros de productos — Panel de estado</div>
+        <div style="display:flex;gap:.7rem;align-items:center;flex-wrap:wrap">
+          <div class="filter-pills" id="filter-pills">
+            <span class="pill pill-all pill-active" onclick="filtrarTabla('all', this)">Todos (10)</span>
+            <span class="pill pill-warn" onclick="filtrarTabla('warn', this)">Por vencer (6)</span>
+            <span class="pill pill-danger" onclick="filtrarTabla('danger', this)">Vencidos (3)</span>
+            <span class="pill pill-ok" onclick="filtrarTabla('ok', this)">Vigentes (2)</span>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showTab('asistente')">✨ Renovar con IA</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>N° CUC / Registro</th>
+            <th>Forma farmac.</th>
+            <th>Vencimiento</th>
+            <th>Días restantes</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-estado="warn">
+            <td><strong>Ivermectina 1% Inyectable</strong><br><small style="color:#6b7a8d">500 ml · Antiparasitario</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0043821</td>
+            <td>Sol. inyectable</td>
+            <td>15/06/2026</td>
+            <td><span class="dias-warn">38 días</span></td>
+            <td><span class="badge badge-warn">⚠ Por vencer</span></td>
+            <td><button class="btn btn-warn btn-sm" onclick="iniciarRenovacion('Ivermectina 1% Inyectable')">Renovar</button></td>
+          </tr>
+          <tr data-estado="warn">
+            <td><strong>Oxitetraciclina 200 mg/ml</strong><br><small style="color:#6b7a8d">100 ml · Antibiótico</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0041203</td>
+            <td>Sol. inyectable</td>
+            <td>22/06/2026</td>
+            <td><span class="dias-warn">45 días</span></td>
+            <td><span class="badge badge-warn">⚠ Por vencer</span></td>
+            <td><button class="btn btn-warn btn-sm" onclick="iniciarRenovacion('Oxitetraciclina 200 mg/ml')">Renovar</button></td>
+          </tr>
+          <tr data-estado="danger">
+            <td><strong>Closantel 5% Oral</strong><br><small style="color:#6b7a8d">500 ml · Antiparasitario</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0038902</td>
+            <td>Sol. oral</td>
+            <td>12/03/2026</td>
+            <td><span class="dias-danger">VENCIDO</span></td>
+            <td><span class="badge badge-danger">🔴 Vencido</span></td>
+            <td><button class="btn btn-primary btn-sm" onclick="iniciarRenovacion('Closantel 5% Oral')">Renovar urgente</button></td>
+          </tr>
+          <tr data-estado="warn">
+            <td><strong>Dexametasona 2 mg/ml</strong><br><small style="color:#6b7a8d">50 ml · Corticoide</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0044410</td>
+            <td>Sol. inyectable</td>
+            <td>01/07/2026</td>
+            <td><span class="dias-warn">54 días</span></td>
+            <td><span class="badge badge-warn">⚠ Por vencer</span></td>
+            <td><button class="btn btn-warn btn-sm" onclick="iniciarRenovacion('Dexametasona 2 mg/ml')">Renovar</button></td>
+          </tr>
+          <tr data-estado="warn">
+            <td><strong>Levamisol 15% Inyectable</strong><br><small style="color:#6b7a8d">250 ml · Antiparasitario</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0040881</td>
+            <td>Sol. inyectable</td>
+            <td>18/07/2026</td>
+            <td><span class="dias-warn">71 días</span></td>
+            <td><span class="badge badge-warn">⚠ Por vencer</span></td>
+            <td><button class="btn btn-warn btn-sm">Renovar</button></td>
+          </tr>
+          <tr data-estado="ok">
+            <td><strong>Enrofloxacina 10% Inyectable</strong><br><small style="color:#6b7a8d">100 ml · Antibiótico</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0045221</td>
+            <td>Sol. inyectable</td>
+            <td>14/02/2027</td>
+            <td><span class="dias-ok">282 días</span></td>
+            <td><span class="badge badge-ok">✓ Vigente</span></td>
+            <td><span style="font-size:.75rem;color:#6b7a8d">—</span></td>
+          </tr>
+          <tr data-estado="warn">
+            <td><strong>Flunixin Meglumina 50 mg/ml</strong><br><small style="color:#6b7a8d">100 ml · AINE</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0043109</td>
+            <td>Sol. inyectable</td>
+            <td>05/08/2026</td>
+            <td><span class="dias-warn">89 días</span></td>
+            <td><span class="badge badge-warn">⚠ Por vencer</span></td>
+            <td><button class="btn btn-warn btn-sm">Renovar</button></td>
+          </tr>
+          <tr data-estado="warn">
+            <td><strong>Vitamina ADE Inyectable</strong><br><small style="color:#6b7a8d">100 ml · Suplemento</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0039445</td>
+            <td>Sol. inyectable</td>
+            <td>30/07/2026</td>
+            <td><span class="dias-warn">83 días</span></td>
+            <td><span class="badge badge-warn">⚠ Por vencer</span></td>
+            <td><button class="btn btn-warn btn-sm">Renovar</button></td>
+          </tr>
+          <tr data-estado="danger">
+            <td><strong>Tilosina 20% Inyectable</strong><br><small style="color:#6b7a8d">50 ml · Antibiótico</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0037781</td>
+            <td>Sol. inyectable</td>
+            <td>20/01/2026</td>
+            <td><span class="dias-danger">VENCIDO</span></td>
+            <td><span class="badge badge-danger">🔴 Vencido</span></td>
+            <td><button class="btn btn-primary btn-sm" onclick="iniciarRenovacion('Tilosina 20%')">Renovar urgente</button></td>
+          </tr>
+          <tr data-estado="ok">
+            <td><strong>Meloxicam 20 mg/ml</strong><br><small style="color:#6b7a8d">100 ml · AINE</small></td>
+            <td style="font-family:monospace;font-size:.8rem">SENASA-P-0046003</td>
+            <td>Sol. inyectable</td>
+            <td>22/11/2027</td>
+            <td><span class="dias-ok">565 días</span></td>
+            <td><span class="badge badge-ok">✓ Vigente</span></td>
+            <td><span style="font-size:.75rem;color:#6b7a8d">—</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: BPM -->
+  <div id="tab-bpm" class="hidden">
+    <div style="margin-bottom:1.2rem" class="bpm-row">
+      <div class="bpm-card">
+        <div class="bpm-label">Certificación BPM — Planta Principal</div>
+        <div class="bpm-value">Vigente ✓</div>
+        <div class="bpm-date">Emitida: 15/03/2024 · Vence: 15/03/2027</div>
+        <div class="progress" style="margin-top:.6rem"><div class="progress-bar" style="width:35%;background:#D4177A"></div></div>
+        <div style="font-size:.72rem;color:#6b7a8d;margin-top:.3rem">35% del período transcurrido · 665 días restantes</div>
+      </div>
+      <div class="bpm-card">
+        <div class="bpm-label">Certificación BPM — Planta Biológicos</div>
+        <div class="bpm-value">Vigente ✓</div>
+        <div class="bpm-date">Emitida: 08/09/2024 · Vence: 08/09/2026</div>
+        <div class="progress" style="margin-top:.6rem"><div class="progress-bar" style="width:72%;background:#F57F17"></div></div>
+        <div style="font-size:.72rem;color:#E65100;margin-top:.3rem">72% del período transcurrido · 123 días restantes · Iniciar renovación</div>
+      </div>
+      <div class="bpm-card">
+        <div class="bpm-label">Auditoría interna BPM programada</div>
+        <div class="bpm-value">15 de junio 2026</div>
+        <div class="bpm-date">Auditor: Dr. Fernando Álvarez (externo)</div>
+        <div style="margin-top:.6rem"><span class="badge badge-blue">38 días</span></div>
+      </div>
+      <div class="bpm-card">
+        <div class="bpm-label">Última inspección SENASA</div>
+        <div class="bpm-value">Conforme ✓</div>
+        <div class="bpm-date">Fecha: 12/11/2025 · Sin observaciones</div>
+        <div style="margin-top:.6rem"><span class="badge badge-ok">Sin no conformidades</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Historial de auditorías e inspecciones</div></div>
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Tipo</th><th>Organismo / Auditor</th><th>Alcance</th><th>Resultado</th><th>Observaciones</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>12/11/2025</td><td><span class="badge badge-blue">SENASA</span></td>
+            <td>Ing. Sosa / DILAVE</td><td>Planta completa</td>
+            <td><span class="badge badge-ok">Conforme</span></td><td>—</td>
+          </tr>
+          <tr>
+            <td>03/08/2025</td><td><span class="badge badge-gray">Interna</span></td>
+            <td>Lic. Pérez (QA)</td><td>Manufactura + Almacenamiento</td>
+            <td><span class="badge badge-warn">2 obs. menores</span></td><td>Cerradas el 30/08/2025</td>
+          </tr>
+          <tr>
+            <td>20/03/2025</td><td><span class="badge badge-blue">SENASA</span></td>
+            <td>Dra. Moreno / DILAVE</td><td>Planta Biológicos</td>
+            <td><span class="badge badge-ok">Conforme</span></td><td>—</td>
+          </tr>
+          <tr>
+            <td>15/11/2024</td><td><span class="badge badge-gray">Interna</span></td>
+            <td>Auditor externo — BV</td><td>Sistema de calidad</td>
+            <td><span class="badge badge-ok">Conforme</span></td><td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: ASISTENTE -->
+  <div id="tab-asistente" class="hidden">
+    <div class="ai-panel">
+      <div class="ai-header">
+        <div class="ai-icon">✨</div>
+        <div>
+          <div class="ai-title">Asistente de Renovación SENASA</div>
+          <div class="ai-sub">Pre-completa el expediente de renovación CUC con los datos del sistema</div>
+        </div>
+      </div>
+
+      <!-- STEPPER -->
+      <div class="stepper" id="stepper">
+        <div class="step step-active" id="step-1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Pre-completar datos</div>
+        </div>
+        <div class="step step-pending" id="step-2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Adjuntar documentos</div>
+        </div>
+        <div class="step step-pending" id="step-3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Presentar ante SENASA</div>
+        </div>
+        <div class="step step-pending" id="step-4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Seguimiento del expediente</div>
+        </div>
+      </div>
+
+      <div class="ai-suggestion" id="ai-producto-seleccionado">
+        <strong>Producto seleccionado:</strong> <span id="producto-nombre">Ivermectina 1% Inyectable</span> · CUC <span id="ai-cuc">SENASA-P-0043821</span> · Vence <span id="ai-vence">15/06/2026</span>
+        <br><small style="color:#6b7a8d">El asistente completó automáticamente los campos disponibles desde el sistema de registros.</small>
+      </div>
+
+      <div class="ai-suggestion" style="background:#E6F4EA;border-left:3px solid #D4177A">
+        <strong>✓ 11 de 14 campos pre-completados</strong> desde el historial del sistema.<br>
+        <small style="color:#4a5568">Requiere completar manualmente: datos del responsable técnico firmante, declaración jurada actualizada y adjuntar certificado de análisis vigente del principio activo.</small>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre del producto</label>
+          <input id="f-nombre" type="text" value="Ivermectina 1% Inyectable - Solución Inyectable">
+        </div>
+        <div class="form-group">
+          <label>N° de registro actual (CUC)</label>
+          <input id="f-cuc" type="text" value="SENASA-P-0043821">
+        </div>
+        <div class="form-group">
+          <label>Titular del registro</label>
+          <input type="text" value="Laboratorio Demo S.A.">
+        </div>
+        <div class="form-group">
+          <label>Director Técnico responsable</label>
+          <input type="text" placeholder="Completar — requiere firma">
+        </div>
+        <div class="form-group">
+          <label>Principio activo</label>
+          <input id="f-pa" type="text" value="Ivermectina — 10 mg/ml (1%)">
+        </div>
+        <div class="form-group">
+          <label>Especie de destino</label>
+          <input id="f-especie" type="text" value="Bovinos, ovinos, equinos, porcinos">
+        </div>
+        <div class="form-group">
+          <label>Indicación terapéutica</label>
+          <input id="f-indicacion" type="text" value="Tratamiento y control de endo y ectoparásitos">
+        </div>
+        <div class="form-group">
+          <label>Vía de administración</label>
+          <select id="f-via"><option>Subcutánea</option><option>Intramuscular</option><option>Intravenosa</option><option>Oral</option></select>
+        </div>
+        <div class="form-group">
+          <label>Período de resguardo — Carne</label>
+          <input id="f-carne" type="text" value="28 días">
+        </div>
+        <div class="form-group">
+          <label>Período de resguardo — Leche</label>
+          <input id="f-leche" type="text" value="No usar en vacas en producción de leche">
+        </div>
+        <div class="form-group form-full">
+          <label>Cambios respecto a la formulación anterior (si aplica)</label>
+          <textarea id="f-cambios" placeholder="Indicar modificaciones en fórmula, proceso o presentación. Si no hubo cambios, indicar 'Sin modificaciones'.">Sin modificaciones en fórmula ni proceso de fabricación respecto al registro vigente.</textarea>
+        </div>
+        <div class="form-group">
+          <label>Fecha de presentación estimada</label>
+          <input type="date" value="2026-05-20">
+        </div>
+        <div class="form-group">
+          <label>Modalidad de presentación</label>
+          <select><option selected>Digital — RENSPA/SENASA online</option><option>Presencial</option></select>
+        </div>
+      </div>
+
+      <div style="margin-top:1.2rem;display:flex;gap:.8rem;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="generarExpediente()">📄 Generar borrador de expediente</button>
+        <button class="btn btn-ghost">📋 Copiar campos</button>
+        <button class="btn btn-ghost">💾 Guardar como borrador</button>
+      </div>
+
+      <div id="expediente-generado" class="hidden" style="margin-top:1.2rem;background:#E6F4EA;border-radius:8px;padding:1rem;font-size:.83rem">
+        <strong style="color:#2E7D32">✓ Borrador generado correctamente</strong><br>
+        <span style="color:#4a5568">El expediente pre-completado fue guardado. Revisá los campos marcados en amarillo antes de presentar ante SENASA. Tiempo estimado de tramitación: 45–90 días hábiles.</span>
+      </div>
+
+      <div id="docs-adjuntar" class="hidden docs-list">
+        <h4>📂 Paso 2 — Documentos a adjuntar</h4>
+        <div class="doc-item">
+          <span class="doc-item-name">📄 Certificado de análisis del principio activo (vigente)</span>
+          <span class="doc-adjuntado hidden" id="doc-adj-0">✓ Adjuntado</span>
+          <button class="btn-subir" onclick="adjuntarDoc(0, this)">Subir</button>
+        </div>
+        <div class="doc-item">
+          <span class="doc-item-name">📋 Declaración jurada del Director Técnico (firmada)</span>
+          <span class="doc-adjuntado hidden" id="doc-adj-1">✓ Adjuntado</span>
+          <button class="btn-subir" onclick="adjuntarDoc(1, this)">Subir</button>
+        </div>
+        <div class="doc-item">
+          <span class="doc-item-name">🏭 Memoria descriptiva del proceso de fabricación</span>
+          <span class="doc-adjuntado hidden" id="doc-adj-2">✓ Adjuntado</span>
+          <button class="btn-subir" onclick="adjuntarDoc(2, this)">Subir</button>
+        </div>
+        <div class="doc-item">
+          <span class="doc-item-name">✓ Comprobante de pago de tasa SENASA</span>
+          <span class="doc-adjuntado hidden" id="doc-adj-3">✓ Adjuntado</span>
+          <button class="btn-subir" onclick="adjuntarDoc(3, this)">Subir</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div id="toast">✓ Expediente generado correctamente</div>
+
+<div class="footer">
+  Demo · Scalabl® para Biovett · Gestión de Registros Regulatorios SENASA · Datos ilustrativos
+</div>
+
+<script>
+/* ── Datos por producto ── */
+const productosData = {
+  'Ivermectina 1% Inyectable': {
+    cuc: 'SENASA-P-0043821', vence: '15/06/2026',
+    pa: 'Ivermectina — 10 mg/ml (1%)', via: 'Subcutánea',
+    especie: 'Bovinos, ovinos, equinos, porcinos',
+    indicacion: 'Tratamiento y control de endo y ectoparásitos',
+    resguardo_carne: '28 días', resguardo_leche: 'No usar en vacas en producción de leche',
+    cambios: 'Sin modificaciones en fórmula ni proceso de fabricación respecto al registro vigente.'
+  },
+  'Oxitetraciclina 200 mg/ml': {
+    cuc: 'SENASA-P-0041203', vence: '22/06/2026',
+    pa: 'Oxitetraciclina clorhidrato — 200 mg/ml', via: 'Intramuscular',
+    especie: 'Bovinos, equinos, porcinos',
+    indicacion: 'Tratamiento de infecciones bacterianas sensibles',
+    resguardo_carne: '28 días', resguardo_leche: '7 días',
+    cambios: 'Sin modificaciones.'
+  },
+  'Closantel 5% Oral': {
+    cuc: 'SENASA-P-0038902', vence: 'VENCIDO (12/03/2026)',
+    pa: 'Closantel sódico — 50 mg/ml (5%)', via: 'Oral',
+    especie: 'Bovinos, ovinos',
+    indicacion: 'Control de fasciola hepática y otros trematodos',
+    resguardo_carne: '42 días', resguardo_leche: 'No usar en vacas en producción de leche',
+    cambios: 'Sin modificaciones.'
+  },
+  'Dexametasona 2 mg/ml': {
+    cuc: 'SENASA-P-0044410', vence: '01/07/2026',
+    pa: 'Dexametasona base — 2 mg/ml', via: 'Intramuscular',
+    especie: 'Bovinos, equinos, caninos, felinos',
+    indicacion: 'Estados inflamatorios, procesos alérgicos, shock',
+    resguardo_carne: '28 días', resguardo_leche: '72 horas',
+    cambios: 'Sin modificaciones.'
+  },
+  'Tilosina 20%': {
+    cuc: 'SENASA-P-0037781', vence: 'VENCIDO (20/01/2026)',
+    pa: 'Tilosina tartrato — 200 mg/ml (20%)', via: 'Intramuscular',
+    especie: 'Bovinos, porcinos',
+    indicacion: 'Infecciones por microorganismos sensibles a macrólidos',
+    resguardo_carne: '21 días', resguardo_leche: 'No usar en vacas en producción de leche',
+    cambios: 'Sin modificaciones.'
+  }
+};
+
+/* ── Tabs ── */
+function showTab(tab) {
+  ['registros','bpm','asistente'].forEach(id => {
+    document.getElementById('tab-' + id).classList.add('hidden');
+  });
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const tabs = ['registros','bpm','asistente'];
+  document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
+}
+
+/* ── Asistente dinámico por producto ── */
+function iniciarRenovacion(producto) {
+  const d = productosData[producto];
+  document.getElementById('producto-nombre').textContent = producto;
+
+  if (d) {
+    document.getElementById('ai-cuc').textContent = d.cuc;
+    document.getElementById('ai-vence').textContent = d.vence;
+    document.getElementById('f-nombre').value = producto;
+    document.getElementById('f-cuc').value = d.cuc;
+    document.getElementById('f-pa').value = d.pa;
+    document.getElementById('f-especie').value = d.especie;
+    document.getElementById('f-indicacion').value = d.indicacion;
+    document.getElementById('f-carne').value = d.resguardo_carne;
+    document.getElementById('f-leche').value = d.resguardo_leche;
+    document.getElementById('f-cambios').value = d.cambios;
+    // vía de administración
+    const via = document.getElementById('f-via');
+    Array.from(via.options).forEach(opt => {
+      opt.selected = opt.text.includes(d.via);
+    });
+  }
+
+  // Resetear stepper al paso 1
+  resetStepper();
+  // Ocultar docs y expediente
+  document.getElementById('docs-adjuntar').classList.add('hidden');
+  document.getElementById('expediente-generado').classList.add('hidden');
+
+  showTab('asistente');
+}
+
+/* ── Stepper ── */
+let pasoActual = 1;
+
+function resetStepper() {
+  pasoActual = 1;
+  for (let i = 1; i <= 4; i++) {
+    const step = document.getElementById('step-' + i);
+    step.classList.remove('step-active','step-done','step-pending');
+    step.classList.add(i === 1 ? 'step-active' : 'step-pending');
+  }
+}
+
+function avanzarStepper() {
+  if (pasoActual >= 4) return;
+  const stepActual = document.getElementById('step-' + pasoActual);
+  stepActual.classList.remove('step-active');
+  stepActual.classList.add('step-done');
+  pasoActual++;
+  const stepNuevo = document.getElementById('step-' + pasoActual);
+  stepNuevo.classList.remove('step-pending');
+  stepNuevo.classList.add('step-active');
+}
+
+/* ── Generar expediente ── */
+function generarExpediente() {
+  document.getElementById('expediente-generado').classList.remove('hidden');
+  document.getElementById('docs-adjuntar').classList.remove('hidden');
+  avanzarStepper();
+  mostrarToast('✓ Expediente generado correctamente');
+}
+
+/* ── Adjuntar documento ── */
+function adjuntarDoc(idx, btn) {
+  btn.style.display = 'none';
+  document.getElementById('doc-adj-' + idx).classList.remove('hidden');
+}
+
+/* ── Toast ── */
+let toastTimer = null;
+function mostrarToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('toast-show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('toast-show'), 3000);
+}
+
+/* ── Filtro de tabla ── */
+function filtrarTabla(estado, el) {
+  document.querySelectorAll('#filter-pills .pill').forEach(p => p.classList.remove('pill-active'));
+  el.classList.add('pill-active');
+  document.querySelectorAll('tbody tr[data-estado]').forEach(tr => {
+    if (estado === 'all' || tr.dataset.estado === estado) {
+      tr.classList.remove('hidden');
+    } else {
+      tr.classList.add('hidden');
+    }
+  });
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biovett AI — Plataforma de Gestión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: #0f0720; color: #e2d9f3; }
+
+/* ── LAYOUT ────────────────────────────────────────────────── */
+#app { display: flex; height: 100vh; }
+
+/* ── SIDEBAR ───────────────────────────────────────────────── */
+#sidebar {
+  width: 220px; min-width: 220px; background: #130929;
+  border-right: 1px solid #2a1650; display: flex; flex-direction: column;
+  padding: 1.5rem 0; overflow-y: auto;
+}
+.sidebar-brand {
+  padding: 0 1.2rem 1.5rem; border-bottom: 1px solid #2a1650; margin-bottom: 1rem;
+}
+.sidebar-logo { font-size: 1.5rem; }
+.sidebar-name { font-size: 1.1rem; font-weight: 800; color: #c084fc; letter-spacing: -0.3px; }
+.sidebar-tagline { font-size: .68rem; color: #6b5a8a; letter-spacing: .5px; text-transform: uppercase; margin-top: .1rem; }
+
+.nav-section { font-size: .62rem; font-weight: 700; color: #4a3568; letter-spacing: 1px; text-transform: uppercase; padding: .6rem 1.2rem .3rem; margin-top: .5rem; }
+.nav-item {
+  display: flex; align-items: center; gap: .7rem; padding: .65rem 1.2rem;
+  cursor: pointer; font-size: .85rem; color: #9879c4; border-left: 3px solid transparent;
+  transition: all .15s; position: relative;
+}
+.nav-item:hover { background: #1f1045; color: #e2d9f3; }
+.nav-item.active { background: #2a1650; color: #c084fc; border-left-color: #a855f7; font-weight: 600; }
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto; background: #7c1d3c; color: #fca5a5; font-size: .62rem;
+  font-weight: 700; padding: .15rem .4rem; border-radius: 10px;
+}
+.nav-badge.yellow { background: #451a03; color: #fcd34d; }
+
+.sidebar-footer {
+  margin-top: auto; padding: 1rem 1.2rem; border-top: 1px solid #2a1650;
+  font-size: .68rem; color: #4a3568; text-align: center;
+}
+.sidebar-footer span { color: #6b5a8a; }
+
+/* ── MAIN CONTENT ──────────────────────────────────────────── */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8f6fd; }
+
+.topbar {
+  background: white; border-bottom: 1px solid #e5d9f5; padding: .75rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.topbar-title { font-size: 1rem; font-weight: 700; color: #1a0e35; }
+.topbar-meta { font-size: .75rem; color: #9879c4; }
+.topbar-right { display: flex; align-items: center; gap: 1rem; }
+.api-indicator {
+  display: flex; align-items: center; gap: .4rem; font-size: .72rem;
+  color: #6b7a8d; background: #f0f4f8; padding: .3rem .7rem; border-radius: 20px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; }
+.dot.green { background: #22c55e; }
+.dot.red { background: #ef4444; }
+
+/* ── SECTIONS ──────────────────────────────────────────────── */
+.section { flex: 1; overflow-y: auto; overflow-x: hidden; display: none; padding: 1.5rem; }
+.section.active { display: block; }
+.section-iframe { flex: 1; overflow: hidden; display: none; }
+.section-iframe.active { display: block; }
+.section-iframe iframe { width: 100%; height: 100%; border: none; }
+
+/* ── DASHBOARD ─────────────────────────────────────────────── */
+.dash-greeting { margin-bottom: 1.5rem; }
+.dash-greeting h1 { font-size: 1.3rem; font-weight: 700; color: #1a0e35; }
+.dash-greeting p { font-size: .82rem; color: #6b7a8d; margin-top: .2rem; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.kpi-card {
+  background: white; border-radius: 12px; padding: 1.1rem 1.2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06); border-left: 4px solid #e5d9f5;
+}
+.kpi-card.purple { border-left-color: #7c3aed; }
+.kpi-card.green  { border-left-color: #22c55e; }
+.kpi-card.yellow { border-left-color: #f59e0b; }
+.kpi-card.red    { border-left-color: #ef4444; }
+.kpi-card.pink   { border-left-color: #ec4899; }
+.kpi-num { font-size: 1.9rem; font-weight: 800; color: #1a0e35; line-height: 1; }
+.kpi-label { font-size: .72rem; color: #6b7a8d; margin-top: .25rem; font-weight: 500; }
+.kpi-change { font-size: .7rem; margin-top: .4rem; }
+.kpi-change.up   { color: #22c55e; }
+.kpi-change.down { color: #ef4444; }
+.kpi-change.warn { color: #f59e0b; }
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.dash-grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+
+.panel {
+  background: white; border-radius: 12px; padding: 1.2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.panel-title {
+  font-size: .72rem; font-weight: 700; color: #6b7a8d; text-transform: uppercase;
+  letter-spacing: .8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;
+}
+.panel-title .pill {
+  font-size: .62rem; padding: .2rem .55rem; border-radius: 10px;
+  background: #f0e8f8; color: #7c3aed; font-weight: 600; text-transform: none; letter-spacing: 0;
+}
+
+/* CUC table */
+.cuc-row { display: flex; align-items: center; gap: .7rem; padding: .55rem 0; border-bottom: 1px solid #f3f0f8; font-size: .82rem; }
+.cuc-row:last-child { border-bottom: none; }
+.cuc-name { flex: 1; font-weight: 500; color: #1a0e35; }
+.cuc-exp { font-size: .72rem; color: #6b7a8d; width: 80px; text-align: right; }
+.badge { padding: .2rem .6rem; border-radius: 20px; font-size: .65rem; font-weight: 700; white-space: nowrap; }
+.badge-ok { background: #dcfce7; color: #16a34a; }
+.badge-warn { background: #fef3c7; color: #d97706; }
+.badge-danger { background: #fee2e2; color: #dc2626; }
+.badge-blue { background: #ede9fe; color: #7c3aed; }
+.badge-gray { background: #f3f4f6; color: #6b7280; }
+
+/* Cold chain */
+.camara-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+.camara-card {
+  background: #f8f6fd; border-radius: 8px; padding: .8rem;
+  border: 1px solid #e5d9f5; text-align: center;
+}
+.camara-temp { font-size: 1.4rem; font-weight: 800; color: #1a0e35; }
+.camara-temp.warn { color: #d97706; }
+.camara-name { font-size: .7rem; color: #6b7a8d; margin-top: .15rem; }
+.camara-range { font-size: .65rem; color: #9ca3af; margin-top: .1rem; }
+.camara-status { display: flex; align-items: center; justify-content: center; gap: .3rem; font-size: .65rem; margin-top: .3rem; font-weight: 600; }
+.camara-status.ok { color: #22c55e; }
+.camara-status.warn { color: #d97706; }
+
+/* Lot bar */
+.lot-bar { margin-bottom: .8rem; }
+.lot-bar-label { display: flex; justify-content: space-between; font-size: .75rem; color: #6b7a8d; margin-bottom: .3rem; }
+.lot-bar-track { height: 6px; background: #f3f0f8; border-radius: 3px; overflow: hidden; }
+.lot-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+.fill-purple { background: #7c3aed; }
+.fill-green  { background: #22c55e; }
+.fill-yellow { background: #f59e0b; }
+.fill-red    { background: #ef4444; }
+
+/* Alerts */
+.alert-item { display: flex; gap: .7rem; padding: .6rem; border-radius: 8px; margin-bottom: .5rem; font-size: .8rem; }
+.alert-item:last-child { margin-bottom: 0; }
+.alert-critical { background: #fef2f2; border-left: 3px solid #ef4444; }
+.alert-warn     { background: #fffbeb; border-left: 3px solid #f59e0b; }
+.alert-info     { background: #f0fdf4; border-left: 3px solid #22c55e; }
+.alert-icon { font-size: 1rem; }
+.alert-body strong { color: #1a0e35; display: block; font-size: .78rem; }
+.alert-body span { color: #6b7a8d; font-size: .72rem; }
+
+/* Donut chart (CSS) */
+.donut-wrap { display: flex; align-items: center; gap: 1.2rem; }
+.donut { width: 90px; height: 90px; border-radius: 50%; flex-shrink: 0; }
+.donut-legend { flex: 1; }
+.donut-leg-item { display: flex; align-items: center; gap: .5rem; font-size: .75rem; margin-bottom: .4rem; }
+.donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.donut-leg-pct { margin-left: auto; font-weight: 700; color: #1a0e35; }
+
+/* ── CHAT FLOTANTE ─────────────────────────────────────────── */
+.chat-fab {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 500;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border: none; color: white; font-size: 1.3rem; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(124,58,237,.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .2s, box-shadow .2s;
+}
+.chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(124,58,237,.5); }
+.chat-fab .badge-dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 12px; height: 12px; background: #22c55e; border-radius: 50%;
+  border: 2px solid white;
+}
+
+.chat-panel {
+  position: fixed; bottom: 5rem; right: 1.5rem; z-index: 499;
+  width: 360px; height: 500px; background: white; border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.15); display: flex; flex-direction: column;
+  overflow: hidden; transform: scale(.9) translateY(20px); opacity: 0;
+  pointer-events: none; transition: all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.chat-panel.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+
+.chat-panel-header {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  padding: .9rem 1rem; display: flex; align-items: center; gap: .7rem; flex-shrink: 0;
+}
+.chat-panel-avatar { font-size: 1.1rem; }
+.chat-panel-title { flex: 1; }
+.chat-panel-title strong { font-size: .88rem; color: white; font-weight: 700; display: block; }
+.chat-panel-title span { font-size: .68rem; color: rgba(255,255,255,.7); }
+.chat-panel-close { background: none; border: none; color: rgba(255,255,255,.7); font-size: 1.1rem; cursor: pointer; padding: .2rem; line-height: 1; }
+.chat-panel-close:hover { color: white; }
+
+.chat-quick { padding: .6rem .8rem; border-bottom: 1px solid #f3f0f8; display: flex; gap: .4rem; flex-wrap: wrap; flex-shrink: 0; }
+.quick-btn {
+  padding: .25rem .65rem; background: #f0e8f8; border: 1px solid #d8c8f0;
+  border-radius: 20px; font-size: .68rem; color: #7c3aed; cursor: pointer;
+  font-weight: 500; transition: all .15s; white-space: nowrap;
+}
+.quick-btn:hover { background: #7c3aed; color: white; border-color: #7c3aed; }
+
+.chat-messages { flex: 1; overflow-y: auto; padding: .8rem; }
+.msg { display: flex; gap: .6rem; margin-bottom: .8rem; align-items: flex-start; }
+.msg.user { flex-direction: row-reverse; }
+.msg-avatar {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; display: flex;
+  align-items: center; justify-content: center; font-size: .75rem;
+}
+.msg-avatar.ai { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+.msg-avatar.user { background: #e5d9f5; font-size: .65rem; font-weight: 700; color: #7c3aed; }
+.msg-bubble {
+  max-width: 80%; padding: .55rem .8rem; border-radius: 10px;
+  font-size: .8rem; line-height: 1.5;
+}
+.msg.ai .msg-bubble { background: #f8f6fd; color: #1a0e35; border-radius: 3px 10px 10px 10px; }
+.msg.user .msg-bubble { background: #7c3aed; color: white; border-radius: 10px 3px 10px 10px; }
+.msg-bubble p { margin-bottom: .35rem; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble strong { font-weight: 700; }
+
+.typing-dot { display: inline-flex; gap: 3px; padding: .55rem .8rem; background: #f8f6fd; border-radius: 3px 10px 10px 10px; }
+.typing-dot span { width: 5px; height: 5px; border-radius: 50%; background: #a855f7; animation: bounce .8s infinite; }
+.typing-dot span:nth-child(2) { animation-delay: .15s; }
+.typing-dot span:nth-child(3) { animation-delay: .3s; }
+@keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
+
+.chat-input-area { padding: .6rem .8rem; border-top: 1px solid #f3f0f8; flex-shrink: 0; }
+.chat-input-row { display: flex; gap: .5rem; align-items: flex-end; }
+.chat-input-row textarea {
+  flex: 1; padding: .55rem .8rem; background: #f8f6fd; border: 1.5px solid #d8c8f0;
+  border-radius: 10px; font-size: .82rem; font-family: 'Inter', sans-serif; color: #1a0e35;
+  resize: none; outline: none; max-height: 80px; min-height: 36px; line-height: 1.4;
+}
+.chat-input-row textarea:focus { border-color: #7c3aed; background: white; }
+.chat-send-btn {
+  width: 36px; height: 36px; border-radius: 10px; background: #7c3aed; border: none;
+  color: white; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: opacity .15s;
+}
+.chat-send-btn:hover { opacity: .85; }
+.chat-send-btn:disabled { opacity: .4; cursor: default; }
+
+/* ── AUTOMATIZACIONES ────────────────────────────────────────── */
+.auto-row {
+  display: flex; align-items: center; gap: 1rem; padding: .9rem 1.1rem;
+  background: white; border-radius: 10px; margin-bottom: .6rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06); border-left: 3px solid transparent;
+}
+.auto-row.active-auto { border-left-color: #22c55e; }
+.auto-row.config-auto { border-left-color: #f59e0b; }
+.auto-row.paused-auto { border-left-color: #e5d9f5; }
+.auto-icon { font-size: 1.3rem; width: 2rem; text-align: center; flex-shrink: 0; }
+.auto-info { flex: 1; }
+.auto-name { font-size: .88rem; font-weight: 700; color: #1a0e35; }
+.auto-desc { font-size: .75rem; color: #6b7a8d; margin-top: .1rem; }
+.auto-badge { font-size: .65rem; font-weight: 700; padding: .2rem .55rem; border-radius: 10px; }
+.auto-badge.on  { background: #dcfce7; color: #16a34a; }
+.auto-badge.cfg { background: #fef3c7; color: #d97706; }
+.auto-badge.off { background: #f3f4f6; color: #6b7280; }
+.auto-last { font-size: .7rem; color: #9ca3af; margin-top: .15rem; }
+
+/* ── REPORTES ────────────────────────────────────────────────── */
+.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.report-card {
+  background: white; border-radius: 12px; padding: 1.2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06); cursor: pointer; transition: box-shadow .15s;
+}
+.report-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+.report-icon { font-size: 1.5rem; margin-bottom: .6rem; }
+.report-title { font-size: .9rem; font-weight: 700; color: #1a0e35; }
+.report-desc { font-size: .75rem; color: #6b7a8d; margin-top: .3rem; line-height: 1.4; }
+.report-meta { display: flex; align-items: center; justify-content: space-between; margin-top: .8rem; }
+.report-date { font-size: .68rem; color: #9ca3af; }
+.report-btn { font-size: .72rem; font-weight: 600; color: #7c3aed; background: #f0e8f8; padding: .25rem .65rem; border-radius: 8px; border: none; cursor: pointer; }
+
+/* ── MODAL REPORTE ─────────────────────────────────────────── */
+.report-modal-overlay {
+  position: fixed; inset: 0; background: rgba(10,4,28,.7); z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.report-modal-overlay.open { opacity: 1; pointer-events: all; }
+.report-modal-box {
+  background: #fff; border-radius: 16px; width: min(820px, 94vw); max-height: 88vh;
+  overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,.35);
+  transform: translateY(12px); transition: transform .25s;
+}
+.report-modal-overlay.open .report-modal-box { transform: translateY(0); }
+.rm-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 1.6rem 2rem 1rem; border-bottom: 1px solid #e8e4f0;
+}
+.rm-header-left { display: flex; flex-direction: column; gap: .2rem; }
+.rm-co { font-size: .68rem; font-weight: 700; color: #9879c4; text-transform: uppercase; letter-spacing: 1px; }
+.rm-title { font-size: 1.15rem; font-weight: 800; color: #1a0e35; }
+.rm-period { font-size: .75rem; color: #6b7a8d; margin-top: .1rem; }
+.rm-close {
+  background: #f3f0f8; border: none; border-radius: 8px;
+  width: 30px; height: 30px; cursor: pointer; font-size: 1rem; color: #6b7a8d;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.rm-close:hover { background: #e8e4f0; }
+.rm-body { padding: 1.2rem 2rem 1.8rem; }
+.pnl-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.pnl-table th {
+  font-size: .65rem; font-weight: 700; color: #9879c4; text-transform: uppercase;
+  letter-spacing: .8px; padding: .5rem .6rem; text-align: right; border-bottom: 2px solid #e8e4f0;
+}
+.pnl-table th:first-child { text-align: left; }
+.pnl-table td { padding: .38rem .6rem; color: #3a2d5a; vertical-align: middle; }
+.pnl-table td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.pnl-row-sub td:first-child { padding-left: 1.4rem; color: #5a4d7a; }
+.pnl-row-total td {
+  font-weight: 700; color: #1a0e35; border-top: 1px solid #e8e4f0;
+  padding-top: .5rem; padding-bottom: .5rem;
+}
+.pnl-row-section td {
+  font-size: .65rem; font-weight: 700; color: #9879c4; text-transform: uppercase;
+  letter-spacing: .8px; padding-top: 1rem; padding-bottom: .2rem; border-top: none;
+}
+.pnl-row-highlight td {
+  font-weight: 800; color: #7c3aed; font-size: .88rem;
+  background: #f5f0fd; border-radius: 6px; padding-top: .55rem; padding-bottom: .55rem;
+}
+.pnl-row-margin td { font-size: .72rem; color: #6b7a8d; padding-bottom: .6rem; }
+.var-pos { color: #16a34a; font-weight: 600; }
+.var-neg { color: #ef4444; font-weight: 600; }
+.var-neu { color: #9ca3af; }
+.rm-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem 2rem; border-top: 1px solid #e8e4f0;
+  background: #faf8ff; border-radius: 0 0 16px 16px;
+}
+.rm-footer-note { font-size: .67rem; color: #9ca3af; }
+.rm-dl-btn {
+  font-size: .75rem; font-weight: 600; color: #fff; background: #7c3aed;
+  border: none; border-radius: 8px; padding: .45rem 1rem; cursor: pointer;
+}
+</style>
+</head>
+<body>
+<a href="/" style="position:fixed;bottom:14px;left:14px;z-index:60;color:#fff;text-decoration:none;font-size:.8rem;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:8px">← Demos</a>
+
+<!-- ── APP SHELL ───────────────────────────────────────────────── -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">🧬</div>
+      <div class="sidebar-name">Biovett AI</div>
+      <div class="sidebar-tagline">Plataforma de Gestión</div>
+    </div>
+
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showSection('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+
+    <div class="nav-section">Operaciones</div>
+    <div class="nav-item" onclick="showSection('trazabilidad')">
+      <span class="nav-icon">📦</span> Trazabilidad
+    </div>
+    <div class="nav-item" onclick="showSection('registros')">
+      <span class="nav-icon">📋</span> Registros SENASA
+      <span class="nav-badge yellow">3</span>
+    </div>
+
+    <div class="nav-section">Inteligencia</div>
+    <div class="nav-item" onclick="showSection('automatizaciones')">
+      <span class="nav-icon">⚡</span> Automatizaciones
+      <span class="nav-badge yellow">5</span>
+    </div>
+    <div class="nav-item" onclick="showSection('reportes')">
+      <span class="nav-icon">📈</span> Reportes
+    </div>
+
+    <div class="sidebar-footer">
+      Powered by <span>Scalabl®</span>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard general</div>
+        <div class="topbar-meta" id="topbar-meta">Actualizado hoy · Jun 2025</div>
+      </div>
+      <div class="topbar-right">
+        <div class="api-indicator">
+          <div class="dot green"></div>
+          <span>Asistente IA activo</span>
+        </div>
+        <div style="font-size:.78rem;color:#6b7a8d">Biovett SA</div>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD ── -->
+    <div class="section active" id="section-dashboard">
+
+      <div class="dash-greeting">
+        <h1>Buenos días, Francisco</h1>
+        <p>Resumen operativo · Laboratorio Biovett SA — hoy hay <strong style="color:#ef4444">4 alertas</strong> que requieren atención.</p>
+      </div>
+
+      <!-- KPIs principales — fila 1: regulatorio + calidad -->
+      <div class="kpi-grid">
+        <div class="kpi-card purple">
+          <div class="kpi-num">34</div>
+          <div class="kpi-label">CUC — Registros vigentes ante SENASA</div>
+          <div class="kpi-change warn">⚠ 3 vencen en &lt;90 días</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-num">93.6%</div>
+          <div class="kpi-label">RFT — Lotes aprobados sin reproceso</div>
+          <div class="kpi-change up">↑ 1.2pp vs mes anterior</div>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-num">78%</div>
+          <div class="kpi-label">OEE — Eficiencia líneas de producción</div>
+          <div class="kpi-change warn">Target: &gt;85%</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-num">1</div>
+          <div class="kpi-label">CUC — Registro vencido sin renovar</div>
+          <div class="kpi-change down">Bovitick Max · urgente</div>
+        </div>
+      </div>
+      <!-- KPIs fila 2: comercial + finanzas -->
+      <div class="kpi-grid" style="margin-top:0">
+        <div class="kpi-card green">
+          <div class="kpi-num">96.2%</div>
+          <div class="kpi-label">OTIF — entregas a tiempo y completas</div>
+          <div class="kpi-change up">↑ 0.8pp vs mes anterior</div>
+        </div>
+        <div class="kpi-card pink">
+          <div class="kpi-num">128.4K</div>
+          <div class="kpi-label">Unidades — despachadas en junio</div>
+          <div class="kpi-change up">↑ 4% vs mayo</div>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-num">4.2d</div>
+          <div class="kpi-label">Ciclo liberación — días promedio por lote</div>
+          <div class="kpi-change up">↓ 0.3d vs mes anterior</div>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-num">3</div>
+          <div class="kpi-label">CAPAs — Acciones correctivas abiertas</div>
+          <div class="kpi-change warn">1 vencida — requiere atención</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+
+        <!-- Panel alertas -->
+        <div class="panel">
+          <div class="panel-title">Alertas activas <span class="pill">4 hoy</span></div>
+
+          <div class="alert-item alert-critical">
+            <div class="alert-icon">🔴</div>
+            <div class="alert-body">
+              <strong>CUC vencida — Bovitick Max 1L</strong>
+              <span>Venció el 3-jun-2025 · Producción detenida hasta renovación SENASA</span>
+            </div>
+          </div>
+          <div class="alert-item alert-warn">
+            <div class="alert-icon">🟡</div>
+            <div class="alert-body">
+              <strong>3 CUC vencen en menos de 90 días</strong>
+              <span>Canivac Triple, Equifort Plus, Porciplex B · iniciar trámite antes del 15-jul</span>
+            </div>
+          </div>
+          <div class="alert-item alert-warn">
+            <div class="alert-icon">🟡</div>
+            <div class="alert-body">
+              <strong>Cámara B — temperatura en límite</strong>
+              <span>7.8°C · rango 2–8°C · monitorear en próximas horas</span>
+            </div>
+          </div>
+          <div class="alert-item alert-info">
+            <div class="alert-icon">🟢</div>
+            <div class="alert-body">
+              <strong>Lote BV-2025-0851 liberado</strong>
+              <span>Antipar Bov 500ml · 2.400 unidades listas para despacho</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel cadena de frío -->
+        <div class="panel">
+          <div class="panel-title">Cadena de frío <span class="pill">Tiempo real</span></div>
+          <div class="camara-grid">
+            <div class="camara-card">
+              <div class="camara-temp">4.2°C</div>
+              <div class="camara-name">Cámara A</div>
+              <div class="camara-range">Rango: 2–8°C</div>
+              <div class="camara-status ok">✓ Normal</div>
+            </div>
+            <div class="camara-card">
+              <div class="camara-temp warn">7.8°C</div>
+              <div class="camara-name">Cámara B</div>
+              <div class="camara-range">Rango: 2–8°C</div>
+              <div class="camara-status warn">⚠ En límite</div>
+            </div>
+            <div class="camara-card">
+              <div class="camara-temp">-18.5°C</div>
+              <div class="camara-name">Cámara C</div>
+              <div class="camara-range">Rango: ≤ -18°C</div>
+              <div class="camara-status ok">✓ Normal</div>
+            </div>
+            <div class="camara-card">
+              <div class="camara-temp">22.3°C</div>
+              <div class="camara-name">Cámara D</div>
+              <div class="camara-range">Rango: 15–25°C</div>
+              <div class="camara-status ok">✓ Normal</div>
+            </div>
+          </div>
+          <div style="margin-top:.8rem;font-size:.72rem;color:#9879c4">Última excursión registrada: hace 3 días · 12 min · resuelta</div>
+        </div>
+
+      </div>
+
+      <div class="dash-grid-3">
+
+        <!-- Panel CUC vencimientos -->
+        <div class="panel">
+          <div class="panel-title">CUC próximos vencimientos</div>
+          <div class="cuc-row">
+            <span class="badge badge-danger">VENCIDA</span>
+            <span class="cuc-name">Bovitick Max 1L</span>
+            <span class="cuc-exp">03-jun-25</span>
+          </div>
+          <div class="cuc-row">
+            <span class="badge badge-warn">87 días</span>
+            <span class="cuc-name">Canivac Triple</span>
+            <span class="cuc-exp">04-sep-25</span>
+          </div>
+          <div class="cuc-row">
+            <span class="badge badge-warn">74 días</span>
+            <span class="cuc-name">Equifort Plus 50ml</span>
+            <span class="cuc-exp">22-ago-25</span>
+          </div>
+          <div class="cuc-row">
+            <span class="badge badge-warn">61 días</span>
+            <span class="cuc-name">Porciplex B 100ml</span>
+            <span class="cuc-exp">09-ago-25</span>
+          </div>
+          <div class="cuc-row">
+            <span class="badge badge-blue">EN TRÁMITE</span>
+            <span class="cuc-name">Antipar Bov 500ml</span>
+            <span class="cuc-exp">Radicado</span>
+          </div>
+          <div class="cuc-row">
+            <span class="badge badge-ok">VIGENTE</span>
+            <span class="cuc-name">Canivac Rabia</span>
+            <span class="cuc-exp">Mar-2028</span>
+          </div>
+          <div style="font-size:.72rem;color:#9879c4;margin-top:.8rem">34 CUC totales · 5 en trámite · <a href="#" onclick="showSection('registros');return false" style="color:#7c3aed;text-decoration:none">Ver panel completo →</a></div>
+        </div>
+
+        <!-- Panel mix comercial -->
+        <div class="panel">
+          <div class="panel-title">Mix por especie</div>
+          <div class="donut-wrap">
+            <div class="donut" style="background: conic-gradient(#7c3aed 0% 45%, #22c55e 45% 73%, #f59e0b 73% 88%, #ec4899 88% 100%); border-radius:50%"></div>
+            <div class="donut-legend">
+              <div class="donut-leg-item"><div class="donut-dot" style="background:#7c3aed"></div>Bovinos<span class="donut-leg-pct">45%</span></div>
+              <div class="donut-leg-item"><div class="donut-dot" style="background:#22c55e"></div>Caninos<span class="donut-leg-pct">28%</span></div>
+              <div class="donut-leg-item"><div class="donut-dot" style="background:#f59e0b"></div>Equinos<span class="donut-leg-pct">15%</span></div>
+              <div class="donut-leg-item"><div class="donut-dot" style="background:#ec4899"></div>Porcinos<span class="donut-leg-pct">12%</span></div>
+            </div>
+          </div>
+          <div style="margin-top:1rem;font-size:.78rem;color:#1a0e35;font-weight:700">128.400 unidades <span style="font-weight:400;color:#6b7a8d">despachadas en jun</span></div>
+        </div>
+
+      </div>
+
+      <!-- Panel producción + tendencia RFT -->
+      <div class="dash-grid" style="margin-bottom:1.5rem">
+        <div class="panel">
+          <div class="panel-title">Producción — últimos 30 días</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.1rem">
+            <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:#7c3aed">47</div><div style="font-size:.7rem;color:#6b7a8d">Lotes procesados</div></div>
+            <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:#22c55e">44</div><div style="font-size:.7rem;color:#6b7a8d">Aprobados</div></div>
+            <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:#f59e0b">2</div><div style="font-size:.7rem;color:#6b7a8d">Cuarentena</div></div>
+            <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:#ef4444">1</div><div style="font-size:.7rem;color:#6b7a8d">Rechazado</div></div>
+          </div>
+          <div class="lot-bar"><div class="lot-bar-label"><span>RFT — Right First Time</span><span style="font-weight:700;color:#1a0e35">93.6%</span></div><div class="lot-bar-track"><div class="lot-bar-fill fill-green" style="width:93.6%"></div></div></div>
+          <div class="lot-bar"><div class="lot-bar-label"><span>OEE — eficiencia equipos</span><span style="font-weight:700;color:#1a0e35">78%</span></div><div class="lot-bar-track"><div class="lot-bar-fill fill-yellow" style="width:78%"></div></div></div>
+          <div class="lot-bar" style="margin-bottom:0"><div class="lot-bar-label"><span>Training compliance BPM</span><span style="font-weight:700;color:#1a0e35">97%</span></div><div class="lot-bar-track"><div class="lot-bar-fill fill-purple" style="width:97%"></div></div></div>
+        </div>
+
+        <!-- Tendencia RFT 6 meses (CSS bar chart) -->
+        <div class="panel">
+          <div class="panel-title">Tendencia RFT — últimos 6 meses <span class="pill">% aprobados</span></div>
+          <div style="display:flex;align-items:flex-end;gap:8px;height:90px;margin-bottom:.5rem">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="font-size:.6rem;color:#6b7a8d">89%</div>
+              <div style="flex:1;width:100%;background:#7c3aed22;border-radius:4px 4px 0 0;height:89%;display:flex;align-items:flex-end"><div style="width:100%;background:#7c3aed;border-radius:4px 4px 0 0" style="height:89%"></div></div>
+              <div style="width:100%;background:#7c3aed;border-radius:4px 4px 0 0;height:80px;opacity:.6"></div>
+              <div style="font-size:.6rem;color:#9ca3af">Ene</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="width:100%;background:#7c3aed;border-radius:4px 4px 0 0;height:85px;opacity:.7"></div>
+              <div style="font-size:.6rem;color:#9ca3af">Feb</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="width:100%;background:#7c3aed;border-radius:4px 4px 0 0;height:77px;opacity:.75"></div>
+              <div style="font-size:.6rem;color:#9ca3af">Mar</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="width:100%;background:#7c3aed;border-radius:4px 4px 0 0;height:82px;opacity:.8"></div>
+              <div style="font-size:.6rem;color:#9ca3af">Abr</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="width:100%;background:#7c3aed;border-radius:4px 4px 0 0;height:87px;opacity:.9"></div>
+              <div style="font-size:.6rem;color:#9ca3af">May</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="width:100%;background:#7c3aed;border-radius:4px 4px 0 0;height:90px"></div>
+              <div style="font-size:.6rem;color:#9ca3af;font-weight:700">Jun</div>
+            </div>
+          </div>
+          <div style="font-size:.7rem;color:#6b7a8d;border-top:1px solid #f3f0f8;padding-top:.6rem">Trend alcista — RFT mejoró 4.6pp en 6 meses · Target industria: &gt;95%</div>
+
+          <div class="panel-title" style="margin-top:1rem">Finanzas operativas</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+            <div style="background:#f8f6fd;border-radius:8px;padding:.7rem;text-align:center">
+              <div style="font-size:1.1rem;font-weight:800;color:#1a0e35">$2.340</div>
+              <div style="font-size:.68rem;color:#6b7a8d">Costo / lote (USD)</div>
+              <div style="font-size:.65rem;color:#22c55e;margin-top:.2rem">↓ 3% vs mayo</div>
+            </div>
+            <div style="background:#f8f6fd;border-radius:8px;padding:.7rem;text-align:center">
+              <div style="font-size:1.1rem;font-weight:800;color:#1a0e35">52d</div>
+              <div style="font-size:.68rem;color:#6b7a8d">DOH — días de inventario</div>
+              <div style="font-size:.65rem;color:#22c55e;margin-top:.2rem">Target: 45–60d ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /section-dashboard -->
+
+    <!-- ── TRAZABILIDAD ── -->
+    <div class="section-iframe" id="section-trazabilidad">
+      <iframe src="/biovett-trazabilidad?embed=1" id="iframe-trazabilidad" loading="lazy"></iframe>
+    </div>
+
+    <!-- ── REGISTROS ── -->
+    <div class="section-iframe" id="section-registros">
+      <iframe src="/biovett-registros?embed=1" id="iframe-registros" loading="lazy"></iframe>
+    </div>
+
+    <!-- ── AUTOMATIZACIONES ── -->
+    <div class="section" id="section-automatizaciones">
+      <div style="max-width:780px">
+        <div class="dash-greeting">
+          <h1>Automatizaciones activas</h1>
+          <p>Flujos configurados que operan sin intervención manual · 5 activos, 1 en configuración.</p>
+        </div>
+        <div class="auto-row active-auto">
+          <div class="auto-icon">🔔</div>
+          <div class="auto-info">
+            <div class="auto-name">Alerta de vencimiento CUC</div>
+            <div class="auto-desc">Notificación automática a Dirección Técnica y Regulatorio 90, 60 y 30 días antes del vencimiento. Genera borrador de inicio de trámite.</div>
+            <div class="auto-last">Última ejecución: hace 2 días · Próxima: Equifort Plus en 14 días</div>
+          </div>
+          <span class="auto-badge on">ACTIVO</span>
+        </div>
+        <div class="auto-row active-auto">
+          <div class="auto-icon">🌡️</div>
+          <div class="auto-info">
+            <div class="auto-name">Monitoreo de cadena de frío</div>
+            <div class="auto-desc">Lectura cada 5 minutos. Alerta inmediata por SMS y email si temperatura supera umbral. Registra excursiones en bitácora automática.</div>
+            <div class="auto-last">Última alerta: Cámara B a 7.8°C · hace 3 horas · notificó a 4 contactos</div>
+          </div>
+          <span class="auto-badge on">ACTIVO</span>
+        </div>
+        <div class="auto-row active-auto">
+          <div class="auto-icon">✅</div>
+          <div class="auto-info">
+            <div class="auto-name">Notificación de lote liberado</div>
+            <div class="auto-desc">Al aprobar un lote en el sistema, notifica a Logística y Ventas con cantidad disponible y fecha de vencimiento del producto.</div>
+            <div class="auto-last">Última ejecución: Antipar Bov 500ml · hoy a las 09:14 · 2.400 unidades</div>
+          </div>
+          <span class="auto-badge on">ACTIVO</span>
+        </div>
+        <div class="auto-row active-auto">
+          <div class="auto-icon">📊</div>
+          <div class="auto-info">
+            <div class="auto-name">Reporte operativo semanal</div>
+            <div class="auto-desc">Genera y envía resumen de producción, lotes, KPIs de calidad y alertas regulatorias todos los lunes a las 08:00 a dirección.</div>
+            <div class="auto-last">Último envío: lunes 2-jun · Próximo: lunes 9-jun 08:00</div>
+          </div>
+          <span class="auto-badge on">ACTIVO</span>
+        </div>
+        <div class="auto-row active-auto">
+          <div class="auto-icon">📋</div>
+          <div class="auto-info">
+            <div class="auto-name">APR — Annual Product Review</div>
+            <div class="auto-desc">Consolida automáticamente datos de lotes, desviaciones, reclamaciones y OOS del año para cada producto. Genera borrador del informe SENASA.</div>
+            <div class="auto-last">Próxima generación: 31-dic-2025 · 34 productos incluidos</div>
+          </div>
+          <span class="auto-badge on">ACTIVO</span>
+        </div>
+        <div class="auto-row config-auto">
+          <div class="auto-icon">📱</div>
+          <div class="auto-info">
+            <div class="auto-name">Receta electrónica — Res. 80/2025</div>
+            <div class="auto-desc">Procesamiento automático de recetas digitales SENASA. Validación, registro y vinculación con despacho. Elimina el proceso manual actual.</div>
+            <div class="auto-last">Estado: integrando con sistema SENASA · estimado: 2 semanas</div>
+          </div>
+          <span class="auto-badge cfg">EN CONFIGURACIÓN</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTES ── -->
+    <div class="section" id="section-reportes">
+      <div style="max-width:900px">
+        <div class="dash-greeting">
+          <h1>Reportes</h1>
+          <p>Reportes automáticos generados por el sistema · descargables en PDF.</p>
+        </div>
+        <div class="report-grid">
+          <div class="report-card">
+            <div class="report-icon">🏭</div>
+            <div class="report-title">Reporte de producción mensual</div>
+            <div class="report-desc">Lotes procesados, RFT, OEE por línea, ciclo de liberación promedio, tendencias y comparativo vs período anterior.</div>
+            <div class="report-meta">
+              <span class="report-date">Generado: 1-jun-2025</span>
+              <button class="report-btn">Ver reporte →</button>
+            </div>
+          </div>
+          <div class="report-card">
+            <div class="report-icon">🛡️</div>
+            <div class="report-title">Estado regulatorio SENASA</div>
+            <div class="report-desc">CUC vigentes, vencidos, en trámite. Desviaciones y CAPAs abiertas. Estado BPM. Alertas para los próximos 90 días.</div>
+            <div class="report-meta">
+              <span class="report-date">Generado: 5-jun-2025</span>
+              <button class="report-btn">Ver reporte →</button>
+            </div>
+          </div>
+          <div class="report-card">
+            <div class="report-icon">🌡️</div>
+            <div class="report-title">Cadena de frío — junio</div>
+            <div class="report-desc">Registro de temperaturas por cámara, excursiones del período, tiempo de recuperación y cumplimiento de rangos por producto.</div>
+            <div class="report-meta">
+              <span class="report-date">Generado: 5-jun-2025</span>
+              <button class="report-btn">Ver reporte →</button>
+            </div>
+          </div>
+          <div class="report-card">
+            <div class="report-icon">📦</div>
+            <div class="report-title">Despachos y OTIF comercial</div>
+            <div class="report-desc">Unidades despachadas por especie y producto, OTIF por cliente, fill rate, días de inventario (DOH) y tendencia de ventas.</div>
+            <div class="report-meta">
+              <span class="report-date">Generado: 3-jun-2025</span>
+              <button class="report-btn">Ver reporte →</button>
+            </div>
+          </div>
+          <div class="report-card">
+            <div class="report-icon">⚠️</div>
+            <div class="report-title">Desviaciones y CAPAs</div>
+            <div class="report-desc">Desviaciones por criticidad (crítica/mayor/menor), CAPAs abiertas y cerradas, tasa de recurrencia y efectividad de acciones correctivas.</div>
+            <div class="report-meta">
+              <span class="report-date">Generado: 1-jun-2025</span>
+              <button class="report-btn">Ver reporte →</button>
+            </div>
+          </div>
+          <div class="report-card">
+            <div class="report-icon">💰</div>
+            <div class="report-title">Finanzas operativas</div>
+            <div class="report-desc">Costo por lote, costo por unidad liberada, margen bruto por línea de producto, impacto financiero de rechazos y retrabajo.</div>
+            <div class="report-meta">
+              <span class="report-date">Generado: 2-jun-2025</span>
+              <button class="report-btn" onclick="openReportModal()">Ver reporte →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ── MODAL ESTADO DE RESULTADOS ── -->
+<div class="report-modal-overlay" id="modal-finanzas" onclick="closeReportModal(event)">
+  <div class="report-modal-box">
+    <div class="rm-header">
+      <div class="rm-header-left">
+        <span class="rm-co">Biovett SA · Informe financiero</span>
+        <span class="rm-title">Estado de Resultados — Finanzas operativas</span>
+        <span class="rm-period">Período: Junio 2025 · Comparativo vs Mayo 2025 · Cifras en USD miles</span>
+      </div>
+      <button class="rm-close" onclick="closeReportModal()">✕</button>
+    </div>
+    <div class="rm-body">
+      <table class="pnl-table">
+        <thead>
+          <tr>
+            <th style="width:52%">Concepto</th>
+            <th>Jun-25</th>
+            <th>May-25</th>
+            <th>Var.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="pnl-row-section"><td colspan="4">Ingresos por ventas</td></tr>
+          <tr class="pnl-row-sub"><td>Vacunas bovinas</td><td>$1.840</td><td>$1.720</td><td class="var-pos">+7.0%</td></tr>
+          <tr class="pnl-row-sub"><td>Antiparasitarios</td><td>$980</td><td>$950</td><td class="var-pos">+3.2%</td></tr>
+          <tr class="pnl-row-sub"><td>Antibióticos veterinarios</td><td>$620</td><td>$590</td><td class="var-pos">+5.1%</td></tr>
+          <tr class="pnl-row-sub"><td>Otros productos</td><td>$180</td><td>$175</td><td class="var-pos">+2.9%</td></tr>
+          <tr class="pnl-row-total"><td>Total ingresos</td><td>$3.620</td><td>$3.435</td><td class="var-pos">+5.4%</td></tr>
+
+          <tr class="pnl-row-section"><td colspan="4">Costo de ventas</td></tr>
+          <tr class="pnl-row-sub"><td>Materias primas</td><td>($1.052)</td><td>($995)</td><td class="var-neg">+5.7%</td></tr>
+          <tr class="pnl-row-sub"><td>Mano de obra directa</td><td>($386)</td><td>($376)</td><td class="var-neg">+2.7%</td></tr>
+          <tr class="pnl-row-sub"><td>Costos de manufactura</td><td>($274)</td><td>($270)</td><td class="var-neg">+1.5%</td></tr>
+          <tr class="pnl-row-sub"><td>Rechazos y reprocesos</td><td>($42)</td><td>($52)</td><td class="var-pos">−19.2%</td></tr>
+          <tr class="pnl-row-total"><td>Total costo de ventas</td><td>($1.754)</td><td>($1.693)</td><td class="var-neg">+3.6%</td></tr>
+
+          <tr class="pnl-row-highlight"><td>Utilidad bruta</td><td>$1.866</td><td>$1.742</td><td class="var-pos">+7.1%</td></tr>
+          <tr class="pnl-row-margin"><td>Margen bruto</td><td>51.5%</td><td>50.7%</td><td class="var-pos">+0.8pp</td></tr>
+
+          <tr class="pnl-row-section"><td colspan="4">Gastos operativos</td></tr>
+          <tr class="pnl-row-sub"><td>Regulatorio y calidad</td><td>($196)</td><td>($191)</td><td class="var-neg">+2.6%</td></tr>
+          <tr class="pnl-row-sub"><td>Logística y distribución</td><td>($218)</td><td>($207)</td><td class="var-neg">+5.3%</td></tr>
+          <tr class="pnl-row-sub"><td>Comercial</td><td>($182)</td><td>($177)</td><td class="var-neg">+2.8%</td></tr>
+          <tr class="pnl-row-sub"><td>Administración general</td><td>($148)</td><td>($148)</td><td class="var-neu">0.0%</td></tr>
+          <tr class="pnl-row-total"><td>Total gastos operativos</td><td>($744)</td><td>($723)</td><td class="var-neg">+2.9%</td></tr>
+
+          <tr class="pnl-row-highlight"><td>EBITDA</td><td>$1.122</td><td>$1.019</td><td class="var-pos">+10.1%</td></tr>
+          <tr class="pnl-row-margin"><td>Margen EBITDA</td><td>31.0%</td><td>29.7%</td><td class="var-pos">+1.3pp</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rm-footer">
+      <span class="rm-footer-note">Generado automáticamente · 2-jun-2025 · Fuente: ERP + datos de producción</span>
+      <button class="rm-dl-btn">↓ Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CHAT FLOTANTE ── -->
+<button class="chat-fab" onclick="toggleChat()" id="chat-fab" aria-label="Asistente IA">
+  🤖<span class="badge-dot"></span>
+</button>
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-panel-header">
+    <div class="chat-panel-avatar">🤖</div>
+    <div class="chat-panel-title">
+      <strong>Asistente Biovett IA</strong>
+      <span>Powered by Claude · online</span>
+    </div>
+    <button class="chat-panel-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-quick">
+    <button class="quick-btn" onclick="sendQuick('¿Cuáles son mis CUC que vencen en los próximos 90 días?')">CUC vencimientos</button>
+    <button class="quick-btn" onclick="sendQuick('Estado del lote BV-2025-0847')">Lote 0847</button>
+    <button class="quick-btn" onclick="sendQuick('¿Cómo impacta la Res. 80/2025 de SENASA en nuestra operación?')">Res. 80/2025</button>
+    <button class="quick-btn" onclick="sendQuick('Resumen ejecutivo operativo de junio')">Resumen jun</button>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input-area">
+    <div class="chat-input-row">
+      <textarea id="chat-input" placeholder="Preguntá sobre lotes, CUC, regulaciones…" rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+      <button class="chat-send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ESTADO ──────────────────────────────────────────────────
+let chatHistory = [];
+let isThinking = false;
+let chatOpened = false;
+
+const SYSTEM_PROMPT = `Sos el asistente de IA interno de Biovett SA, un laboratorio farmacológico veterinario argentino con sede en Buenos Aires y 200 empleados.
+
+Contexto de la empresa:
+- Portfolio: 34 productos registrados (vacunas, antiparasitarios, antibióticos veterinarios para bovinos, caninos, equinos y porcinos)
+- Plantas: Pilar (producción principal) y Rosario (línea de inyectables)
+- Regulatorio: 34 CUC vigentes ante SENASA, certificación BPM vigente (SENASA Res. 416/2024)
+- Situación regulatoria actual: 1 CUC vencida (Bovitick Max 1L, venció 3-jun-2025), 3 por vencer en menos de 90 días (Canivac Triple sep-25, Equifort Plus ago-25, Porciplex B ago-25), 5 en trámite
+- Producción últimos 30 días: 47 lotes procesados, 44 aprobados, 2 en cuarentena, 1 rechazado
+- Cadena de frío: 4 cámaras — A (4.2°C OK), B (7.8°C en límite), C (-18.5°C OK), D (22.3°C OK)
+- Lote BV-2025-0847: Canivac Triple 5ml · en cuarentena desde 5-jun · pendiente liberación por control microbiológico
+- Lote BV-2025-0851: Antipar Bov 500ml · liberado hoy · 2.400 unidades listas para despacho
+- Mix comercial: Bovinos 45%, Caninos 28%, Equinos 15%, Porcinos 12% · 128.400 unidades despachadas en junio
+
+Marco regulatorio SENASA relevante:
+- CUC (Certificado de Uso y Comercialización): registro por producto, validez 10 años, renovación 6 meses antes del vencimiento
+- BPM: Buenas Prácticas de Manufactura, auditoría cada 2 años
+- Res. 80/2025: implementación de receta electrónica digital para productos de venta bajo receta
+- Res. 11/2025 y 416/2024: actualizaciones de procedimientos de registro y habilitación
+
+Para renovar un CUC necesitás: formulario SENASA F-SENASA-DRPA-001, certificado de análisis del lote vigente, protocolo de fabricación actualizado, declaración BPM vigente, pago de arancel (varía por categoría de producto).
+
+Respondé siempre en español neutro, de forma concisa y profesional. Podés usar listas cuando ayude a la claridad. Si te preguntan algo que no sabés con certeza, aclaralo.`;
+
+// ── NAVEGACIÓN ───────────────────────────────────────────────
+const sectionMeta = {
+  dashboard:        { title: 'Dashboard general',              meta: 'Resumen operativo · Jun 2025' },
+  trazabilidad:     { title: 'Trazabilidad de lotes',          meta: 'Sistema de seguimiento de producción' },
+  registros:        { title: 'Registros SENASA',               meta: '3 alertas activas' },
+  automatizaciones: { title: 'Automatizaciones',               meta: '5 flujos activos · 1 en configuración' },
+  reportes:         { title: 'Reportes ejecutivos',            meta: '6 reportes disponibles' },
+};
+
+function openReportModal() {
+  document.getElementById('modal-finanzas').classList.add('open');
+}
+function closeReportModal(e) {
+  if (!e || e.target === document.getElementById('modal-finanzas')) {
+    document.getElementById('modal-finanzas').classList.remove('open');
+  }
+}
+
+function showSection(name) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+  document.querySelectorAll('.section, .section-iframe').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('section-' + name);
+  if (target) target.classList.add('active');
+
+  const m = sectionMeta[name] || {};
+  document.getElementById('topbar-title').textContent = m.title || name;
+  document.getElementById('topbar-meta').textContent  = m.meta  || '';
+}
+
+// ── CHAT FLOTANTE ─────────────────────────────────────────────
+function toggleChat() {
+  const panel = document.getElementById('chat-panel');
+  const isOpen = panel.classList.toggle('open');
+  if (isOpen && !chatOpened) {
+    chatOpened = true;
+    addWelcomeMessage();
+  }
+  if (isOpen) {
+    setTimeout(() => document.getElementById('chat-input').focus(), 300);
+  }
+}
+
+// ── CHAT ─────────────────────────────────────────────────────
+function addWelcomeMessage() {
+  appendMsg('ai', '¡Hola! Soy el asistente de Biovett. Puedo ayudarte con información sobre lotes, registros SENASA, vencimientos de CUC, cadena de frío y cualquier consulta operativa del laboratorio. ¿En qué te ayudo hoy?');
+}
+
+function appendMsg(role, text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar ' + role;
+  avatar.textContent = role === 'ai' ? '🤖' : 'FS';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^(.*)$/, '<p>$1</p>');
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-indicator';
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar ai';
+  avatar.textContent = '🤖';
+  const typing = document.createElement('div');
+  typing.className = 'typing-dot';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  div.appendChild(avatar);
+  div.appendChild(typing);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function sendQuick(text) {
+  const panel = document.getElementById('chat-panel');
+  if (!panel.classList.contains('open')) {
+    panel.classList.add('open');
+    if (!chatOpened) {
+      chatOpened = true;
+      addWelcomeMessage();
+    }
+  }
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+async function sendMessage() {
+  if (isThinking) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  appendMsg('user', text);
+
+  chatHistory.push({ role: 'user', content: text });
+  isThinking = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory, system: SYSTEM_PROMPT })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Error ' + res.status);
+    }
+
+    const data = await res.json();
+    const reply = data.content[0].text;
+    chatHistory.push({ role: 'assistant', content: reply });
+    removeTyping();
+    appendMsg('ai', reply);
+  } catch(e) {
+    removeTyping();
+    appendMsg('ai', `⚠️ Error al conectar con el asistente: ${e.message}`);
+  } finally {
+    isThinking = false;
+    document.getElementById('send-btn').disabled = false;
+    input.focus();
+  }
+}
+
+// auto-resize textarea
+document.getElementById('chat-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+</script>
+</body>
+</html>

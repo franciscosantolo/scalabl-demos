@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trazabilidad de Lote — Demo Biovett · Scalabl®</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #F7F5FC; color: #1a2332; }
+
+  /* HEADER */
+  .header { background: #6B3FA0; color: white; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .header-logo { font-size: .85rem; opacity: .7; }
+  .header h1 { font-size: 1.1rem; font-weight: 600; }
+  .header-badge { background: #D4177A; color: white; font-size: .72rem; font-weight: 700; padding: .3rem .7rem; border-radius: 20px; letter-spacing: .5px; }
+
+  /* SEARCH BAR */
+  .search-bar { background: white; border-bottom: 1px solid #E5D9F5; padding: 1rem 2rem; display: flex; gap: 1rem; align-items: center; }
+  .search-bar input { flex: 1; padding: .6rem 1rem; border: 1.5px solid #DDD0EE; border-radius: 8px; font-size: .9rem; outline: none; }
+  .search-bar input:focus { border-color: #6B3FA0; }
+  .btn { padding: .6rem 1.2rem; border-radius: 8px; border: none; font-size: .88rem; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #6B3FA0; color: white; }
+  .btn-secondary { background: #F0E8F8; color: #6B3FA0; }
+
+  /* LOTE HEADER CARD */
+  .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem 2rem; }
+  .lot-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(107,63,160,.08); margin-bottom: 1.5rem; display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; }
+  .lot-id { font-size: 1.4rem; font-weight: 700; color: #6B3FA0; letter-spacing: .5px; }
+  .lot-product { font-size: 1rem; color: #4a5568; margin-top: .2rem; }
+  .lot-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: .8rem; }
+  .meta-item { font-size: .82rem; }
+  .meta-item span { color: #6b7a8d; display: block; margin-bottom: .1rem; }
+  .meta-item strong { color: #1a2332; }
+  .status-badge { padding: .35rem .9rem; border-radius: 20px; font-size: .78rem; font-weight: 700; letter-spacing: .4px; display: inline-block; }
+  .status-ok { background: #E6F4EA; color: #2E7D32; }
+  .status-warn { background: #FFF8E1; color: #F57F17; }
+  .status-dist { background: #F0E8F8; color: #6B3FA0; }
+  .status-err { background: #FDECEA; color: #C62828; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card { background: white; border-radius: 10px; padding: 1rem 1.2rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .stat-num { font-size: 1.6rem; font-weight: 700; color: #6B3FA0; }
+  .stat-label { font-size: .78rem; color: #6b7a8d; margin-top: .2rem; }
+  .stat-card.green .stat-num { color: #2E7D32; }
+  .stat-card.amber .stat-num { color: #F57F17; }
+
+  /* TIMELINE */
+  .section-title { font-size: .78rem; font-weight: 700; color: #6b7a8d; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem; }
+  .timeline { position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 28px; top: 0; bottom: 0; width: 2px; background: #E5D9F5; }
+  .step { display: flex; gap: 1rem; margin-bottom: 1rem; position: relative; }
+  .step-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; z-index: 1; position: relative; }
+  .step-icon.ok { background: #E6F4EA; }
+  .step-icon.warn { background: #FFF8E1; }
+  .step-icon.dist { background: #F0E8F8; }
+  .step-body { flex: 1; background: white; border-radius: 10px; padding: 1rem 1.2rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .step-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: .5rem; }
+  .step-title { font-weight: 700; font-size: .95rem; color: #1a2332; }
+  .step-date { font-size: .78rem; color: #6b7a8d; }
+  .step-detail { font-size: .82rem; color: #4a5568; margin-top: .5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .step-detail-item span { color: #6b7a8d; display: block; font-size: .75rem; }
+  .step-tags { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+  .tag { font-size: .72rem; padding: .2rem .6rem; border-radius: 4px; font-weight: 600; }
+  .tag-ok { background: #E6F4EA; color: #2E7D32; }
+  .tag-warn { background: #FFF8E1; color: #F57F17; }
+  .tag-info { background: #F0E8F8; color: #6B3FA0; }
+
+  /* DISTRIBUTION TABLE */
+  .dist-card { background: white; border-radius: 12px; padding: 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(107,63,160,.08); margin-top: 1.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  th { text-align: left; padding: .6rem .8rem; color: #6b7a8d; font-size: .75rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; border-bottom: 2px solid #E5D9F5; }
+  td { padding: .7rem .8rem; border-bottom: 1px solid #F0F4F8; color: #1a2332; }
+  tr:last-child td { border-bottom: none; }
+  .alert-row td { background: #FDECEA; }
+
+  /* ALERT BANNER */
+  .alert-banner { background: #FFF3E0; border: 1px solid #FFB74D; border-radius: 8px; padding: .8rem 1rem; font-size: .83rem; color: #E65100; margin-top: 1rem; display: flex; align-items: center; gap: .6rem; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 2rem; font-size: .75rem; color: #8899AA; margin-top: 2rem; }
+
+  /* CHEVRON EXPANDIBLE */
+  .step-chevron { font-size: .75rem; color: #6b7a8d; margin-left: auto; padding-left: .8rem; cursor: pointer; transition: transform .3s ease; display: inline-block; user-select: none; }
+  .step-chevron.abierto { transform: rotate(180deg); }
+  .step-header { cursor: pointer; }
+
+  /* STEP EXPANDIDO */
+  .step-expandido { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+  .step-expandido.abierto { max-height: 320px; }
+  .step-expand-inner { border-top: 1px solid #E5D9F5; margin-top: .8rem; padding-top: .8rem; }
+  .expand-docs { display: flex; flex-direction: column; gap: .4rem; margin-bottom: .7rem; }
+  .expand-doc { font-size: .8rem; color: #4a5568; display: flex; align-items: center; gap: .4rem; }
+  .expand-doc a { color: #6B3FA0; text-decoration: none; font-size: .78rem; }
+  .expand-doc a:hover { text-decoration: underline; }
+  .expand-firma { font-size: .78rem; color: #6b7a8d; margin-bottom: .4rem; }
+  .expand-hash { font-size: .72rem; color: #9aa5b4; font-family: monospace; background: #F7F5FC; padding: .2rem .5rem; border-radius: 4px; display: inline-block; }
+
+  /* PANEL ALERTA */
+  .alert-banner { background: #FFF3E0; border: 1px solid #FFB74D; border-radius: 8px; padding: .8rem 1rem; font-size: .83rem; color: #E65100; margin-top: 1rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+  .btn-gestionar { margin-left: auto; background: #E65100; color: white; border: none; padding: .4rem .9rem; border-radius: 6px; font-size: .8rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .btn-gestionar:hover { background: #BF360C; }
+  .panel-alerta { background: white; border: 1.5px solid #FFB74D; border-radius: 10px; padding: 1.2rem 1.4rem; margin-top: .6rem; display: none; }
+  .panel-alerta.visible { display: block; }
+  .panel-alerta h4 { font-size: .82rem; font-weight: 700; color: #E65100; margin-bottom: .8rem; }
+  .mini-tabla { width: 100%; font-size: .8rem; border-collapse: collapse; margin-bottom: 1rem; }
+  .mini-tabla th { text-align: left; padding: .4rem .6rem; color: #6b7a8d; font-size: .72rem; border-bottom: 1px solid #E5D9F5; }
+  .mini-tabla td { padding: .45rem .6rem; border-bottom: 1px solid #F0F4F8; }
+  .mini-tabla tr:last-child td { border-bottom: none; }
+  .temp-alerta { color: #E65100; font-weight: 700; }
+  .panel-alerta label { font-size: .8rem; font-weight: 600; color: #1a2332; display: block; margin-bottom: .4rem; }
+  .panel-alerta textarea { width: 100%; border: 1.5px solid #DDD0EE; border-radius: 6px; padding: .5rem .7rem; font-size: .82rem; resize: vertical; min-height: 70px; outline: none; font-family: inherit; }
+  .panel-alerta textarea:focus { border-color: #6B3FA0; }
+  .panel-acciones { display: flex; gap: .8rem; margin-top: .9rem; flex-wrap: wrap; }
+  .btn-liberar { background: #2E7D32; color: white; border: none; padding: .5rem 1rem; border-radius: 7px; font-size: .82rem; font-weight: 700; cursor: pointer; }
+  .btn-liberar:hover { background: #1B5E20; }
+  .btn-cuarentena { background: #C62828; color: white; border: none; padding: .5rem 1rem; border-radius: 7px; font-size: .82rem; font-weight: 700; cursor: pointer; }
+  .btn-cuarentena:hover { background: #7F0000; }
+  .panel-confirmacion { font-size: .84rem; font-weight: 600; color: #2E7D32; margin-top: .6rem; display: none; }
+
+  /* BOTÓN EXPORTAR */
+  .btn-exportar { background: white; border: 1.5px solid #6B3FA0; color: #6B3FA0; padding: .5rem 1.1rem; border-radius: 8px; font-size: .83rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: .5rem; }
+  .btn-exportar:hover { background: #F0E8F8; }
+
+  /* TOAST */
+  .toast { position: fixed; top: 1.2rem; right: 1.5rem; background: #1a2332; color: white; padding: .75rem 1.2rem; border-radius: 10px; font-size: .84rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,.18); z-index: 9999; display: flex; align-items: center; gap: .6rem; opacity: 0; transform: translateY(-12px); transition: opacity .3s ease, transform .3s ease; pointer-events: none; }
+  .toast.visible { opacity: 1; transform: translateY(0); }
+
+  /* BOTÓN VOLVER */
+  .btn-volver { background: #F0E8F8; color: #6B3FA0; border: none; padding: .5rem 1rem; border-radius: 7px; font-size: .83rem; font-weight: 600; cursor: pointer; display: none; }
+  .btn-volver.visible { display: inline-block; }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .lot-meta { gap: 1rem; }
+    .step-detail { gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+<script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
+<style>.embedded .header{display:none!important}</style>
+
+<div class="header">
+  <div>
+    <div class="header-logo">Scalabl® · Plataforma Biovett</div>
+    <h1>Sistema de Trazabilidad de Lotes</h1>
+  </div>
+  <span class="header-badge">🔬 SENASA-READY</span>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="lote-input" value="IVE-2026-0312" placeholder="Buscar número de lote...">
+  <button class="btn btn-primary" onclick="buscar()">🔍 Consultar</button>
+  <button class="btn btn-secondary" onclick="probarOtroLote()">Probar otro lote</button>
+  <button class="btn-volver" id="btn-volver" onclick="volverAIVE()">← Volver al lote IVE</button>
+  <button class="btn-exportar" onclick="exportarPDF(this)">⬇ Exportar historial PDF</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div class="container" id="resultado">
+
+<!-- ========== LOTE IVE ========== -->
+<div id="lote-ive">
+
+  <!-- LOT HEADER -->
+  <div class="lot-card">
+    <div>
+      <div class="lot-id">Lote IVE-2026-0312</div>
+      <div class="lot-product">Ivermectina 1% Inyectable · Frasco 500 ml</div>
+      <div class="lot-meta">
+        <div class="meta-item"><span>Registro SENASA</span><strong>SENASA-P-0043821</strong></div>
+        <div class="meta-item"><span>Forma farmacéutica</span><strong>Solución inyectable</strong></div>
+        <div class="meta-item"><span>Principio activo</span><strong>Ivermectina 10 mg/ml</strong></div>
+        <div class="meta-item"><span>Tamaño de lote</span><strong>5.000 unidades</strong></div>
+        <div class="meta-item"><span>Fecha de vencimiento</span><strong>Enero 2029</strong></div>
+        <div class="meta-item"><span>Director Técnico</span><strong>Dr. Gustavo Marchetti</strong></div>
+      </div>
+    </div>
+    <div style="margin-left:auto">
+      <span class="status-badge status-dist">🚚 En distribución</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num">9/9</div><div class="stat-label">Etapas completadas</div></div>
+    <div class="stat-card green"><div class="stat-num">5.000</div><div class="stat-label">Unidades fabricadas</div></div>
+    <div class="stat-card green"><div class="stat-num">98,4%</div><div class="stat-label">Rendimiento de lote</div></div>
+    <div class="stat-card amber"><div class="stat-num">1</div><div class="stat-label">Alerta activa en distribución</div></div>
+    <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">Distribuidores habilitados</div></div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="section-title">Historial completo del lote</div>
+  <div class="timeline">
+
+    <!-- PASO 1 -->
+    <div class="step">
+      <div class="step-icon ok">📦</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">1. Ingreso de Materias Primas</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">15 ene 2026 · 08:30 hs</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Principio activo</span>Ivermectina API · 52,5 kg</div>
+          <div class="step-detail-item"><span>Proveedor</span>Química Sigma S.A. · Remito 00043882</div>
+          <div class="step-detail-item"><span>Excipiente</span>Propilenglicol · 180 L · Glicerina · 40 L</div>
+          <div class="step-detail-item"><span>Responsable</span>Lic. Carla Benítez</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Certificado de análisis recibido</span>
+          <span class="tag tag-ok">✓ Cuarentena aplicada</span>
+          <span class="tag tag-info">Nro. interno MP: 2026-MP-0089</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Certificado de análisis Ivermectina API — Lote Sigma 2026-001 <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Remito de proveedor 00043882 — Química Sigma S.A. <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Registro de cuarentena MP 2026-MP-0089 <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Lic. Carla Benítez</strong> — 15/01/2026 08:47 hs</div>
+            <div class="expand-hash">SHA-256: a3f9c2d1e8b047f3c6a19e2d4b7c8f05a1d3e6b9c2f4a7d0e3b6c9f2a5d8e1b4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="step">
+      <div class="step-icon ok">🔬</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">2. Control de Calidad de Insumos (CCI)</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">16–18 ene 2026</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Identidad (IR)</span>Conforme ✓</div>
+          <div class="step-detail-item"><span>Potencia HPLC</span>99,8% · Especif. ≥98%</div>
+          <div class="step-detail-item"><span>Agua residual</span>0,3% · Especif. ≤0,5%</div>
+          <div class="step-detail-item"><span>Analista</span>Farm. Roberto Díaz</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Aprobado para manufactura</span>
+          <span class="tag tag-ok">✓ Levantamiento de cuarentena</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Informe CCI-IVE-2026-0312 — Análisis completo de insumos <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Cromatograma HPLC — Ivermectina API (Lote Sigma 2026-001) <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Acta de liberación de cuarentena MP-2026-MP-0089 <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Farm. Roberto Díaz</strong> — 18/01/2026 16:22 hs</div>
+            <div class="expand-hash">SHA-256: b7e4d1c9a2f6e3b8d0c5f2a9e6b3d0c7f4a1e8b5d2c9f6a3e0b7d4c1f8a5e2b9</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step">
+      <div class="step-icon ok">⚗️</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">3. Fabricación — Preparación de solución</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">22 ene 2026 · Turno mañana</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Orden de fabricación</span>OF-2026-0312</div>
+          <div class="step-detail-item"><span>Equipo</span>Tanque mezclador TQ-04 · 500 L</div>
+          <div class="step-detail-item"><span>Temperatura mezcla</span>22°C ± 2°C</div>
+          <div class="step-detail-item"><span>Operarios</span>J. Ramírez · P. Suárez</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Rendimiento: 98,2%</span>
+          <span class="tag tag-ok">✓ Sin desvíos de proceso</span>
+          <span class="tag tag-info">Volumen obtenido: 2.490 L</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Orden de fabricación OF-2026-0312 — firmada y ejecutada <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Registro de operaciones de mezclado — TQ-04 <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Planilla de control de temperatura durante proceso <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>J. Ramírez (Operario) · P. Suárez (Operario)</strong> — 22/01/2026 13:10 hs</div>
+            <div class="expand-hash">SHA-256: c9f2a5d8e1b4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2b5d8c1f4a7e0b3d6c9f2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="step">
+      <div class="step-icon ok">🧪</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">4. Control en Proceso (IPC)</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">22 ene 2026 · 14:00 hs</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>pH</span>6,8 · Especif. 6,5–7,2 ✓</div>
+          <div class="step-detail-item"><span>Claridad visual</span>Conforme — sin partículas ✓</div>
+          <div class="step-detail-item"><span>Color</span>Incoloro a levemente amarillo ✓</div>
+          <div class="step-detail-item"><span>Densidad</span>1,032 g/ml ✓</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Proceso liberado para acondicionamiento</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Planilla IPC-2026-0312 — controles en proceso completos <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Registro fotográfico de claridad visual <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Farm. Roberto Díaz (Analista IPC)</strong> — 22/01/2026 16:05 hs</div>
+            <div class="expand-hash">SHA-256: d2e5b8c1f4a7d0e3b6c9f2a5e8b1d4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2b5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 5 -->
+    <div class="step">
+      <div class="step-icon ok">🏭</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">5. Acondicionamiento — Envasado y etiquetado</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">24 ene 2026</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Línea</span>Línea 3 — Frascos PET 500 ml</div>
+          <div class="step-detail-item"><span>Unidades envasadas</span>5.000 frascos</div>
+          <div class="step-detail-item"><span>Lote impreso</span>IVE-2026-0312 ✓</div>
+          <div class="step-detail-item"><span>Vencimiento impreso</span>01/2029 ✓</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Control de cierre: 50/50 muestras conformes</span>
+          <span class="tag tag-ok">✓ Etiquetas verificadas por DT</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Orden de acondicionamiento OA-2026-0312 <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Control de muestras de cierre — 50 unidades verificadas <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Verificación de etiquetas — aprobación DT <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dr. Gustavo Marchetti (DT)</strong> — 24/01/2026 17:30 hs</div>
+            <div class="expand-hash">SHA-256: e8b1d4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2b5d8c1f4a7e0b3d6c9f2a5e8b1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 6 -->
+    <div class="step">
+      <div class="step-icon ok">✅</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">6. Control de Producto Terminado (CPT)</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">25–28 ene 2026</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Esterilidad</span>Conforme (Ph. Eur.) ✓</div>
+          <div class="step-detail-item"><span>Pirógenos</span>Negativo — LAL test ✓</div>
+          <div class="step-detail-item"><span>Potencia final HPLC</span>99,1% ✓</div>
+          <div class="step-detail-item"><span>Volumen nominal</span>500 ml ± 2% ✓</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Todas las especificaciones cumplidas</span>
+          <span class="tag tag-info">Informe CPT: IF-2026-0312-CPT</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Informe de CPT IF-2026-0312-CPT — análisis completo <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Resultado LAL test — pirógenos negativos <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Cromatograma HPLC — potencia final 99,1% <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Farm. Roberto Díaz (Analista CPT)</strong> — 28/01/2026 14:18 hs</div>
+            <div class="expand-hash">SHA-256: f4a7d0e3b6c9f2a5e8b1d4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2b5d8c1f4a7</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 7 -->
+    <div class="step">
+      <div class="step-icon ok">📋</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">7. Liberación de Lote</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">30 ene 2026 · 11:45 hs</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Director Técnico</span>Dr. Gustavo Marchetti (M.N. 18.432)</div>
+          <div class="step-detail-item"><span>Revisión de historia</span>Completa — sin desvíos sin cerrar</div>
+          <div class="step-detail-item"><span>Certificado de lote</span>CL-IVE-2026-0312</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ LOTE APROBADO — APTO PARA DISTRIBUCIÓN</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Certificado de lote CL-IVE-2026-0312 — firmado digitalmente <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Historia de manufactura revisada completa <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Resolución de liberación — DT Dr. Marchetti <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dr. Gustavo Marchetti (Director Técnico, M.N. 18.432)</strong> — 30/01/2026 11:45 hs</div>
+            <div class="expand-hash">SHA-256: a1e4b7d0c3f6a9e2b5d8c1f4a7e0b3d6c9f2a5e8b1d4c7f0a3e6b9d2c5f8a1e4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 8 -->
+    <div class="step">
+      <div class="step-icon ok">🏪</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">8. Almacenamiento</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">30 ene 2026</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Depósito</span>Sector B — Temperatura ambiente</div>
+          <div class="step-detail-item"><span>Condición</span>15–25°C · Humedad &lt;65%</div>
+          <div class="step-detail-item"><span>Sensor</span>TH-B04 — Monitoreo continuo</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ 47 días en almacenamiento sin desvíos</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Registro de temperatura — Sector B, sensor TH-B04 (30 días) <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Registro de humedad — Sector B (30 días) <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Lic. Carla Benítez (Almacenamiento)</strong> — Registro continuo desde 30/01/2026</div>
+            <div class="expand-hash">SHA-256: b7d4c1f8a5e2b9d6c3f0a7e4b1d8c5f2a9e6b3d0c7f4a1e8b5d2c9f6a3e0b7d4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 9 -->
+    <div class="step">
+      <div class="step-icon dist">🚚</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">9. Distribución — En curso</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">Desde 3 feb 2026</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Unidades despachadas</span>4.200 de 5.000</div>
+          <div class="step-detail-item"><span>Unidades en stock</span>800</div>
+          <div class="step-detail-item"><span>Destinos</span>3 distribuidores · 12 veterinarias directas</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-warn">⚠ 1 alerta de temperatura — Distribuidor Norte</span>
+          <span class="tag tag-ok">✓ Remitos con QR trazable</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Plan de distribución aprobado — DT y Dirección Comercial <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Listado de remitos generados con QR (R-2026-088xx) <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Alerta TH-C12 — Reporte sensor Distribuidora Norpatagónica <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dr. Gustavo Marchetti (DT — plan de distribución)</strong> — 03/02/2026 09:00 hs</div>
+            <div class="expand-hash">SHA-256: c5f8a1e4b7d0c3f6a9e2b5d8c1f4a7e0b3d6c9f2a5e8b1d4c7f0a3e6b9d2c5f8</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end timeline -->
+
+  <!-- ALERT -->
+  <div class="alert-banner">
+    <span>⚠️ <strong>Alerta activa:</strong> Distribuidora Norpatagónica S.A. reportó temperatura de 27°C durante 4 horas el 12/02/2026 (sensor TH-C12). Unidades afectadas: 120 frascos. Estado: en evaluación por DT.</span>
+    <button class="btn-gestionar" onclick="togglePanelAlerta()">Gestionar alerta →</button>
+  </div>
+  <div class="panel-alerta" id="panel-alerta">
+    <h4>📋 Gestión de alerta de temperatura — TH-C12</h4>
+    <table class="mini-tabla">
+      <thead>
+        <tr><th>Fecha</th><th>Temperatura registrada</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>10/02/2026</td><td>24°C</td><td style="color:#2E7D32;">Conforme</td></tr>
+        <tr><td>11/02/2026</td><td>25°C</td><td style="color:#2E7D32;">Conforme</td></tr>
+        <tr><td>12/02/2026</td><td class="temp-alerta">27°C ⚠</td><td class="temp-alerta">Excede límite</td></tr>
+      </tbody>
+    </table>
+    <label for="eval-dt">Evaluación del Director Técnico:</label>
+    <textarea id="eval-dt" placeholder="Ingrese aquí la evaluación técnica del desvío de temperatura y criterio de disposición de las unidades afectadas..."></textarea>
+    <div class="panel-acciones">
+      <button class="btn-liberar" onclick="resolverAlerta('conforme')">✓ Unidades conformes — liberar</button>
+      <button class="btn-cuarentena" onclick="resolverAlerta('cuarentena')">⚠ Iniciar cuarentena de unidades</button>
+    </div>
+    <div class="panel-confirmacion" id="panel-confirmacion"></div>
+  </div>
+
+  <!-- DISTRIBUTION TABLE -->
+  <div class="dist-card" style="margin-top:1.5rem">
+    <div class="section-title" style="margin-bottom:.8rem">Trazabilidad de distribución</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Destinatario</th>
+          <th>Tipo</th>
+          <th>Remito</th>
+          <th>Fecha</th>
+          <th>Unidades</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Distribuidora Agroveter S.A.</strong><br><small style="color:#6b7a8d">Buenos Aires · Hab. SENASA 00-2341</small></td>
+          <td>Distribuidor</td>
+          <td>R-2026-08821</td>
+          <td>03/02/2026</td>
+          <td>2.000</td>
+          <td><span class="status-badge status-ok">Conforme</span></td>
+        </tr>
+        <tr>
+          <td><strong>VetFarm Distribuciones SRL</strong><br><small style="color:#6b7a8d">Córdoba · Hab. SENASA 00-1887</small></td>
+          <td>Distribuidor</td>
+          <td>R-2026-08829</td>
+          <td>05/02/2026</td>
+          <td>1.500</td>
+          <td><span class="status-badge status-ok">Conforme</span></td>
+        </tr>
+        <tr class="alert-row">
+          <td><strong>Distribuidora Norpatagónica S.A.</strong><br><small style="color:#6b7a8d">Neuquén · Hab. SENASA 00-2102</small></td>
+          <td>Distribuidor</td>
+          <td>R-2026-08844</td>
+          <td>07/02/2026</td>
+          <td>700</td>
+          <td><span class="status-badge status-err">⚠ Alerta temp.</span></td>
+        </tr>
+        <tr>
+          <td><strong>Veterinaria El Campo</strong><br><small style="color:#6b7a8d">Azul, Buenos Aires</small></td>
+          <td>Veterinaria</td>
+          <td>R-2026-09011</td>
+          <td>10/02/2026</td>
+          <td>—</td>
+          <td><span class="status-badge status-ok">Conforme</span></td>
+        </tr>
+        <tr>
+          <td><strong>Otras veterinarias (11)</strong><br><small style="color:#6b7a8d">Múltiples provincias</small></td>
+          <td>Veterinaria</td>
+          <td>—</td>
+          <td>Feb 2026</td>
+          <td>—</td>
+          <td><span class="status-badge status-ok">Conformes</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- fin #lote-ive -->
+
+<!-- ========== LOTE VAC ========== -->
+<div id="lote-vac" style="display:none;">
+
+  <!-- LOT HEADER -->
+  <div class="lot-card">
+    <div>
+      <div class="lot-id">Lote VAC-2026-0088</div>
+      <div class="lot-product">Vacuna Clostridiosis Polivalente (tipo C-D) · Frasco 50 ml · 10 dosis</div>
+      <div class="lot-meta">
+        <div class="meta-item"><span>Registro SENASA</span><strong>SENASA-B-0021441</strong></div>
+        <div class="meta-item"><span>Forma farmacéutica</span><strong>Suspensión inyectable</strong></div>
+        <div class="meta-item"><span>Tamaño de lote</span><strong>10.000 unidades</strong></div>
+        <div class="meta-item"><span>Fecha de vencimiento</span><strong>Agosto 2027</strong></div>
+        <div class="meta-item"><span>Director Técnico</span><strong>Dra. Patricia Gómez (M.N. 22.187)</strong></div>
+      </div>
+    </div>
+    <div style="margin-left:auto">
+      <span class="status-badge status-ok">✓ Liberado — en stock</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num">8/8</div><div class="stat-label">Etapas completadas</div></div>
+    <div class="stat-card green"><div class="stat-num">10.000</div><div class="stat-label">Unidades producidas</div></div>
+    <div class="stat-card green"><div class="stat-num">97,1%</div><div class="stat-label">Rendimiento de lote</div></div>
+    <div class="stat-card green"><div class="stat-num">0</div><div class="stat-label">Alertas activas</div></div>
+    <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Distribuidores habilitados</div></div>
+  </div>
+
+  <!-- TIMELINE VAC -->
+  <div class="section-title">Historial completo del lote</div>
+  <div class="timeline">
+
+    <!-- VAC PASO 1 -->
+    <div class="step">
+      <div class="step-icon ok">📦</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">1. Ingreso de Materias Primas</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">05 oct 2025 · 09:00 hs</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Cepa bacteriana</span>Clostridium perfringens tipo C y D</div>
+          <div class="step-detail-item"><span>Proveedor</span>BioVet Argentina S.A. · Remito 00021934</div>
+          <div class="step-detail-item"><span>Adyuvante</span>Hidróxido de aluminio · Conservante: tiomersal</div>
+          <div class="step-detail-item"><span>Responsable</span>Lic. Mónica Peralta</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Certificado de identidad de cepas recibido</span>
+          <span class="tag tag-ok">✓ Cuarentena biológica aplicada</span>
+          <span class="tag tag-info">Nro. interno MP: 2025-BIO-0214</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Certificado de identidad de cepas C-D — BioVet Argentina <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Remito de proveedor 00021934 — materiales biológicos <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Registro de cuarentena biológica MP-2025-BIO-0214 <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Lic. Mónica Peralta</strong> — 05/10/2025 09:42 hs</div>
+            <div class="expand-hash">SHA-256: 1a9e2b5d8c1f4a7e0b3d6c9f2a5e8b1d4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAC PASO 2 -->
+    <div class="step">
+      <div class="step-icon ok">🔬</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">2. Control de Calidad de Insumos (CCI)</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">06–10 oct 2025</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Recuento UFC</span>≥1×10⁸ UFC/ml · Especif. mínimo ✓</div>
+          <div class="step-detail-item"><span>pH suspensión</span>6,9 · Especif. 6,5–7,5 ✓</div>
+          <div class="step-detail-item"><span>Esterilidad insumos</span>Conforme — cultivo negativo ✓</div>
+          <div class="step-detail-item"><span>Analista</span>Dra. Ana Soria (Microbiología)</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Cepas aprobadas para fermentación</span>
+          <span class="tag tag-ok">✓ Levantamiento de cuarentena biológica</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Informe CCI-VAC-2026-0088 — análisis microbiológico completo <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Resultado recuento UFC — cepas tipo C y D <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dra. Ana Soria (Microbiología)</strong> — 10/10/2025 15:30 hs</div>
+            <div class="expand-hash">SHA-256: 2b5d8c1f4a7e0b3d6c9f2a5e8b1d4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2b5d8</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAC PASO 3 -->
+    <div class="step">
+      <div class="step-icon ok">🧫</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">3. Fermentación — Cultivo bacteriano</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">14–18 oct 2025</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Biorreactor</span>BR-02 · 200 L</div>
+          <div class="step-detail-item"><span>Temperatura cultivo</span>37°C ± 0,5°C</div>
+          <div class="step-detail-item"><span>Duración</span>72 horas · anaerobiosis estricta</div>
+          <div class="step-detail-item"><span>Responsable</span>Lic. Mónica Peralta · Téc. D. Ocampo</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Crecimiento conforme en ambas cepas</span>
+          <span class="tag tag-ok">✓ Sin contaminación detectada</span>
+          <span class="tag tag-info">Volumen cosechado: 198 L</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Protocolo de fermentación BR-02 — registro completo de 72h <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Curva de crecimiento bacteriano — tipo C y D <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Lic. Mónica Peralta · Téc. D. Ocampo</strong> — 18/10/2025 08:15 hs</div>
+            <div class="expand-hash">SHA-256: 3c6f9a2e5b8d1c4f7a0e3b6d9c2f5a8e1b4d7c0f3a6e9b2d5c8f1a4e7b0d3c6f9</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAC PASO 4 -->
+    <div class="step">
+      <div class="step-icon ok">🧪</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">4. Control en Proceso (IPC)</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">19 oct 2025 · 10:00 hs</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>UFC final</span>≥5×10⁸ UFC/ml ✓</div>
+          <div class="step-detail-item"><span>Esterilidad</span>Conforme — cultivo negativo ✓</div>
+          <div class="step-detail-item"><span>pH cosecha</span>7,1 · Especif. 6,8–7,4 ✓</div>
+          <div class="step-detail-item"><span>Analista</span>Dra. Ana Soria</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Cosecha liberada para formulación</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Planilla IPC-VAC-2026-0088 — controles de cosecha <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Resultado esterilidad — cultivos negativos en 14 días <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dra. Ana Soria (Microbiología)</strong> — 19/10/2025 14:22 hs</div>
+            <div class="expand-hash">SHA-256: 4d7c0f3a6e9b2d5c8f1a4e7b0d3c6f9a2e5b8d1c4f7a0e3b6d9c2f5a8e1b4d7c0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAC PASO 5 -->
+    <div class="step">
+      <div class="step-icon ok">❄️</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">5. Liofilización y acondicionamiento</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">22–26 oct 2025</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Proceso</span>Formulación + envasado · Frascos 50 ml</div>
+          <div class="step-detail-item"><span>Unidades envasadas</span>10.000 frascos · 10 dosis c/u</div>
+          <div class="step-detail-item"><span>Lote impreso</span>VAC-2026-0088 ✓</div>
+          <div class="step-detail-item"><span>Vencimiento impreso</span>08/2027 ✓</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Control de cierre: 80/80 muestras conformes</span>
+          <span class="tag tag-ok">✓ Etiquetas con código de cadena de frío</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Protocolo de formulación y acondicionamiento VAC-0088 <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Control de cierre — 80 muestras verificadas <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dra. Patricia Gómez (DT)</strong> — 26/10/2025 16:00 hs</div>
+            <div class="expand-hash">SHA-256: 5e8b1d4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2b5d8c1f4a7e0b3d6c9f2a5e8b1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAC PASO 6 -->
+    <div class="step">
+      <div class="step-icon ok">✅</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">6. Control de Producto Terminado (CPT)</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">27 oct – 12 nov 2025</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Esterilidad</span>Conforme — 14 días cultivo ✓</div>
+          <div class="step-detail-item"><span>Inocuidad</span>Test in vivo — sin reacciones adversas ✓</div>
+          <div class="step-detail-item"><span>Potencia antigénica</span>Conforme — títulos protectores ✓</div>
+          <div class="step-detail-item"><span>Identidad</span>ELISA — tipo C y D confirmados ✓</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ Todas las especificaciones biológicas cumplidas</span>
+          <span class="tag tag-info">Informe CPT: IF-VAC-2026-0088-CPT</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Informe CPT IF-VAC-2026-0088-CPT — análisis biológico completo <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Resultado test de inocuidad in vivo — semanas 1 a 4 <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Resultado ELISA — confirmación antigénica tipo C y D <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dra. Ana Soria (Analista CPT Biológico)</strong> — 12/11/2025 11:55 hs</div>
+            <div class="expand-hash">SHA-256: 6f9c2a5e8b1d4c7f0a3e6b9d2c5f8a1e4b7d0c3f6a9e2b5d8c1f4a7e0b3d6c9f2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAC PASO 7 -->
+    <div class="step">
+      <div class="step-icon ok">📋</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">7. Liberación de Lote</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">18 nov 2025 · 10:30 hs</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Director Técnico</span>Dra. Patricia Gómez (M.N. 22.187)</div>
+          <div class="step-detail-item"><span>Revisión de historia</span>Completa — sin desvíos sin cerrar</div>
+          <div class="step-detail-item"><span>Certificado de lote</span>CL-VAC-2026-0088</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ LOTE APROBADO — APTO PARA DISTRIBUCIÓN</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Certificado de lote CL-VAC-2026-0088 — firmado digitalmente <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Historia de manufactura biológica revisada completa <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Dra. Patricia Gómez (Directora Técnica, M.N. 22.187)</strong> — 18/11/2025 10:30 hs</div>
+            <div class="expand-hash">SHA-256: 7a0d3c6f9e2b5a8d1c4e7b0d3f6c9a2e5b8a1d4c7f0a3e6b9d2c5f8a1e4b7d0c3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAC PASO 8 -->
+    <div class="step">
+      <div class="step-icon ok">🏪</div>
+      <div class="step-body">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-title">8. Almacenamiento — Cadena de frío</div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="step-date">18 nov 2025</div>
+            <span class="step-chevron">▼</span>
+          </div>
+        </div>
+        <div class="step-detail">
+          <div class="step-detail-item"><span>Depósito</span>Cámara fría CF-01 — cadena de frío</div>
+          <div class="step-detail-item"><span>Condición</span>2–8°C · Humedad &lt;70% · sin congelar</div>
+          <div class="step-detail-item"><span>Sensor</span>TH-CF01-A y TH-CF01-B — redundancia</div>
+        </div>
+        <div class="step-tags">
+          <span class="tag tag-ok">✓ En stock — 10.000 unidades disponibles</span>
+          <span class="tag tag-ok">✓ Cadena de frío ininterrumpida desde liberación</span>
+        </div>
+        <div class="step-expandido">
+          <div class="step-expand-inner">
+            <div class="expand-docs">
+              <div class="expand-doc">📄 Registro temperatura cámara CF-01 (168 días) — sensores A y B <a href="#">Ver documento completo →</a></div>
+              <div class="expand-doc">📄 Plan de distribución en cadena de frío aprobado <a href="#">Ver documento completo →</a></div>
+            </div>
+            <div class="expand-firma">Firmado por: <strong>Lic. Mónica Peralta (Almacenamiento)</strong> — Registro continuo desde 18/11/2025</div>
+            <div class="expand-hash">SHA-256: 8b1e4a7d0f3c6b9e2a5d8b1c4f7a0e3b6d9c2f5a8e1b4d7c0f3a6e9b2d5c8f1a4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- fin timeline VAC -->
+
+  <!-- DISTRIBUTION TABLE VAC -->
+  <div class="dist-card" style="margin-top:1.5rem">
+    <div class="section-title" style="margin-bottom:.8rem">Trazabilidad de distribución</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Destinatario</th>
+          <th>Tipo</th>
+          <th>Remito</th>
+          <th>Fecha</th>
+          <th>Unidades</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>BioDistribuciones del Norte S.A.</strong><br><small style="color:#6b7a8d">Salta · Hab. SENASA 00-3102 · cadena de frío certificada</small></td>
+          <td>Distribuidor</td>
+          <td>R-2026-01120</td>
+          <td>15/04/2026</td>
+          <td>3.000</td>
+          <td><span class="status-badge status-ok">Conforme</span></td>
+        </tr>
+        <tr>
+          <td><strong>VetFarm Distribuciones SRL</strong><br><small style="color:#6b7a8d">Córdoba · Hab. SENASA 00-1887 · cadena de frío certificada</small></td>
+          <td>Distribuidor</td>
+          <td>R-2026-01134</td>
+          <td>17/04/2026</td>
+          <td>2.500</td>
+          <td><span class="status-badge status-ok">Conforme</span></td>
+        </tr>
+        <tr>
+          <td><strong>AgroVacunas Pampeanas S.A.</strong><br><small style="color:#6b7a8d">Santa Rosa, La Pampa · Hab. SENASA 00-2788</small></td>
+          <td>Distribuidor</td>
+          <td>R-2026-01148</td>
+          <td>20/04/2026</td>
+          <td>2.000</td>
+          <td><span class="status-badge status-ok">Conforme</span></td>
+        </tr>
+        <tr>
+          <td><strong>Laboratorio Veterinario Regional</strong><br><small style="color:#6b7a8d">Rosario, Santa Fe · Hab. SENASA 00-1544</small></td>
+          <td>Distribuidor</td>
+          <td>R-2026-01162</td>
+          <td>22/04/2026</td>
+          <td>1.500</td>
+          <td><span class="status-badge status-ok">Conforme</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- fin #lote-vac -->
+
+</div>
+
+<div class="footer">
+  Demo · Scalabl® para Biovett · Sistema de Trazabilidad de Lotes · Datos ilustrativos
+</div>
+
+<script>
+// =====================
+// Búsqueda de lotes
+// =====================
+var loteActivo = 'IVE';
+
+function buscar() {
+  var input = document.getElementById('lote-input').value.trim().toUpperCase();
+  var divIVE = document.getElementById('lote-ive');
+  var divVAC = document.getElementById('lote-vac');
+  var btnVolver = document.getElementById('btn-volver');
+
+  if (input === 'VAC-2026-0088') {
+    divIVE.style.display = 'none';
+    divVAC.style.display = 'block';
+    btnVolver.classList.add('visible');
+    loteActivo = 'VAC';
+  } else {
+    // Por defecto mostrar IVE (incluyendo IVE-2026-0312 o vacío)
+    divIVE.style.display = 'block';
+    divVAC.style.display = 'none';
+    btnVolver.classList.remove('visible');
+    loteActivo = 'IVE';
+    document.getElementById('lote-input').value = 'IVE-2026-0312';
+  }
+}
+
+function probarOtroLote() {
+  document.getElementById('lote-input').value = 'VAC-2026-0088';
+  buscar();
+}
+
+function volverAIVE() {
+  document.getElementById('lote-input').value = 'IVE-2026-0312';
+  buscar();
+}
+
+// =====================
+// Timeline expandible
+// =====================
+function toggleStep(header) {
+  var body = header.closest('.step-body');
+  var expandido = body.querySelector('.step-expandido');
+  var chevron = header.querySelector('.step-chevron');
+  if (!expandido) return;
+
+  var estaAbierto = expandido.classList.contains('abierto');
+  if (estaAbierto) {
+    expandido.classList.remove('abierto');
+    if (chevron) chevron.classList.remove('abierto');
+  } else {
+    expandido.classList.add('abierto');
+    if (chevron) chevron.classList.add('abierto');
+  }
+}
+
+// =====================
+// Panel de alerta
+// =====================
+function togglePanelAlerta() {
+  var panel = document.getElementById('panel-alerta');
+  panel.classList.toggle('visible');
+}
+
+function resolverAlerta(tipo) {
+  var confirmacion = document.getElementById('panel-confirmacion');
+  var panel = document.getElementById('panel-alerta');
+  var mensaje = '';
+
+  if (tipo === 'conforme') {
+    mensaje = '✓ Evaluación registrada: unidades declaradas conformes y liberadas para distribución normal. Firmado por DT.';
+    confirmacion.style.color = '#2E7D32';
+  } else {
+    mensaje = '⚠ Cuarentena iniciada: 120 frascos separados de stock activo. Pendiente disposición final por DT.';
+    confirmacion.style.color = '#C62828';
+  }
+
+  confirmacion.textContent = mensaje;
+  confirmacion.style.display = 'block';
+
+  // Colapsar el panel después de 2 segundos
+  setTimeout(function() {
+    panel.classList.remove('visible');
+    confirmacion.style.display = 'none';
+  }, 2500);
+}
+
+// =====================
+// Exportar historial PDF
+// =====================
+function exportarPDF(btn) {
+  var textoOriginal = btn.innerHTML;
+  btn.innerHTML = 'Generando...';
+  btn.disabled = true;
+
+  setTimeout(function() {
+    btn.innerHTML = textoOriginal;
+    btn.disabled = false;
+
+    var nombreArchivo = loteActivo === 'VAC'
+      ? 'Historial-VAC-2026-0088.pdf'
+      : 'Historial-IVE-2026-0312.pdf';
+
+    mostrarToast('✓ ' + nombreArchivo + ' generado — listo para descargar');
+  }, 1500);
+}
+
+function mostrarToast(mensaje) {
+  var toast = document.getElementById('toast');
+  toast.textContent = mensaje;
+  toast.classList.add('visible');
+
+  setTimeout(function() {
+    toast.classList.remove('visible');
+  }, 3000);
+}
+</script>
+
+</body>
+</html>

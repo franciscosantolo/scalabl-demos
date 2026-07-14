@@ -4,12 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Factura vs. Orden de compra · Demo</title>
-<script src="/lib/xlsx.full.min.js"></script>
 <style>
   :root{--bg:#0f1523;--panel:#151c2e;--panel2:#1b2338;--line:#28324c;--ink:#eef2fb;--muted:#93a0bd;
-    --accent:#dafb37;--accent2:#5b8cff;--ok:#37d99a;--warn:#ffb454;--err:#ff6b6b;}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
+    --accent:#dafb37;--accent2:#5b8cff;--ok:#37d99a;--ok-bg:rgba(55,217,154,.1);--err:#ff6b6b;--err-bg:rgba(255,107,107,.1);--warn:#ffb454;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
      radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.18),transparent),
      radial-gradient(900px 500px at -10% 10%,rgba(218,251,55,.08),transparent),var(--bg);color:var(--ink);min-height:100vh}
   .wrap{max-width:1000px;margin:0 auto;padding:30px 22px 80px}
@@ -17,191 +16,154 @@
   .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700}
   h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:.35rem 0 .3rem;line-height:1.08;font-weight:800}
   h1 em{font-style:normal;color:var(--accent)}
-  .sub{color:var(--muted);font-size:1.02rem;max-width:62ch;line-height:1.5}
+  .sub{color:var(--muted);font-size:1.02rem;max-width:64ch;line-height:1.5}
   .badge{display:inline-block;background:rgba(255,180,84,.14);color:var(--warn);border:1px solid rgba(255,180,84,.3);
-     padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.03em}
-  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px}
-  .btn{appearance:none;border:0;border-radius:11px;padding:12px 18px;font-weight:700;font-size:.92rem;cursor:pointer;transition:.15s;font-family:inherit}
-  .btn-primary{background:var(--accent);color:#0f1523}.btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
-  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}.btn-ghost:hover{border-color:var(--accent2)}
-  .btn-blue{background:var(--accent2);color:#fff}.btn-blue:hover{filter:brightness(1.06);transform:translateY(-1px)}
-  .muted{color:var(--muted)}.hide{display:none}
-  .drop{margin-top:16px;border:1.5px dashed var(--line);border-radius:16px;background:var(--panel);padding:34px 22px;text-align:center;transition:.15s;cursor:pointer}
-  .drop.hot{border-color:var(--accent);background:var(--panel2)}
-  .drop .big{font-size:1.05rem;font-weight:700}.drop .small{color:var(--muted);font-size:.85rem;margin-top:6px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:22px}
-  .card h2{margin:0 0 4px;font-size:1.15rem}.card .lead{color:var(--muted);font-size:.9rem;margin:0 0 14px}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:4px 0 18px}
-  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-  .stat .v{font-size:1.5rem;font-weight:800}.stat .l{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
-  .v.ok{color:var(--ok)}.v.warn{color:var(--warn)}.v.err{color:var(--err)}
-  table{width:100%;border-collapse:collapse;font-size:.83rem}
-  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
-  th{color:var(--muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--panel)}
-  td.num{text-align:right;font-variant-numeric:tabular-nums}
-  .tag{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;display:inline-block}
-  .tag.ok{background:rgba(55,217,154,.15);color:var(--ok)}
-  .tag.warn{background:rgba(255,180,84,.15);color:var(--warn)}
-  .tag.err{background:rgba(255,107,107,.15);color:var(--err)}
-  .tbl-wrap{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:12px}
-  tr.bad td{background:rgba(255,107,107,.05)}
-  footer{margin-top:40px;color:var(--muted);font-size:.78rem;text-align:center;line-height:1.6}
-  @media(max-width:720px){.stats{grid-template-columns:1fr 1fr}}
+     padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.03em;margin-top:14px}
+  .steplabel{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+     margin:30px 0 12px;display:flex;align-items:center;gap:9px}
+  .stepnum{background:var(--accent);color:#0f1523;width:21px;height:21px;border-radius:50%;display:inline-flex;
+     align-items:center;justify-content:center;font-size:.72rem;font-weight:900}
+  .oc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px}
+  .oc-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+  .oc-meta{display:flex;gap:26px;flex-wrap:wrap}
+  .oc-f .l{font-size:.64rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  .oc-f .v{font-size:.9rem;font-weight:700;margin-top:2px}
+  .oc-pill{font-size:.7rem;font-weight:800;color:var(--accent);background:rgba(218,251,55,.1);padding:5px 12px;border-radius:100px;white-space:nowrap}
+  .oc-items{border-top:1px solid var(--line);margin-top:14px;padding-top:12px;display:flex;gap:12px;flex-wrap:wrap}
+  .oc-item{font-size:.78rem;color:var(--muted);background:var(--panel2);padding:6px 12px;border-radius:8px}
+  .oc-item strong{color:var(--ink)}
+  .inbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .inbox-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .inbox-bar .t{font-size:.82rem;font-weight:700;color:var(--muted)}
+  .mail{display:flex;gap:14px;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s}
+  .mail:last-child{border-bottom:none}
+  .mail:hover{background:var(--panel2)}
+  .mail.sel-ok{background:var(--ok-bg);box-shadow:inset 3px 0 0 var(--ok)}
+  .mail.sel-err{background:var(--err-bg);box-shadow:inset 3px 0 0 var(--err)}
+  .mail .av{width:38px;height:38px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;font-size:1.1rem;flex-shrink:0}
+  .mail .who{font-weight:700;font-size:.9rem}
+  .mail .subj{color:var(--muted);font-size:.82rem;margin-top:1px}
+  .mail .att{font-size:.72rem;color:var(--accent2);margin-top:3px}
+  .mail .arrow{margin-left:auto;color:var(--muted);font-size:.8rem;white-space:nowrap;text-align:right}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:10px}
+  .result{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .result.hide{display:none}
+  .r-head{padding:18px 24px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .r-badge{padding:7px 16px;border-radius:100px;font-size:.75rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+  .r-badge.ok{background:var(--ok-bg);color:var(--ok)}.r-badge.err{background:var(--err-bg);color:var(--err)}
+  .r-head .r-t{font-weight:700}.r-head .r-s{color:var(--muted);font-size:.83rem;margin-top:2px}
+  .r-body{padding:18px 24px}
+  .chk{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:.88rem}
+  .chk:last-child{border-bottom:none}
+  .chk .i{flex-shrink:0;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:900;margin-top:1px}
+  .chk .i.ok{background:var(--ok-bg);color:var(--ok)}.chk .i.err{background:var(--err-bg);color:var(--err)}
+  .chk .d{color:var(--muted);font-size:.8rem}
+  .r-action{margin:16px 0 0;padding:14px 16px;border-radius:11px;font-size:.88rem;line-height:1.5}
+  .r-action.ok{background:var(--ok-bg);border:1px solid rgba(55,217,154,.3)}
+  .r-action.err{background:var(--err-bg);border:1px solid rgba(255,107,107,.3)}
+  footer{margin-top:44px;color:var(--muted);font-size:.78rem;text-align:center;line-height:1.6}
+  @media(max-width:640px){.oc-top{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <a class="back" href="/">← Demos</a>
   <div class="kick">Control de cuentas por pagar</div>
-  <h1>Factura contra<br><em>orden de compra</em></h1>
-  <p class="sub">Subes las facturas de proveedores tal como llegan. El sistema las cruza contra las órdenes de compra emitidas y marca cada diferencia — precio, cantidad, ítems que no estaban autorizados — antes de que se pague de más.</p>
-  <div style="margin-top:14px"><span class="badge">Demo · datos ficticios</span></div>
+  <h1>Cada factura que entra,<br><em>controlada sola</em></h1>
+  <p class="sub">Las facturas llegan por email todos los días. En vez de revisarlas a mano, el sistema abre cada una, la contrasta contra su orden de compra y decide: si coincide, la aprueba para pago; si no, la frena y avisa qué está mal — antes de que se pague de más.</p>
+  <div><span class="badge">Demo · datos ficticios</span></div>
 
-  <div class="row">
-    <button class="btn btn-ghost" id="btn-ejemplo">⬇ Descargar facturas de ejemplo</button>
-    <span class="muted" style="font-size:.82rem">o sube tu propio Excel de facturas abajo</span>
-  </div>
-
-  <div class="drop" id="drop">
-    <div class="big">Arrastra el Excel de facturas aquí o haz clic</div>
-    <div class="small">Columnas: OC · Ítem · Cantidad · Precio unitario</div>
-    <input type="file" id="file" accept=".xlsx,.xls" class="hide">
-  </div>
-
-  <div class="card" style="margin-top:16px">
-    <h2 style="font-size:1rem;margin:0 0 8px">Órdenes de compra emitidas (base de referencia)</h2>
-    <div class="tbl-wrap" style="max-height:170px">
-      <table id="tabla-oc"><thead><tr><th>OC</th><th>Proveedor</th><th>Ítem</th><th class="num">Cant.</th><th class="num">Precio unit.</th></tr></thead><tbody></tbody></table>
+  <div class="steplabel"><span class="stepnum">1</span>La orden de compra de referencia</div>
+  <div class="oc">
+    <div class="oc-top">
+      <div class="oc-meta">
+        <div class="oc-f"><div class="l">Orden</div><div class="v">OC-2026-0421</div></div>
+        <div class="oc-f"><div class="l">Proveedor</div><div class="v">Distribuidora del Norte S.A.</div></div>
+        <div class="oc-f"><div class="l">Fecha</div><div class="v">15/06/2026</div></div>
+        <div class="oc-f"><div class="l">Total autorizado</div><div class="v">$2.800.000,00</div></div>
+      </div>
+      <span class="oc-pill">Emitida y aprobada</span>
+    </div>
+    <div class="oc-items">
+      <div class="oc-item"><strong>Harina 000 x 25kg</strong> · 200 u · $8.200/u</div>
+      <div class="oc-item"><strong>Aceite girasol x 12u</strong> · 80 u · $14.500/u</div>
     </div>
   </div>
 
-  <div id="resultado" class="hide">
-    <div class="card">
-      <h2>Resultado del control</h2>
-      <p class="lead">Cada línea de factura, cruzada con su orden de compra.</p>
-      <div class="stats">
-        <div class="stat"><div class="v" id="s-total">0</div><div class="l">Líneas</div></div>
-        <div class="stat"><div class="v ok" id="s-ok">0</div><div class="l">Conformes</div></div>
-        <div class="stat"><div class="v err" id="s-dif">0</div><div class="l">Con diferencia</div></div>
-        <div class="stat"><div class="v warn" id="s-monto">$0</div><div class="l">En disputa</div></div>
+  <div class="steplabel"><span class="stepnum">2</span>Llegan las facturas al correo</div>
+  <div class="inbox">
+    <div class="inbox-bar">📨 <span class="t">Bandeja · cuentas@empresa</span></div>
+    <div class="mail" id="mail-ok" onclick="verificar('ok')">
+      <div class="av">🏢</div>
+      <div>
+        <div class="who">Distribuidora del Norte S.A.</div>
+        <div class="subj">Factura B 0001-00008934 · OC-2026-0421</div>
+        <div class="att">📎 factura_8934.pdf</div>
       </div>
-      <div class="tbl-wrap">
-        <table id="tabla"><thead><tr><th>OC</th><th>Ítem</th><th class="num">Cant.</th><th class="num">Precio fact.</th><th class="num">Precio OC</th><th>Control</th></tr></thead><tbody></tbody></table>
+      <div class="arrow">hoy 09:14<br>→ Verificar</div>
+    </div>
+    <div class="mail" id="mail-err" onclick="verificar('err')">
+      <div class="av">🏢</div>
+      <div>
+        <div class="who">Distribuidora del Norte S.A.</div>
+        <div class="subj">Factura B 0001-00008935 · OC-2026-0421</div>
+        <div class="att">📎 factura_8935.pdf</div>
       </div>
-      <div class="row" style="margin-top:16px">
-        <button class="btn btn-blue" id="btn-xlsx">⬇ Descargar informe de diferencias (.xlsx)</button>
-      </div>
+      <div class="arrow">hoy 11:42<br>→ Verificar</div>
     </div>
   </div>
+  <div class="hint">Haz clic en una factura para ver cómo el sistema la contrasta automáticamente. Una llega correcta; la otra, con una diferencia.</div>
+
+  <div id="result" class="result hide"></div>
 
   <footer>Demo con datos ficticios · ninguna factura ni proveedor es real.<br>Control de cuentas por pagar · Scalabl</footer>
 </div>
 
 <script>
-// ── Órdenes de compra (base ficticia) ─────────────────────────────────────────
-// item -> {cantidad autorizada, precio unitario acordado}
-const OC = {
-  "OC-1042": {prov:"Distribuidora del Norte S.A.", items:{
-     "Harina 000 x 25kg":{cant:200, precio:8200},
-     "Aceite girasol x 12u":{cant:80, precio:14500},
-  }},
-  "OC-1043": {prov:"Insumos Patagonia S.R.L.", items:{
-     "Detergente industrial x 5L":{cant:120, precio:6300},
-     "Guantes nitrilo x 100":{cant:300, precio:4200},
-  }},
-  "OC-1044": {prov:"Envases del Plata S.A.", items:{
-     "Caja cartón 40x30 x 50u":{cant:150, precio:2900},
-     "Film stretch x 500m":{cant:60, precio:5100},
-  }},
-};
-const norm = s => String(s||"").toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
-
-// pintar tabla OC
-(function(){
-  const tb=document.querySelector("#tabla-oc tbody"); let rows="";
-  for(const [oc,d] of Object.entries(OC))
-    for(const [it,v] of Object.entries(d.items))
-      rows+=`<tr><td>${oc}</td><td>${d.prov}</td><td>${it}</td><td class="num">${v.cant}</td><td class="num">${money(v.precio)}</td></tr>`;
-  tb.innerHTML=rows;
-})();
-
-function money(n){return "$"+Number(n).toLocaleString("es-AR",{minimumFractionDigits:0,maximumFractionDigits:2});}
-let FILAS=[];
-
-// ── Excel de ejemplo (facturas: algunas OK, otras con diferencias) ─────────────
-document.getElementById("btn-ejemplo").addEventListener("click",()=>{
-  const m=[["OC","Ítem","Cantidad","Precio unitario"],
-    ["OC-1042","Harina 000 x 25kg",200,8200],            // OK
-    ["OC-1042","Aceite girasol x 12u",80,15200],          // precio: 14500 -> 15200
-    ["OC-1043","Detergente industrial x 5L",120,6300],   // OK
-    ["OC-1043","Guantes nitrilo x 100",360,4200],         // cantidad: 300 -> 360
-    ["OC-1043","Barbijo x 50",100,3500],                  // ítem no está en la OC
-    ["OC-1044","Caja cartón 40x30 x 50u",150,2900],      // OK
-    ["OC-1044","Film stretch x 500m",60,5600],            // precio: 5100 -> 5600
-    ["OC-1099","Pallet plástico",40,9800],                // OC inexistente
-  ];
-  const ws=XLSX.utils.aoa_to_sheet(m); ws["!cols"]=[{wch:10},{wch:30},{wch:10},{wch:14}];
-  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Facturas"); XLSX.writeFile(wb,"facturas_ejemplo.xlsx");
-});
-
-// ── Upload ────────────────────────────────────────────────────────────────────
-const drop=document.getElementById("drop"),fileInput=document.getElementById("file");
-drop.addEventListener("click",()=>fileInput.click());
-drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("hot");});
-drop.addEventListener("dragleave",()=>drop.classList.remove("hot"));
-drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("hot");if(e.dataTransfer.files[0])leer(e.dataTransfer.files[0]);});
-fileInput.addEventListener("change",e=>{if(e.target.files[0])leer(e.target.files[0]);});
-function leer(file){const r=new FileReader();r.onload=e=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});const ws=wb.Sheets[wb.SheetNames[0]];procesar(XLSX.utils.sheet_to_json(ws,{header:1,blankrows:false}));};r.readAsArrayBuffer(file);}
-
-function procesar(rows){
-  FILAS=[];
-  const first=(rows[0]||[]).map(norm);
-  const start=first.some(c=>/OC|ORDEN|ITEM|ÍTEM|CANT/.test(c))?1:0;
-  for(let i=start;i<rows.length;i++){
-    const r=rows[i]; if(!r||r.length<4) continue;
-    const oc=String(r[0]||"").trim(), item=String(r[1]||"").trim();
-    const cant=parseFloat(r[2])||0, precio=parseFloat(r[3])||0;
-    if(!oc||!item) continue;
-    let estado="ok", detalle="Conforme", precioOC=null, disputa=0;
-    const orden=OC[oc];
-    if(!orden){ estado="err"; detalle="OC inexistente"; disputa=cant*precio; }
-    else{
-      const ref=orden.items[item]||orden.items[Object.keys(orden.items).find(k=>norm(k)===norm(item))];
-      if(!ref){ estado="err"; detalle="Ítem no autorizado en la OC"; disputa=cant*precio; }
-      else{
-        precioOC=ref.precio;
-        if(precio>ref.precio){ estado="err"; detalle="Diferencia de precio (+"+money(precio-ref.precio)+"/u)"; disputa=(precio-ref.precio)*cant; }
-        else if(cant>ref.cant){ estado="warn"; detalle="Cantidad excede la OC (+"+(cant-ref.cant)+")"; disputa=(cant-ref.cant)*precio; }
-        else detalle="Conforme";
-      }
-    }
-    FILAS.push({oc,item,cant,precio,precioOC,estado,detalle,disputa});
+const RES = {
+  ok: {
+    factura:"0001-00008934", total:"$2.800.000,00",
+    badge:"Aprobada para pago", sub:"Todos los controles coinciden con la OC-2026-0421.",
+    checks:[
+      {ok:true,t:"Proveedor y OC",d:"Distribuidora del Norte S.A. · OC-2026-0421 vigente."},
+      {ok:true,t:"Ítems facturados",d:"Los 2 ítems corresponden a los autorizados en la OC."},
+      {ok:true,t:"Cantidades",d:"Harina 200 u · Aceite 80 u — exactas."},
+      {ok:true,t:"Precios unitarios",d:"$8.200 y $14.500 — coinciden con lo acordado."},
+      {ok:true,t:"Total",d:"$2.800.000,00 — igual al total autorizado."},
+    ],
+    action:"✓ Factura conforme. El sistema la deja lista para pago en el próximo lote, sin intervención."
+  },
+  err: {
+    factura:"0001-00008935", total:"$2.856.000,00",
+    badge:"Requiere revisión", sub:"Hay una diferencia contra la OC-2026-0421.",
+    checks:[
+      {ok:true,t:"Proveedor y OC",d:"Distribuidora del Norte S.A. · OC-2026-0421 vigente."},
+      {ok:true,t:"Ítems facturados",d:"Los 2 ítems corresponden a los autorizados en la OC."},
+      {ok:true,t:"Cantidades",d:"Harina 200 u · Aceite 80 u — exactas."},
+      {ok:false,t:"Precio unitario — Aceite girasol x 12u",d:"Facturado $15.200/u · autorizado $14.500/u (+$700/u)."},
+      {ok:false,t:"Total",d:"$2.856.000,00 · esperado $2.800.000,00 — diferencia de +$56.000."},
+    ],
+    action:"⚠ El sistema frena la factura y avisa a cuentas por pagar: sobreprecio de $56.000 en el aceite. No se paga hasta resolver con el proveedor."
   }
-  render();
-}
+};
 
-function render(){
-  document.getElementById("resultado").classList.remove("hide");
-  const total=FILAS.length, ok=FILAS.filter(f=>f.estado==="ok").length;
-  const dif=total-ok, disputa=FILAS.reduce((a,f)=>a+f.disputa,0);
-  document.getElementById("s-total").textContent=total;
-  document.getElementById("s-ok").textContent=ok;
-  document.getElementById("s-dif").textContent=dif;
-  document.getElementById("s-monto").textContent=money(disputa);
-  const tag={ok:'<span class="tag ok">✓ Conforme</span>',warn:'<span class="tag warn">Revisar</span>',err:'<span class="tag err">Diferencia</span>'};
-  document.querySelector("#tabla tbody").innerHTML=FILAS.map(f=>`<tr class="${f.estado!=='ok'?'bad':''}">
-     <td>${f.oc}</td><td>${f.item}</td><td class="num">${f.cant}</td>
-     <td class="num">${money(f.precio)}</td><td class="num">${f.precioOC!=null?money(f.precioOC):'<span class="muted">—</span>'}</td>
-     <td>${tag[f.estado]} <span class="muted" style="font-size:.76rem">${f.estado!=='ok'?f.detalle:''}</span></td></tr>`).join("");
-  document.getElementById("resultado").scrollIntoView({behavior:"smooth",block:"start"});
+function verificar(mode){
+  document.getElementById("mail-ok").className="mail"+(mode==="ok"?" sel-ok":"");
+  document.getElementById("mail-err").className="mail"+(mode==="err"?" sel-err":"");
+  const r=RES[mode], el=document.getElementById("result");
+  el.innerHTML=`
+    <div class="r-head">
+      <span class="r-badge ${mode}">${mode==="ok"?"✓ ":"⚠ "}${r.badge}</span>
+      <div><div class="r-t">Factura ${r.factura} · ${r.total}</div><div class="r-s">${r.sub}</div></div>
+    </div>
+    <div class="r-body">
+      ${r.checks.map(c=>`<div class="chk"><span class="i ${c.ok?'ok':'err'}">${c.ok?'✓':'✕'}</span>
+         <div><div>${c.t}</div><div class="d">${c.d}</div></div></div>`).join("")}
+      <div class="r-action ${mode}">${r.action}</div>
+    </div>`;
+  el.classList.remove("hide");
+  el.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
-
-document.getElementById("btn-xlsx").addEventListener("click",()=>{
-  const data=[["OC","Ítem","Cantidad","Precio factura","Precio OC","Control","Monto en disputa"]];
-  FILAS.forEach(f=>data.push([f.oc,f.item,f.cant,f.precio,f.precioOC??"",f.detalle,f.disputa||""]));
-  const ws=XLSX.utils.aoa_to_sheet(data); ws["!cols"]=[{wch:10},{wch:30},{wch:10},{wch:14},{wch:12},{wch:34},{wch:16}];
-  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Control"); XLSX.writeFile(wb,"control_facturas.xlsx");
-});
 </script>
 </body>
 </html>

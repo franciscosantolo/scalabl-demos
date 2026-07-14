@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demos · IA aplicada a la operación</title>
+<style>
+  :root{
+    --bg:#0f1523; --panel:#151c2e; --panel2:#1b2338; --line:#28324c;
+    --ink:#eef2fb; --muted:#93a0bd; --accent:#dafb37; --accent2:#5b8cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
+     radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.18),transparent),
+     radial-gradient(900px 500px at -10% 10%,rgba(218,251,55,.08),transparent),var(--bg);
+     color:var(--ink);min-height:100vh}
+  .wrap{max-width:940px;margin:0 auto;padding:56px 22px 80px}
+  .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(1.9rem,4.5vw,2.9rem);margin:.4rem 0 .35rem;line-height:1.06;font-weight:800}
+  h1 em{font-style:normal;color:var(--accent)}
+  .sub{color:var(--muted);font-size:1.05rem;max-width:62ch;line-height:1.55}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:34px}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);border:1px solid var(--line);
+     border-radius:16px;padding:22px;transition:.16s;position:relative;overflow:hidden}
+  a.card:hover{border-color:var(--accent2);transform:translateY(-3px);background:var(--panel2)}
+  a.card.soon{opacity:.62;pointer-events:none}
+  .ic{font-size:1.7rem}
+  .card h3{margin:12px 0 5px;font-size:1.12rem}
+  .card p{margin:0;color:var(--muted);font-size:.87rem;line-height:1.5}
+  .pill{position:absolute;top:16px;right:16px;font-size:.66rem;font-weight:700;letter-spacing:.04em;
+     text-transform:uppercase;padding:4px 9px;border-radius:20px}
+  .pill.live{background:rgba(55,217,154,.16);color:#37d99a}
+  .pill.soon{background:rgba(147,160,189,.14);color:var(--muted)}
+  .go{margin-top:14px;color:var(--accent2);font-weight:700;font-size:.86rem}
+  footer{margin-top:48px;color:var(--muted);font-size:.78rem;line-height:1.6;border-top:1px solid var(--line);padding-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kick">IA aplicada a la operación</div>
+  <h1>Demos <em>en vivo</em></h1>
+  <p class="sub">Ejemplos funcionales de automatización y sistemas a medida. Todos con datos ficticios — ninguna empresa, cuenta o dato es real. Sirven para mostrar el concepto tocándolo, no para operar.</p>
+
+  <div class="grid">
+    <a class="card" href="/pagos">
+      <span class="pill live">Activa</span>
+      <div class="ic">💸</div>
+      <h3>Lote de pagos</h3>
+      <p>Del Excel de pagos de la operación al archivo listo para importar en el banco. Reconoce beneficiarios y completa cuentas.</p>
+      <div class="go">Abrir demo →</div>
+    </a>
+
+    <a class="card" href="/facturas">
+      <span class="pill live">Activa</span>
+      <div class="ic">🧾</div>
+      <h3>Factura vs. Orden de compra</h3>
+      <p>Cruza cada factura contra su orden de compra y marca las diferencias: precio, cantidad, ítems que no coinciden.</p>
+      <div class="go">Abrir demo →</div>
+    </a>
+
+    <a class="card" href="/trazabilidad">
+      <span class="pill live">Activa</span>
+      <div class="ic">🔎</div>
+      <h3>Trazabilidad de lotes</h3>
+      <p>Seguí un lote de punta a punta — origen, producción, control y distribución — con su historial completo y verificable.</p>
+      <div class="go">Abrir demo →</div>
+    </a>
+  </div>
+
+  <footer>
+    Demos con datos ficticios · Scalabl · IA aplicada a la operación
+  </footer>
+</div>
+</body>
+</html>

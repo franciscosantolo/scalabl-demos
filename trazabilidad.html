@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trazabilidad de lotes · Demo</title>
+<style>
+  :root{--bg:#0f1523;--panel:#151c2e;--panel2:#1b2338;--line:#28324c;--ink:#eef2fb;--muted:#93a0bd;
+    --accent:#dafb37;--accent2:#5b8cff;--ok:#37d99a;--warn:#ffb454;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
+     radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.18),transparent),
+     radial-gradient(900px 500px at -10% 10%,rgba(218,251,55,.08),transparent),var(--bg);color:var(--ink);min-height:100vh}
+  .wrap{max-width:820px;margin:0 auto;padding:30px 22px 80px}
+  .back{display:inline-block;color:var(--muted);text-decoration:none;font-size:.82rem;margin-bottom:14px}
+  .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:.35rem 0 .3rem;line-height:1.08;font-weight:800}
+  h1 em{font-style:normal;color:var(--accent)}
+  .sub{color:var(--muted);font-size:1.02rem;max-width:62ch;line-height:1.5}
+  .badge{display:inline-block;background:rgba(255,180,84,.14);color:var(--warn);border:1px solid rgba(255,180,84,.3);
+     padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.03em;margin-top:14px}
+  .search{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .search input{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:11px;
+     padding:13px 15px;color:var(--ink);font-size:.95rem;font-family:inherit;outline:none}
+  .search input:focus{border-color:var(--accent2)}
+  .btn{appearance:none;border:0;border-radius:11px;padding:13px 20px;font-weight:700;font-size:.92rem;cursor:pointer;background:var(--accent);color:#0f1523;font-family:inherit}
+  .chips{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:20px;padding:6px 13px;font-size:.8rem;cursor:pointer;transition:.14s}
+  .chip:hover{border-color:var(--accent2);color:var(--ink)}
+  .muted{color:var(--muted)}.hide{display:none}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:24px}
+  .lote-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+  .lote-head h2{margin:0;font-size:1.3rem}
+  .lote-head .code{color:var(--accent);font-weight:800;font-size:.9rem;letter-spacing:.04em}
+  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 6px}
+  .meta div{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+  .meta .l{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em}
+  .meta .v{font-weight:700;margin-top:3px;font-size:.92rem}
+  .sello{display:flex;align-items:center;gap:10px;background:rgba(55,217,154,.08);border:1px solid rgba(55,217,154,.28);
+     border-radius:11px;padding:11px 14px;margin-top:16px;font-size:.82rem}
+  .sello .h{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ok);word-break:break-all}
+  .tl{margin-top:24px;position:relative;padding-left:8px}
+  .ev{position:relative;padding:0 0 22px 30px;border-left:2px solid var(--line)}
+  .ev:last-child{border-left-color:transparent;padding-bottom:0}
+  .ev .dot{position:absolute;left:-9px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--ok);border:3px solid var(--bg)}
+  .ev .et{font-weight:700;font-size:.96rem}
+  .ev .dt{color:var(--muted);font-size:.78rem;margin:1px 0 6px}
+  .ev .de{color:#c3cee6;font-size:.85rem;line-height:1.5}
+  .ev .who{color:var(--muted);font-size:.76rem;margin-top:4px}
+  .notfound{color:var(--warn);margin-top:20px;font-size:.9rem}
+  footer{margin-top:44px;color:var(--muted);font-size:.78rem;text-align:center;line-height:1.6}
+  @media(max-width:640px){.meta{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← Demos</a>
+  <div class="kick">Documentación y trazabilidad</div>
+  <h1>Trazabilidad<br>de <em>lotes</em></h1>
+  <p class="sub">Cada lote deja un rastro completo — desde la materia prima hasta el destino final. Ante una auditoría, un reclamo o un retiro, la historia entera aparece en segundos, sellada y verificable.</p>
+  <div><span class="badge">Demo · datos ficticios</span></div>
+
+  <div class="search">
+    <input id="q" placeholder="Ingresa un código de lote (ej. L-2406-A)" autocomplete="off">
+    <button class="btn" id="btn-buscar">Rastrear</button>
+  </div>
+  <div class="chips">
+    <span class="muted" style="font-size:.8rem">Ejemplos:</span>
+    <span class="chip" data-l="L-2406-A">L-2406-A</span>
+    <span class="chip" data-l="L-2405-B">L-2405-B</span>
+    <span class="chip" data-l="L-2404-C">L-2404-C</span>
+  </div>
+
+  <div id="notfound" class="notfound hide"></div>
+  <div id="resultado" class="hide"></div>
+
+  <footer>Demo con datos ficticios · ningún lote, producto ni planta es real.<br>Documentación y trazabilidad · Scalabl</footer>
+</div>
+
+<script>
+const LOTES = {
+  "L-2406-A": {
+    producto:"Antiparasitario bovino · 500 ml", fabricacion:"12/06/2026", vencimiento:"12/06/2028",
+    estado:"Distribuido", sello:"a91f· c4d2· 7e08· b155",
+    eventos:[
+      {et:"Recepción de materia prima", dt:"03/06/2026 · 08:40", de:"Ingreso de principio activo (lote proveedor MP-8841) y excipientes. Certificados de análisis validados.", who:"Depósito · L. Fernández"},
+      {et:"Producción", dt:"05/06/2026 · 11:15", de:"Fabricación del lote L-2406-A. 4.000 unidades. Parámetros de proceso dentro de especificación.", who:"Planta · Línea 2"},
+      {et:"Control de calidad", dt:"08/06/2026 · 16:20", de:"Ensayos físico-químicos y microbiológicos: conforme. pH 6.8, valoración 99.2%.", who:"Laboratorio · Dra. M. Ríos"},
+      {et:"Liberación", dt:"10/06/2026 · 09:05", de:"Lote liberado para comercialización. Firma de dirección técnica.", who:"Dirección Técnica"},
+      {et:"Distribución", dt:"14/06/2026 · 07:30", de:"Despacho a 3 distribuidores regionales. Cadena de frío registrada.", who:"Logística"},
+    ]
+  },
+  "L-2405-B": {
+    producto:"Vitamina inyectable equina · 250 ml", fabricacion:"22/05/2026", vencimiento:"22/05/2028",
+    estado:"En control de calidad", sello:"5b3e· 90aa· 1f47· cc20",
+    eventos:[
+      {et:"Recepción de materia prima", dt:"14/05/2026 · 10:10", de:"Ingreso de vitaminas y vehículo estéril. Certificados validados.", who:"Depósito · L. Fernández"},
+      {et:"Producción", dt:"18/05/2026 · 13:40", de:"Fabricación del lote L-2405-B. 2.500 unidades.", who:"Planta · Línea 1"},
+      {et:"Control de calidad", dt:"En curso", de:"Ensayo de esterilidad en incubación (14 días). Resultado preliminar conforme.", who:"Laboratorio · Dra. M. Ríos"},
+    ]
+  },
+  "L-2404-C": {
+    producto:"Suplemento mineral porcino · 25 kg", fabricacion:"30/04/2026", vencimiento:"30/04/2027",
+    estado:"Retirado del mercado", sello:"7d10· 44be· a2f9· 0e63",
+    eventos:[
+      {et:"Recepción de materia prima", dt:"20/04/2026 · 09:00", de:"Ingreso de premezcla mineral (lote MP-8710).", who:"Depósito"},
+      {et:"Producción", dt:"24/04/2026 · 14:20", de:"Fabricación del lote L-2404-C. 800 bolsas.", who:"Planta · Línea 3"},
+      {et:"Control de calidad", dt:"27/04/2026 · 15:00", de:"Desvío detectado: humedad fuera de especificación en 2 muestras.", who:"Laboratorio"},
+      {et:"Retiro preventivo", dt:"02/05/2026 · 11:30", de:"Retiro del mercado del lote completo. Notificación a distribuidores y trazado de unidades entregadas (612 de 800 recuperadas).", who:"Dirección Técnica"},
+    ]
+  },
+};
+
+const norm = s => String(s||"").toUpperCase().replace(/\s+/g,"").trim();
+const LOOKUP = {}; Object.keys(LOTES).forEach(k=>LOOKUP[norm(k)]=k);
+
+function buscar(codigo){
+  const key = LOOKUP[norm(codigo)];
+  const nf = document.getElementById("notfound"), res = document.getElementById("resultado");
+  if(!key){ res.classList.add("hide"); nf.classList.remove("hide");
+    nf.textContent = "No se encontró el lote «"+codigo+"». Prueba con L-2406-A, L-2405-B o L-2404-C."; return; }
+  nf.classList.add("hide");
+  const L = LOTES[key];
+  const estadoColor = L.estado==="Retirado del mercado" ? "var(--warn)" : "var(--ok)";
+  res.innerHTML = `<div class="card">
+    <div class="lote-head">
+      <div><div class="code">${key}</div><h2>${L.producto}</h2></div>
+      <div style="text-align:right"><div class="muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em">Estado</div>
+        <div style="font-weight:800;color:${estadoColor}">${L.estado}</div></div>
+    </div>
+    <div class="meta">
+      <div><div class="l">Fabricación</div><div class="v">${L.fabricacion}</div></div>
+      <div><div class="l">Vencimiento</div><div class="v">${L.vencimiento}</div></div>
+      <div><div class="l">Eventos registrados</div><div class="v">${L.eventos.length}</div></div>
+    </div>
+    <div class="sello">🔒 <span>Sello de integridad · <span class="h">${L.sello}</span></span>
+      <span class="muted" style="margin-left:auto">registro inalterable</span></div>
+    <div class="tl">${L.eventos.map(e=>`
+      <div class="ev"><div class="dot"></div>
+        <div class="et">${e.et}</div><div class="dt">${e.dt}</div>
+        <div class="de">${e.de}</div><div class="who">${e.who}</div></div>`).join("")}</div>
+  </div>`;
+  res.classList.remove("hide");
+  res.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+document.getElementById("btn-buscar").addEventListener("click",()=>buscar(document.getElementById("q").value));
+document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")buscar(e.target.value);});
+document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{
+  document.getElementById("q").value=c.dataset.l; buscar(c.dataset.l);
+}));
+</script>
+</body>
+</html>

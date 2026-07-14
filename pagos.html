@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de lote de pagos · Demo</title>
+<script src="/lib/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1523; --panel:#151c2e; --panel2:#1b2338; --line:#28324c;
+    --ink:#eef2fb; --muted:#93a0bd; --accent:#dafb37; --accent2:#5b8cff;
+    --ok:#37d99a; --warn:#ffb454; --err:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
+     radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.18),transparent),
+     radial-gradient(900px 500px at -10% 10%,rgba(218,251,55,.08),transparent),var(--bg);
+     color:var(--ink);min-height:100vh}
+  .wrap{max-width:1000px;margin:0 auto;padding:38px 22px 80px}
+  header .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:.35rem 0 .3rem;line-height:1.08;font-weight:800}
+  h1 em{font-style:normal;color:var(--accent)}
+  .sub{color:var(--muted);font-size:1.02rem;max-width:60ch;line-height:1.5}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0 22px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 18px;position:relative}
+  .step .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#0f1523;font-weight:800;display:grid;place-items:center;font-size:.85rem;margin-bottom:10px}
+  .step h3{margin:.1rem 0 .3rem;font-size:1rem}
+  .step p{margin:0;color:var(--muted);font-size:.86rem;line-height:1.45}
+  .btn{appearance:none;border:0;border-radius:11px;padding:12px 18px;font-weight:700;font-size:.92rem;cursor:pointer;transition:.15s;font-family:inherit}
+  .btn-primary{background:var(--accent);color:#0f1523}
+  .btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--accent2)}
+  .btn-blue{background:var(--accent2);color:#fff}
+  .btn-blue:hover{filter:brightness(1.06);transform:translateY(-1px)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .drop{margin-top:6px;border:1.5px dashed var(--line);border-radius:16px;background:var(--panel);
+        padding:34px 22px;text-align:center;transition:.15s;cursor:pointer}
+  .drop.hot{border-color:var(--accent);background:var(--panel2)}
+  .drop .big{font-size:1.05rem;font-weight:700}
+  .drop .small{color:var(--muted);font-size:.85rem;margin-top:6px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:22px}
+  .card h2{margin:0 0 4px;font-size:1.15rem}
+  .card .lead{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:4px 0 18px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .stat .v{font-size:1.5rem;font-weight:800}
+  .stat .l{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+  .v.ok{color:var(--ok)} .v.warn{color:var(--warn)}
+  table{width:100%;border-collapse:collapse;font-size:.84rem}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--panel)}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+  .tag.ok{background:rgba(55,217,154,.15);color:var(--ok)}
+  .tag.no{background:rgba(255,107,107,.15);color:var(--err)}
+  .tbl-wrap{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .opt{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:16px}
+  .opt h4{margin:0 0 4px;font-size:.98rem}
+  .opt p{margin:0 0 12px;color:var(--muted);font-size:.82rem;line-height:1.45}
+  pre{background:#0a0f1a;border:1px solid var(--line);border-radius:12px;padding:14px;overflow:auto;
+      font-size:.72rem;line-height:1.5;color:#b9c6e6;max-height:220px;margin-top:8px;white-space:pre}
+  .muted{color:var(--muted)} .hide{display:none}
+  footer{margin-top:40px;color:var(--muted);font-size:.78rem;text-align:center;line-height:1.6}
+  .badge{display:inline-block;background:rgba(255,180,84,.14);color:var(--warn);border:1px solid rgba(255,180,84,.3);
+         padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.03em}
+  @media(max-width:720px){.steps,.stats,.opts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="/" style="display:inline-block;color:#93a0bd;text-decoration:none;font-size:.82rem;margin-bottom:14px">← Demos</a>
+  <header>
+    <div class="kick">Automatización de procesos financieros</div>
+    <h1>Del Excel de pagos<br>al <em>archivo para el banco</em></h1>
+    <p class="sub">Subes la planilla de la operación tal como sale del sistema. La plataforma reconoce a cada beneficiario, completa el CBU y genera el lote listo para importar en el homebanking — en segundos, sin cargar nada a mano.</p>
+    <div style="margin-top:14px"><span class="badge">Demo · datos ficticios</span></div>
+  </header>
+
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h3>Descarga el ejemplo</h3><p>Una planilla de pagos igual a la que usa la operación, con beneficiarios e importes.</p></div>
+    <div class="step"><div class="n">2</div><h3>Sube el Excel</h3><p>La plataforma lee la planilla y cruza cada beneficiario con la base de cuentas.</p></div>
+    <div class="step"><div class="n">3</div><h3>Descarga el lote</h3><p>Archivo para el banco + planilla procesada. Revisas y confirmas.</p></div>
+  </div>
+
+  <div class="row">
+    <button class="btn btn-ghost" id="btn-ejemplo">⬇ Descargar Excel de ejemplo</button>
+    <span class="muted" style="font-size:.82rem">o sube tu propia planilla abajo</span>
+  </div>
+
+  <div class="drop" id="drop" style="margin-top:16px">
+    <div class="big">Arrastra el Excel aquí o haz clic para elegirlo</div>
+    <div class="small">Formato .xlsx — columnas: Beneficiario · Importe</div>
+    <input type="file" id="file" accept=".xlsx,.xls" class="hide">
+  </div>
+
+  <div id="resultado" class="hide">
+    <div class="card">
+      <h2>Resultado del procesamiento</h2>
+      <p class="lead">Cada fila de la planilla, cruzada con la base de cuentas.</p>
+      <div class="stats">
+        <div class="stat"><div class="v" id="s-total">0</div><div class="l">Pagos</div></div>
+        <div class="stat"><div class="v" id="s-monto">$0</div><div class="l">Monto total</div></div>
+        <div class="stat"><div class="v ok" id="s-match">0</div><div class="l">Con cuenta</div></div>
+        <div class="stat"><div class="v warn" id="s-nomatch">0</div><div class="l">A revisar</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table id="tabla"><thead><tr><th>Beneficiario</th><th>Banco</th><th>CBU</th><th class="num">Importe</th><th>Estado</th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <div class="opts">
+        <div class="opt">
+          <h4>Archivo para el banco (.txt)</h4>
+          <p>Lote en formato Interbanking — cabecera del ordenante + un registro por pago. Se importa directo en el homebanking.</p>
+          <button class="btn btn-primary" id="btn-txt">⬇ Descargar lote .txt</button>
+        </div>
+        <div class="opt">
+          <h4>Planilla procesada (.xlsx)</h4>
+          <p>El mismo Excel, con CBU y banco completados y las filas a revisar marcadas.</p>
+          <button class="btn btn-blue" id="btn-xlsx">⬇ Descargar Excel procesado</button>
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="muted" style="font-size:.8rem;font-weight:600">Vista previa del lote (primeras líneas)</div>
+        <pre id="preview"></pre>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Demo con datos ficticios · ninguna cuenta ni empresa es real.<br>
+    Automatización de procesos financieros · Scalabl
+  </footer>
+</div>
+
+<script>
+// ── Registro ficticio de beneficiarios (nombre → CBU · banco) ─────────────────
+const REGISTRO = [
+  {nombre:"Distribuidora del Norte S.A.",      cbu:"2850590940090418135201", banco:"Macro"},
+  {nombre:"Insumos Patagonia S.R.L.",          cbu:"0070099530004012345678", banco:"Galicia"},
+  {nombre:"Transporte Andino S.A.",            cbu:"0110359230035901824417", banco:"Nación"},
+  {nombre:"Metalúrgica Río Cuarto S.R.L.",     cbu:"0170099540000012398765", banco:"BBVA"},
+  {nombre:"Papelera Litoral S.A.",             cbu:"0140301703500091234567", banco:"Provincia"},
+  {nombre:"Servicios Cuyo S.R.L.",             cbu:"1910001155000078451236", banco:"Credicoop"},
+  {nombre:"Alimentos del Sur S.A.",            cbu:"0720000188000018345291", banco:"Santander"},
+  {nombre:"Ferretería Central S.R.L.",         cbu:"0000031500000201948572", banco:"Nación"},
+  {nombre:"Química Delta S.A.",                cbu:"0270005810000112233445", banco:"Supervielle"},
+  {nombre:"Logística Pampeana S.R.L.",         cbu:"0110123430012345678901", banco:"Nación"},
+  {nombre:"Envases del Plata S.A.",            cbu:"0150501101000098761234", banco:"ICBC"},
+  {nombre:"Textil Mediterránea S.R.L.",        cbu:"3220001805000045612378", banco:"Comafi"},
+  {nombre:"Repuestos Andes S.A.",              cbu:"0290000012000034567812", banco:"Ciudad"},
+  {nombre:"Agroinsumos La Llanura S.R.L.",     cbu:"0340008500000019283746", banco:"Patagonia"},
+  {nombre:"Construcciones Aconcagua S.A.",     cbu:"0110471530047100255893", banco:"Nación"},
+  {nombre:"Electrónica del Este S.R.L.",       cbu:"0070144530004098712345", banco:"Galicia"},
+];
+const CBU_ORDENANTE = "0110000000000012345678"; // ordenante ficticio
+
+// ── Normalización de nombres (para el match) ──────────────────────────────────
+function norm(s){
+  return String(s||"").toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.,]/g," ").replace(/\s+/g," ").trim();
+}
+const LOOKUP = {};
+REGISTRO.forEach(r => LOOKUP[norm(r.nombre)] = r);
+
+// ── Formato Interbanking ──────────────────────────────────────────────────────
+function fmtX(v,len){ return String(v==null?"":v).slice(0,len).padEnd(len," "); }
+function fmtImporte(v){ return String(Math.round(parseFloat(v)*100)).padStart(17,"0"); }
+function pad2(n){ return String(n).padStart(2,"0"); }
+function regU(cbu,fecha,obs){
+  const a = fecha.getFullYear()+pad2(fecha.getMonth()+1)+pad2(fecha.getDate());
+  const m = pad2(fecha.getMonth()+1)+"/"+pad2(fecha.getDate())+"/"+String(fecha.getFullYear()).slice(2);
+  return "*U*"+fmtX(cbu,22)+"D"+a+"N"+fmtX(obs,60)+" "+"000"+"00"+fmtX(m,8)+fmtX(a,8)+" ".repeat(123);
+}
+function regM(cbu,importe,nombre){
+  return "*M*"+fmtX(cbu,22)+fmtImporte(importe)+fmtX(nombre,60)
+    +"  "+" ".repeat(12)+"  "+" ".repeat(12)+" ".repeat(12)
+    +"  "+"0".repeat(12)+" ".repeat(12)+"0".repeat(10)+" ".repeat(11)+" ".repeat(51);
+}
+
+// ── Estado ────────────────────────────────────────────────────────────────────
+let FILAS = [];
+const fmtMoney = n => "$"+Number(n).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ── Generar Excel de ejemplo ──────────────────────────────────────────────────
+document.getElementById("btn-ejemplo").addEventListener("click", ()=>{
+  const muestra = [
+    ["Beneficiario","Importe"],
+    ["Distribuidora del Norte S.A.", 458200.50],
+    ["Insumos Patagonia S.R.L.",      127900.00],
+    ["Transporte Andino S.A.",        312450.75],
+    ["Metalúrgica Río Cuarto S.R.L.",  89300.00],
+    ["Papelera Litoral S.A.",         204100.20],
+    ["Servicios Cuyo S.R.L.",          65780.00],
+    ["Alimentos del Sur S.A.",        531200.00],
+    ["Ferretería Central S.R.L.",      42350.90],
+    ["Química Delta S.A.",            178650.00],
+    ["Logística Pampeana S.R.L.",     296400.00],
+    ["Envases del Plata S.A.",        115900.40],
+    ["Consultora Nueva Era S.R.L.",    73200.00],  // sin cuenta en la base → a revisar
+    ["Repuestos Andes S.A.",          158740.00],
+    ["Agroinsumos La Llanura S.R.L.", 402310.60],
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(muestra);
+  ws["!cols"] = [{wch:34},{wch:14}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Pagos");
+  XLSX.writeFile(wb, "pagos_ejemplo.xlsx");
+});
+
+// ── Carga / drag & drop ───────────────────────────────────────────────────────
+const drop = document.getElementById("drop");
+const fileInput = document.getElementById("file");
+drop.addEventListener("click", ()=> fileInput.click());
+drop.addEventListener("dragover", e=>{ e.preventDefault(); drop.classList.add("hot"); });
+drop.addEventListener("dragleave", ()=> drop.classList.remove("hot"));
+drop.addEventListener("drop", e=>{ e.preventDefault(); drop.classList.remove("hot"); if(e.dataTransfer.files[0]) leer(e.dataTransfer.files[0]); });
+fileInput.addEventListener("change", e=>{ if(e.target.files[0]) leer(e.target.files[0]); });
+
+function leer(file){
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const wb = XLSX.read(new Uint8Array(e.target.result), {type:"array"});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, {header:1, blankrows:false});
+    procesar(rows);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function esImporte(v){ return v!=null && v!=="" && !isNaN(parseFloat(String(v).replace(/[.$\s]/g,"").replace(",","."))); }
+function parseImporte(v){
+  if(typeof v==="number") return v;
+  return parseFloat(String(v).replace(/\./g,"").replace(",",".").replace(/[^0-9.]/g,""))||0;
+}
+
+function procesar(rows){
+  // detectar fila de encabezado y columnas nombre/importe
+  FILAS = [];
+  let startIdx = 0;
+  const first = (rows[0]||[]).map(x=>norm(x));
+  if(first.some(c=>/BENEFICIARIO|NOMBRE|PROVEEDOR|RAZON/.test(c))) startIdx = 1;
+  for(let i=startIdx;i<rows.length;i++){
+    const r = rows[i]; if(!r) continue;
+    // nombre = primera celda de texto; importe = primera celda numérica
+    let nombre=null, importe=null;
+    for(const c of r){
+      if(nombre===null && typeof c==="string" && c.trim() && !esImporte(c)) nombre=c.trim();
+      else if(importe===null && esImporte(c)) importe=parseImporte(c);
+    }
+    if(!nombre || importe===null) continue;
+    const hit = LOOKUP[norm(nombre)] || null;
+    FILAS.push({nombre, importe, cbu: hit?hit.cbu:"", banco: hit?hit.banco:"", match: !!hit});
+  }
+  render();
+}
+
+function render(){
+  const cont = document.getElementById("resultado");
+  cont.classList.remove("hide");
+  const total = FILAS.length;
+  const monto = FILAS.reduce((a,f)=>a+f.importe,0);
+  const match = FILAS.filter(f=>f.match).length;
+  document.getElementById("s-total").textContent = total;
+  document.getElementById("s-monto").textContent = fmtMoney(monto);
+  document.getElementById("s-match").textContent = match;
+  document.getElementById("s-nomatch").textContent = total-match;
+
+  const tb = document.querySelector("#tabla tbody");
+  tb.innerHTML = FILAS.map(f=>`<tr>
+     <td>${f.nombre}</td>
+     <td>${f.banco||'<span class="muted">—</span>'}</td>
+     <td style="font-variant-numeric:tabular-nums">${f.cbu||'<span class="muted">—</span>'}</td>
+     <td class="num">${fmtMoney(f.importe)}</td>
+     <td>${f.match?'<span class="tag ok">✓ Con cuenta</span>':'<span class="tag no">A revisar</span>'}</td>
+   </tr>`).join("");
+
+  // preview del TXT (solo los que matchean)
+  const pagos = FILAS.filter(f=>f.match);
+  const lineas = generarTxt(pagos).split("\n");
+  document.getElementById("preview").textContent =
+     lineas.slice(0,6).join("\n") + (lineas.length>6?("\n… ("+lineas.length+" líneas en total)"):"");
+  cont.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function generarTxt(pagos){
+  const hoy = new Date();
+  const obs = "Pago a proveedores "+pad2(hoy.getDate())+"/"+pad2(hoy.getMonth()+1)+"/"+hoy.getFullYear();
+  const out = [ regU(CBU_ORDENANTE, hoy, obs) ];
+  pagos.forEach(p=> out.push(regM(p.cbu, p.importe, p.nombre)));
+  return out.join("\n")+"\n";
+}
+
+document.getElementById("btn-txt").addEventListener("click", ()=>{
+  const pagos = FILAS.filter(f=>f.match);
+  if(!pagos.length){ alert("No hay pagos con cuenta para exportar."); return; }
+  const hoy = new Date();
+  const nombre = "lote_pagos_"+hoy.getFullYear()+pad2(hoy.getMonth()+1)+pad2(hoy.getDate())+".txt";
+  const blob = new Blob([generarTxt(pagos)], {type:"text/plain"});
+  descargar(blob, nombre);
+});
+
+document.getElementById("btn-xlsx").addEventListener("click", ()=>{
+  const data = [["Beneficiario","Banco","CBU","Importe","Estado"]];
+  FILAS.forEach(f=> data.push([f.nombre, f.banco, f.cbu, f.importe, f.match?"Con cuenta":"A revisar"]));
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws["!cols"]=[{wch:34},{wch:14},{wch:26},{wch:14},{wch:12}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Procesado");
+  XLSX.writeFile(wb, "pagos_procesado.xlsx");
+});
+
+function descargar(blob, nombre){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
+</script>
+</body>
+</html>

@@ -3,19 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap" rel="stylesheet">
 <title>Dashboard operativo · Demo</title>
 <style>
-  :root{--bg:#0f1523;--panel:#151c2e;--panel2:#1b2338;--line:#28324c;--ink:#eef2fb;--muted:#93a0bd;
-    --accent:#dafb37;--accent2:#5b8cff;--ok:#37d99a;--warn:#ffb454;--err:#ff6b6b;--violet:#a78bfa;}
+  :root{
+    --bg:#F2F2F4;--panel:#FFFFFF;--panel2:#F5F6F8;--line:#E3E4E9;--ink:#1A212A;--muted:#565E68;--accent:#1F4E9B;--accent2:#2E63B8;--ok:#1f9d63;--ok-bg:rgba(31,157,99,.10);--warn:#b7791f;--err:#d64545;--err-bg:rgba(214,69,69,.10);--violet:#7c5cd6;
+  }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
-     radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.18),transparent),
-     radial-gradient(900px 500px at -10% 10%,rgba(218,251,55,.08),transparent),var(--bg);color:var(--ink);min-height:100vh}
+     radial-gradient(1200px 600px at 80% -10%,rgba(31,78,155,.06),transparent),
+     radial-gradient(900px 500px at -10% 10%,rgba(127,168,220,.10),transparent),var(--bg);color:var(--ink);min-height:100vh}
   .wrap{max-width:1080px;margin:0 auto;padding:30px 22px 80px}
   .back{display:inline-block;color:var(--muted);text-decoration:none;font-size:.82rem;margin-bottom:14px}
   .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  h1{font-size:clamp(1.7rem,4vw,2.4rem);margin:.35rem 0 .3rem;line-height:1.08;font-weight:800}
-  h1 em{font-style:normal;color:var(--accent)}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,4vw,2.4rem);margin:.35rem 0 .3rem;line-height:1.08;font-weight:800}
+  h1 em{font-style:italic;color:var(--accent)}
   .sub{color:var(--muted);font-size:1rem;max-width:62ch;line-height:1.5}
   .badge{display:inline-block;background:rgba(255,180,84,.14);color:var(--warn);border:1px solid rgba(255,180,84,.3);
      padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.03em;margin-top:14px}
@@ -23,7 +27,7 @@
   .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
   .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:inherit;font-weight:700;
      font-size:.85rem;padding:9px 16px;cursor:pointer;transition:.14s}
-  .seg button.on{background:var(--accent);color:#0f1523}
+  .seg button.on{background:var(--accent);color:#fff}
   .updated{color:var(--muted);font-size:.78rem;margin-left:auto}
   .updated .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:6px;box-shadow:0 0 0 3px rgba(55,217,154,.18)}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
@@ -63,6 +67,31 @@
   .alert .t{font-weight:700;font-size:.86rem}.alert .d{color:var(--muted);font-size:.78rem;margin-top:1px}
   footer{margin-top:40px;color:var(--muted);font-size:.78rem;text-align:center;line-height:1.6}
   @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr}.grid2,.grid2b{grid-template-columns:1fr}}
+
+  /* chat asistente */
+  .chat-fab{position:fixed;right:22px;bottom:22px;width:56px;height:56px;border-radius:50%;border:0;cursor:pointer;
+    background:var(--accent);color:#fff;font-size:1.4rem;box-shadow:0 8px 26px rgba(31,78,155,.4);z-index:40;transition:.15s}
+  .chat-fab:hover{transform:translateY(-2px)}
+  .chat-win{position:fixed;right:22px;bottom:88px;width:min(380px,calc(100vw - 44px));height:min(520px,70vh);
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 60px rgba(26,33,42,.25);
+    display:none;flex-direction:column;overflow:hidden;z-index:40}
+  .chat-win.open{display:flex}
+  .chat-head{background:var(--accent);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px}
+  .chat-head .av{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center}
+  .chat-head .tt{font-weight:700;font-size:.92rem}.chat-head .ss{font-size:.72rem;opacity:.85}
+  .chat-head .x{margin-left:auto;background:transparent;border:0;color:#fff;font-size:1.2rem;cursor:pointer;opacity:.85}
+  .chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--panel2)}
+  .msg{max-width:82%;padding:10px 13px;border-radius:14px;font-size:.86rem;line-height:1.45}
+  .msg.bot{background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start}
+  .msg.user{background:var(--accent);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+  .chat-pills{display:flex;gap:7px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);background:var(--panel)}
+  .chat-pill{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:6px 11px;font-size:.76rem;
+    color:var(--accent);cursor:pointer;font-family:inherit;font-weight:600;transition:.14s}
+  .chat-pill:hover{border-color:var(--accent);background:#fff}
+  .chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:var(--panel)}
+  .chat-input-row input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:.85rem;color:var(--ink);outline:none}
+  .chat-input-row input:focus{border-color:var(--accent)}
+  .chat-input-row button{border:0;background:var(--accent);color:#fff;border-radius:10px;padding:0 15px;font-weight:800;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -123,7 +152,7 @@ const DATA = {
   mes: {
     kpis:[["Ventas","$48,2 M","+8,4%","up"],["Pedidos","3.940","+5,1%","up"],["Ticket prom.","$12.230","+3,2%","up"],["Margen","31,4%","-0,6%","down"]],
     suc:[["Centro",14.1],["Norte",11.8],["Sur",9.2],["Oeste",7.6],["Litoral",5.5]],
-    canal:[["Local",46,"#5b8cff"],["Online",34,"#dafb37"],["Mayorista",20,"#a78bfa"]],
+    canal:[["Local",46,"#1F4E9B"],["Online",34,"#4E9BD4"],["Mayorista",20,"#A7C4E4"]],
     linea:[31,34,33,38,40,44,45,48],
     tabla:[["Centro","$14,1 M","1.180","$11.950","+9%","up"],["Norte","$11,8 M","980","$12.040","+6%","up"],["Sur","$9,2 M","760","$12.100","+2%","up"],["Oeste","$7,6 M","640","$11.870","-3%","down"],["Litoral","$5,5 M","380","$14.470","+11%","up"]],
     alerts:[["err","📉","Oeste bajó 3%","Segundo mes en caída. Revisar dotación y mix."],["warn","📦","Stock bajo en 4 SKU","Reponer antes del fin de semana en Centro y Norte."],["info","🎯","Meta del mes al 96%","Faltan $1,8 M para cerrar el objetivo."]],
@@ -131,7 +160,7 @@ const DATA = {
   tri: {
     kpis:[["Ventas","$139,6 M","+7,1%","up"],["Pedidos","11.520","+4,3%","up"],["Ticket prom.","$12.120","+2,7%","up"],["Margen","31,9%","+0,4%","up"]],
     suc:[["Centro",41.0],["Norte",34.2],["Sur",26.8],["Oeste",22.9],["Litoral",14.7]],
-    canal:[["Local",44,"#5b8cff"],["Online",37,"#dafb37"],["Mayorista",19,"#a78bfa"]],
+    canal:[["Local",44,"#1F4E9B"],["Online",37,"#4E9BD4"],["Mayorista",19,"#A7C4E4"]],
     linea:[95,102,110,118,125,131,136,140],
     tabla:[["Centro","$41,0 M","3.410","$12.020","+8%","up"],["Norte","$34,2 M","2.860","$11.960","+5%","up"],["Sur","$26,8 M","2.210","$12.130","+3%","up"],["Oeste","$22,9 M","1.940","$11.800","-1%","down"],["Litoral","$14,7 M","1.100","$13.360","+9%","up"]],
     alerts:[["warn","📦","Quiebres recurrentes","3 SKU con faltante en 2 de 3 meses."],["info","🚀","Online creció 6 pts","Ganó participación sobre el canal local."],["info","🎯","Trimestre sobre plan","+3,1% vs. presupuesto."]],
@@ -139,7 +168,7 @@ const DATA = {
   ano: {
     kpis:[["Ventas","$536,0 M","+12,8%","up"],["Pedidos","44.700","+9,0%","up"],["Ticket prom.","$11.990","+3,5%","up"],["Margen","32,2%","+1,1%","up"]],
     suc:[["Centro",158],["Norte",131],["Sur",103],["Oeste",88],["Litoral",56]],
-    canal:[["Local",42,"#5b8cff"],["Online",40,"#dafb37"],["Mayorista",18,"#a78bfa"]],
+    canal:[["Local",42,"#1F4E9B"],["Online",40,"#4E9BD4"],["Mayorista",18,"#A7C4E4"]],
     linea:[62,68,74,79,83,89,95,100].map(x=>x*1.3),
     tabla:[["Centro","$158 M","13.100","$12.060","+13%","up"],["Norte","$131 M","11.000","$11.910","+11%","up"],["Sur","$103 M","8.600","$11.980","+9%","up"],["Oeste","$88 M","7.500","$11.730","+4%","up"],["Litoral","$56 M","4.500","$12.440","+15%","up"]],
     alerts:[["info","🏆","Mejor año de la serie","+12,8% vs. año anterior."],["info","🚀","Online casi empata a Local","40% vs 42% de participación."],["warn","🧭","Oeste rezagada","Crece por debajo del promedio (+4%)."]],
@@ -156,7 +185,7 @@ function render(p){
     <div class="bar-track"><div class="bar" style="height:${Math.round(s[1]/max*100)}%"></div></div><div class="bar-lb">${s[0]}</div></div>`).join("");
   // donut
   let acc=0;const circ=document.getElementById("donut");
-  circ.innerHTML=`<circle cx="21" cy="21" r="15.915" fill="none" stroke="#28324c" stroke-width="6"></circle>`+
+  circ.innerHTML=`<circle cx="21" cy="21" r="15.915" fill="none" stroke="#E3E4E9" stroke-width="6"></circle>`+
     d.canal.map(c=>{const seg=`<circle cx="21" cy="21" r="15.915" fill="none" stroke="${c[2]}" stroke-width="6"
       stroke-dasharray="${c[1]} ${100-c[1]}" stroke-dashoffset="${25-acc}"></circle>`;acc+=c[1];return seg;}).join("");
   document.getElementById("legend").innerHTML=d.canal.map(c=>`<div><span class="sw" style="background:${c[2]}"></span>${c[0]}<span class="pct">${c[1]}%</span></div>`).join("");
@@ -166,7 +195,7 @@ function render(p){
   const path=pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
   const area=`${pad},${H-pad} `+path+` ${W-pad},${H-pad}`;
   document.getElementById("line").innerHTML=`
-    <polygon points="${area}" fill="rgba(218,251,55,.08)"></polygon>
+    <polygon points="${area}" fill="rgba(127,168,220,.10)"></polygon>
     <polyline points="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
     ${pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--accent)"></circle>`).join("")}`;
   // tabla
@@ -180,6 +209,41 @@ document.getElementById("seg").addEventListener("click",e=>{
   render(b.dataset.p);
 });
 render("mes");
+</script>
+
+<button class="chat-fab" id="fab" onclick="toggleChat()" aria-label="Asistente">✦</button>
+<div class="chat-win" id="chat">
+  <div class="chat-head"><div class="av">✦</div>
+    <div><div class="tt">Asistente de operación</div><div class="ss">Pregúntale sobre el panel</div></div>
+    <button class="x" onclick="toggleChat()">×</button></div>
+  <div class="chat-msgs" id="msgs"></div>
+  <div class="chat-pills" id="pills"></div>
+  <div class="chat-input-row">
+    <input id="chat-in" placeholder="Escribe una pregunta…" onkeydown="if(event.key==='Enter')enviar()">
+    <button onclick="enviar()">➤</button>
+  </div>
+</div>
+<script>
+const BOT_INTRO="Hola 👋 Soy el asistente del panel. Puedo resumirte el período, comparar sucursales o explicarte las alertas. ¿Qué querés saber?";
+const QA=[
+  {k:["mejor","top","lidera","sucursal que","mejor sucursal","cuál vende"],a:"En el mes, <strong>Centro</strong> lidera con <strong>$14,1 M (+9%)</strong>. Le siguen Norte ($11,8 M, +6%) y Sur ($9,2 M, +2%)."},
+  {k:["oeste","cayo","cayó","baja","peor","cae"],a:"<strong>Oeste</strong> cayó <strong>3%</strong> — es su segundo mes en baja. La alerta recomienda revisar dotación y mix de productos en esa sucursal."},
+  {k:["meta","objetivo","plan","llegamos"],a:"El mes va al <strong>96% de la meta</strong>. Faltan <strong>$1,8 M</strong> para cerrar el objetivo."},
+  {k:["resum","resumen","como viene","cómo viene","general","panorama"],a:"Ventas <strong>$48,2 M (+8,4%)</strong>, 3.940 pedidos, ticket promedio $12.230. El margen bajó 0,6 pts (31,4%). Online ganó terreno."},
+  {k:["canal","online","local","mayorista"],a:"Por canal: <strong>Local 46%</strong>, <strong>Online 34%</strong>, Mayorista 20%. Online viene creciendo mes a mes."},
+  {k:["stock","quiebre","faltante","reponer"],a:"Hay <strong>stock bajo en 4 SKU</strong>. Conviene reponer antes del fin de semana en Centro y Norte."},
+];
+const PILLS=["Resumime el mes","¿Mejor sucursal?","¿Por qué cayó Oeste?","¿Cómo viene la meta?"];
+function toggleChat(){const c=document.getElementById("chat");c.classList.toggle("open");
+  if(c.classList.contains("open")&&!document.getElementById("msgs").children.length){bot(BOT_INTRO);pills();}}
+function pills(){document.getElementById("pills").innerHTML=PILLS.map(p=>`<button class="chat-pill" onclick="preg('${p}')">${p}</button>`).join("");}
+function add(cls,html){const m=document.createElement("div");m.className="msg "+cls;m.innerHTML=html;
+  const box=document.getElementById("msgs");box.appendChild(m);box.scrollTop=box.scrollHeight;}
+function bot(h){add("bot",h);} 
+function responder(q){const s=q.toLowerCase();const hit=QA.find(x=>x.k.some(k=>s.includes(k)));
+  return hit?hit.a:"Puedo contarte sobre <strong>sucursales</strong>, <strong>canales</strong>, la <strong>meta</strong> del mes o darte un <strong>resumen</strong>. Probá una de las sugerencias de arriba.";}
+function preg(q){add("user",q);setTimeout(()=>bot(responder(q)),350);}
+function enviar(){const i=document.getElementById("chat-in");const v=i.value.trim();if(!v)return;i.value="";preg(v);}
 </script>
 </body>
 </html>

@@ -3,21 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap" rel="stylesheet">
 <title>Demos · IA aplicada a la operación</title>
 <style>
   :root{
-    --bg:#0f1523; --panel:#151c2e; --panel2:#1b2338; --line:#28324c;
-    --ink:#eef2fb; --muted:#93a0bd; --accent:#dafb37; --accent2:#5b8cff;
+    --bg:#F2F2F4;--panel:#FFFFFF;--panel2:#F5F6F8;--line:#E3E4E9;--ink:#1A212A;--muted:#565E68;--accent:#1F4E9B;--accent2:#2E63B8;--ok:#1f9d63;--ok-bg:rgba(31,157,99,.10);--warn:#b7791f;--err:#d64545;--err-bg:rgba(214,69,69,.10);--violet:#7c5cd6;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
-     radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.18),transparent),
-     radial-gradient(900px 500px at -10% 10%,rgba(218,251,55,.08),transparent),var(--bg);
+     radial-gradient(1200px 600px at 80% -10%,rgba(31,78,155,.06),transparent),
+     radial-gradient(900px 500px at -10% 10%,rgba(127,168,220,.10),transparent),var(--bg);
      color:var(--ink);min-height:100vh}
   .wrap{max-width:940px;margin:0 auto;padding:56px 22px 80px}
   .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  h1{font-size:clamp(1.9rem,4.5vw,2.9rem);margin:.4rem 0 .35rem;line-height:1.06;font-weight:800}
-  h1 em{font-style:normal;color:var(--accent)}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,4.5vw,2.9rem);margin:.4rem 0 .35rem;line-height:1.06;font-weight:800}
+  h1 em{font-style:italic;color:var(--accent)}
   .sub{color:var(--muted);font-size:1.05rem;max-width:62ch;line-height:1.55}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:34px}
   a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);border:1px solid var(--line);
@@ -29,7 +31,7 @@
   .card p{margin:0;color:var(--muted);font-size:.87rem;line-height:1.5}
   .pill{position:absolute;top:16px;right:16px;font-size:.66rem;font-weight:700;letter-spacing:.04em;
      text-transform:uppercase;padding:4px 9px;border-radius:20px}
-  .pill.live{background:rgba(55,217,154,.16);color:#37d99a}
+  .pill.live{background:rgba(31,157,99,.12);color:#1f9d63}
   .pill.soon{background:rgba(147,160,189,.14);color:var(--muted)}
   .go{margin-top:14px;color:var(--accent2);font-weight:700;font-size:.86rem}
   footer{margin-top:48px;color:var(--muted);font-size:.78rem;line-height:1.6;border-top:1px solid var(--line);padding-top:20px}

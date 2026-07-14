@@ -3,32 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap" rel="stylesheet">
 <title>Factura vs. Orden de compra · Demo</title>
 <style>
-  :root{--bg:#0f1523;--panel:#151c2e;--panel2:#1b2338;--line:#28324c;--ink:#eef2fb;--muted:#93a0bd;
-    --accent:#dafb37;--accent2:#5b8cff;--ok:#37d99a;--ok-bg:rgba(55,217,154,.1);--err:#ff6b6b;--err-bg:rgba(255,107,107,.1);--warn:#ffb454;}
+  :root{
+    --bg:#F2F2F4;--panel:#FFFFFF;--panel2:#F5F6F8;--line:#E3E4E9;--ink:#1A212A;--muted:#565E68;--accent:#1F4E9B;--accent2:#2E63B8;--ok:#1f9d63;--ok-bg:rgba(31,157,99,.10);--warn:#b7791f;--err:#d64545;--err-bg:rgba(214,69,69,.10);--violet:#7c5cd6;
+  }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
-     radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.18),transparent),
-     radial-gradient(900px 500px at -10% 10%,rgba(218,251,55,.08),transparent),var(--bg);color:var(--ink);min-height:100vh}
+     radial-gradient(1200px 600px at 80% -10%,rgba(31,78,155,.06),transparent),
+     radial-gradient(900px 500px at -10% 10%,rgba(127,168,220,.10),transparent),var(--bg);color:var(--ink);min-height:100vh}
   .wrap{max-width:1000px;margin:0 auto;padding:30px 22px 80px}
   .back{display:inline-block;color:var(--muted);text-decoration:none;font-size:.82rem;margin-bottom:14px}
   .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:.35rem 0 .3rem;line-height:1.08;font-weight:800}
-  h1 em{font-style:normal;color:var(--accent)}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,4vw,2.5rem);margin:.35rem 0 .3rem;line-height:1.08;font-weight:800}
+  h1 em{font-style:italic;color:var(--accent)}
   .sub{color:var(--muted);font-size:1.02rem;max-width:64ch;line-height:1.5}
   .badge{display:inline-block;background:rgba(255,180,84,.14);color:var(--warn);border:1px solid rgba(255,180,84,.3);
      padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.03em;margin-top:14px}
   .steplabel{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
      margin:30px 0 12px;display:flex;align-items:center;gap:9px}
-  .stepnum{background:var(--accent);color:#0f1523;width:21px;height:21px;border-radius:50%;display:inline-flex;
+  .stepnum{background:var(--accent);color:#fff;width:21px;height:21px;border-radius:50%;display:inline-flex;
      align-items:center;justify-content:center;font-size:.72rem;font-weight:900}
   .oc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px}
   .oc-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
   .oc-meta{display:flex;gap:26px;flex-wrap:wrap}
   .oc-f .l{font-size:.64rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
   .oc-f .v{font-size:.9rem;font-weight:700;margin-top:2px}
-  .oc-pill{font-size:.7rem;font-weight:800;color:var(--accent);background:rgba(218,251,55,.1);padding:5px 12px;border-radius:100px;white-space:nowrap}
+  .oc-pill{font-size:.7rem;font-weight:800;color:var(--accent);background:rgba(31,78,155,.1);padding:5px 12px;border-radius:100px;white-space:nowrap}
   .oc-items{border-top:1px solid var(--line);margin-top:14px;padding-top:12px;display:flex;gap:12px;flex-wrap:wrap}
   .oc-item{font-size:.78rem;color:var(--muted);background:var(--panel2);padding:6px 12px;border-radius:8px}
   .oc-item strong{color:var(--ink)}

@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nómade Rentals · Dashboard de Torres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<script src="/lib/chart.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --sidebar: #141414;
+  --sidebar-hover: #252525;
+  --sidebar-footer: #0d0d0d;
+  --accent: #c29947;
+  --accent-light: #f7f0e0;
+  --bg: #F5F5F3;
+  --white: #ffffff;
+  --text: #2a2a2a;
+  --muted: #7a7a7a;
+  --border: #E5E3DF;
+  --gray-mid: #4f4f4f;
+  --green: #059669;
+  --green-bg: #D1FAE5;
+  --amber: #D97706;
+  --amber-bg: #FEF3C7;
+  --red: #DC2626;
+  --red-bg: #FEE2E2;
+  --shadow: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+}
+body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar { width: 220px; background: var(--sidebar); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 10px; }
+.sidebar-brand { padding: 1.5rem 1.25rem 1rem; border-bottom: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
+.brand-logo { font-size: .65rem; font-weight: 700; letter-spacing: .12em; color: rgba(255,255,255,.4); text-transform: uppercase; margin-bottom: .35rem; }
+.brand-name { font-size: 1.1rem; font-weight: 700; color: white; letter-spacing: -.01em; }
+.brand-sub { font-size: .72rem; color: rgba(255,255,255,.35); margin-top: .15rem; }
+.sidebar-nav { padding: .75rem; flex: 1; }
+.nav-label { font-size: .62rem; font-weight: 600; letter-spacing: .1em; color: rgba(255,255,255,.3); text-transform: uppercase; padding: .6rem .5rem .4rem; }
+.nav-item { display: flex; align-items: center; gap: .65rem; padding: .6rem .75rem; border-radius: 8px; cursor: pointer; font-size: .83rem; font-weight: 500; color: rgba(255,255,255,.5); transition: all .15s; margin-bottom: .15rem; }
+.nav-item:hover { background: var(--sidebar-hover); color: rgba(255,255,255,.8); }
+.nav-item.active { background: var(--accent); color: white; }
+.nav-item .icon { font-size: 1rem; width: 1.1rem; text-align: center; }
+.sidebar-bottom { padding: .75rem; border-top: 1px solid rgba(255,255,255,.06); flex-shrink: 0; background: var(--sidebar-footer); }
+.alert-badge { background: var(--accent); color: white; font-size: .65rem; font-weight: 700; padding: .15rem .45rem; border-radius: 20px; margin-left: auto; }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 1.75rem; height: 56px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: var(--shadow); }
+.topbar-left { display: flex; align-items: center; gap: 1rem; }
+.page-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+.date-chip { font-size: .78rem; color: var(--muted); background: var(--bg); padding: .3rem .75rem; border-radius: 20px; }
+.topbar-right { display: flex; align-items: center; gap: .75rem; }
+.currency-toggle { display: flex; background: var(--bg); border-radius: 8px; padding: 3px; gap: 2px; }
+.currency-btn { font-size: .75rem; font-weight: 600; padding: .3rem .65rem; border-radius: 6px; cursor: pointer; transition: all .15s; color: var(--muted); border: none; background: none; }
+.currency-btn.active { background: var(--white); color: var(--accent); box-shadow: var(--shadow); }
+.notif-btn { position: relative; background: none; border: none; cursor: pointer; padding: .35rem; border-radius: 8px; font-size: 1.1rem; }
+.notif-dot { position: absolute; top: 3px; right: 3px; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; border: 1.5px solid white; }
+
+/* VIEWS */
+.view { display: none; flex: 1; overflow-y: auto; padding: 1.5rem 1.75rem; }
+.view.active { display: block; }
+
+/* KPI CARDS */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+.kpi-card { background: var(--white); border-radius: 12px; padding: 1.1rem 1.25rem; box-shadow: var(--shadow); border-left: 3px solid var(--accent); }
+.kpi-label { font-size: .72rem; font-weight: 600; letter-spacing: .05em; color: var(--muted); text-transform: uppercase; margin-bottom: .5rem; }
+.kpi-value { font-size: 1.75rem; font-weight: 800; color: var(--text); letter-spacing: -.03em; line-height: 1; }
+.kpi-value .currency-sym { font-size: 1rem; font-weight: 600; color: var(--muted); }
+.kpi-trend { display: flex; align-items: center; gap: .3rem; margin-top: .4rem; font-size: .75rem; font-weight: 500; }
+.kpi-trend.up { color: var(--green); }
+.kpi-trend.down { color: var(--red); }
+.kpi-sub { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+
+/* GRID 2 COLS */
+.two-col { display: grid; grid-template-columns: 1fr 340px; gap: 1rem; margin-bottom: 1rem; }
+.card { background: var(--white); border-radius: 12px; padding: 1.25rem; box-shadow: var(--shadow); border-left: 3px solid #2a2a2a; }
+.card-title { font-size: .85rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+.card-title .subtitle { font-size: .72rem; font-weight: 400; color: var(--muted); margin-left: auto; }
+
+/* TOWERS GRID */
+.towers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem; }
+.tower-card { background: var(--white); border-radius: 12px; padding: 1.1rem; box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s; cursor: pointer; border-left: 3px solid #2a2a2a; }
+.tower-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.tower-card.green { border-left-color: #2a2a2a; }
+.tower-card.amber { border-left-color: #2a2a2a; }
+.tower-card.red { border-left-color: #2a2a2a; }
+.tower-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: .75rem; }
+.tower-name { font-size: .88rem; font-weight: 700; color: var(--text); }
+.tower-units { font-size: .7rem; color: var(--muted); margin-top: .1rem; }
+.tower-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.tower-status.green { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
+.tower-status.amber { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
+.tower-status.red { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
+.tower-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.tower-metric { text-align: center; }
+.tower-metric-val { font-size: .95rem; font-weight: 700; color: var(--text); }
+.tower-metric-lbl { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: .1rem; }
+.occ-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: .75rem; }
+.occ-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.tower-footer { display: flex; align-items: center; justify-content: space-between; margin-top: .75rem; font-size: .7rem; color: var(--muted); }
+.tower-segment { background: var(--accent-light); color: var(--accent); font-size: .65rem; font-weight: 600; padding: .15rem .45rem; border-radius: 4px; }
+.tower-alerts { color: var(--red); font-weight: 600; }
+
+/* ALERTS */
+.alert-item { display: flex; align-items: flex-start; gap: .75rem; padding: .7rem 0; border-bottom: 1px solid var(--border); }
+.alert-item:last-child { border-bottom: none; }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.alert-dot.critical { background: var(--red); }
+.alert-dot.warning { background: var(--amber); }
+.alert-dot.info { background: var(--accent); }
+.alert-tower { font-size: .7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.alert-msg { font-size: .78rem; color: var(--text); margin-top: .1rem; line-height: 1.35; }
+.alert-action { font-size: .72rem; font-weight: 600; color: var(--accent); cursor: pointer; margin-left: auto; flex-shrink: 0; padding: .2rem .5rem; border-radius: 5px; transition: background .12s; }
+.alert-action:hover { background: var(--accent-light); }
+
+/* OPS VIEW */
+.ops-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+.ops-card { background: var(--white); border-radius: 12px; padding: 1rem 1.25rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 1rem; border-left: 3px solid var(--accent); }
+.ops-icon { font-size: 1.5rem; width: 44px; height: 44px; background: var(--bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ops-val { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+.ops-lbl { font-size: .73rem; color: var(--muted); font-weight: 500; }
+
+/* CALENDAR HEATMAP */
+.heatmap-table { width: 100%; border-collapse: collapse; font-size: .75rem; }
+.heatmap-table th { text-align: center; padding: .4rem .3rem; color: var(--muted); font-weight: 500; font-size: .7rem; }
+.heatmap-table td { text-align: center; padding: .35rem .25rem; }
+.heatmap-table .tower-row td:first-child { text-align: left; font-weight: 600; font-size: .73rem; padding-right: .75rem; color: var(--text); white-space: nowrap; cursor:pointer; }
+.heatmap-table .tower-row td:first-child:hover { color: var(--accent); text-decoration: underline; }
+.hm-cell { width: 100%; min-width: 28px; height: 26px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 600; cursor: default; transition: transform .1s; }
+.hm-cell:hover { transform: scale(1.15); }
+.hm-high { background: #D1FAE5; color: #065F46; }
+.hm-mid { background: #FEF3C7; color: #92400E; }
+.hm-low { background: #FEE2E2; color: #991B1B; }
+.hm-in { background: #DBEAFE; color: #1E40AF; }
+.hm-out { background: #F3E8FF; color: #6D28D9; }
+
+/* ── TOWER DETAIL ───────────────────────────────────────── */
+.back-btn { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; font-weight: 600; color: var(--muted); cursor: pointer; padding: .35rem .75rem; border-radius: 8px; transition: background .12s; margin-bottom: 1rem; border: none; background: var(--white); box-shadow: var(--shadow); }
+.back-btn:hover { background: var(--bg); color: var(--text); }
+.tower-detail-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: .75rem; margin-bottom: 1.25rem; }
+.strip-card { background: var(--white); border-radius: 10px; padding: .85rem 1rem; box-shadow: var(--shadow); border-left: 3px solid var(--accent); }
+.strip-val { font-size: 1.4rem; font-weight: 800; letter-spacing: -.03em; color: var(--text); }
+.strip-lbl { font-size: .68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: .2rem; }
+
+.filter-row { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.filter-tab { font-size: .78rem; font-weight: 600; padding: .35rem .9rem; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); color: var(--muted); background: var(--white); transition: all .12s; }
+.filter-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+.filter-tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+.unit-table-wrap { overflow-x: auto; }
+.unit-table { width: 100%; border-collapse: collapse; font-size: .76rem; white-space: nowrap; }
+.unit-table th { background: var(--bg); padding: .5rem .6rem; font-weight: 600; font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; text-align: center; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 2; }
+.unit-table th.col-unit { text-align: left; }
+.unit-table td { padding: .4rem .5rem; border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
+.unit-table tr:last-child td { border-bottom: none; }
+.unit-table tr:hover td { background: #FAFAFA; }
+.unit-num { font-weight: 700; color: var(--text); font-size: .82rem; }
+.unit-floor { font-size: .68rem; color: var(--muted); }
+.unit-type { display: inline-block; background: var(--bg); color: var(--muted); font-size: .65rem; font-weight: 600; padding: .1rem .4rem; border-radius: 4px; }
+
+/* source badges */
+.src-air { background: #F0EFED; color: #4f4f4f; font-size: .65rem; font-weight: 700; padding: .12rem .4rem; border-radius: 4px; }
+.src-bkg { background: #DBEAFE; color: #1D4ED8; font-size: .65rem; font-weight: 700; padding: .12rem .4rem; border-radius: 4px; }
+.src-dir { background: #D1FAE5; color: #065F46; font-size: .65rem; font-weight: 700; padding: .12rem .4rem; border-radius: 4px; }
+
+/* unit status cells */
+.us-occ  { background: #F1F5F9; color: #475569; font-size: .67rem; border-radius: 5px; padding: .25rem .3rem; }
+.us-in   { background: #DBEAFE; color: #1E40AF; font-size: .67rem; font-weight: 700; border-radius: 5px; padding: .25rem .3rem; }
+.us-out  { background: #F3E8FF; color: #6D28D9; font-size: .67rem; font-weight: 700; border-radius: 5px; padding: .25rem .3rem; }
+.us-free { background: #D1FAE5; color: #065F46; font-size: .67rem; border-radius: 5px; padding: .25rem .3rem; }
+.us-mnt  { background: #FEE2E2; color: #991B1B; font-size: .67rem; font-weight: 700; border-radius: 5px; padding: .25rem .3rem; }
+.us-cell { width: 52px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; transition: transform .1s; cursor: default; }
+.us-cell:hover { transform: scale(1.1); }
+
+/* ── PRECIOS VIEW ───────────────────────────────────────── */
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+.pricing-card { background: var(--white); border-radius: 12px; padding: 1rem 1.25rem; box-shadow: var(--shadow); border-left: 3px solid #2a2a2a; }
+.pricing-tower-name { font-size: .88rem; font-weight: 700; margin-bottom: .5rem; }
+.demand-bar { height: 6px; border-radius: 3px; background: var(--border); margin: .4rem 0 .6rem; }
+.demand-fill { height: 100%; border-radius: 3px; }
+.price-row { display: flex; justify-content: space-between; align-items: center; font-size: .78rem; margin-bottom: .3rem; }
+.price-current { font-weight: 700; font-size: .95rem; color: var(--text); }
+.price-suggested { font-weight: 700; font-size: .95rem; color: var(--green); }
+.apply-btn { font-size: .72rem; font-weight: 600; color: white; background: var(--accent); border: none; border-radius: 6px; padding: .3rem .75rem; cursor: pointer; margin-top: .5rem; width: 100%; transition: opacity .15s; }
+.apply-btn:hover { opacity: .85; }
+.demand-label { font-size: .72rem; font-weight: 600; }
+
+/* ── RESERVAS VIEW ──────────────────────────────────────── */
+.reservas-filters { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.reservas-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.reservas-table th { background: var(--bg); padding: .6rem .9rem; font-size: .7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; text-align: left; border-bottom: 2px solid var(--border); }
+.reservas-table td { padding: .65rem .9rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.reservas-table tr:hover td { background: #FAFAFA; }
+.res-status { font-size: .7rem; font-weight: 700; padding: .18rem .55rem; border-radius: 20px; }
+.res-confirmed { background: var(--green-bg); color: var(--green); }
+.res-pending   { background: var(--amber-bg); color: var(--amber); }
+.res-cancelled { background: var(--red-bg); color: var(--red); }
+.guest-name { font-weight: 600; color: var(--text); }
+.guest-flag { font-size: .85rem; }
+
+/* ── RESEÑAS VIEW ───────────────────────────────────────── */
+.resena-item { background: var(--white); border-radius: 12px; padding: 1.1rem 1.25rem; box-shadow: var(--shadow); margin-bottom: .85rem; border-left: 3px solid #2a2a2a; }
+.resena-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .6rem; }
+.resena-guest { font-weight: 600; font-size: .88rem; }
+.resena-meta { font-size: .72rem; color: var(--muted); }
+.resena-stars { color: #FBBF24; font-size: .9rem; letter-spacing: .05em; }
+.resena-text { font-size: .82rem; color: var(--muted); line-height: 1.5; margin-bottom: .6rem; font-style: italic; }
+.resena-reply { background: var(--bg); border-radius: 8px; padding: .65rem .9rem; font-size: .78rem; color: var(--text); line-height: 1.4; border-left: 3px solid var(--accent); }
+.resena-reply-label { font-size: .68rem; font-weight: 700; color: var(--accent); margin-bottom: .25rem; }
+.reply-btn { font-size: .72rem; font-weight: 600; color: var(--accent); background: var(--accent-light); border: none; border-radius: 6px; padding: .3rem .75rem; cursor: pointer; }
+
+/* ── PROPIETARIOS VIEW ──────────────────────────────────── */
+.prop-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.prop-table th { background: var(--bg); padding: .6rem 1rem; font-size: .7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; text-align: left; border-bottom: 2px solid var(--border); }
+.prop-table td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.prop-table tr:hover td { background: #FAFAFA; }
+.prop-name { font-weight: 700; color: var(--text); }
+.liq-status { font-size: .7rem; font-weight: 700; padding: .18rem .55rem; border-radius: 20px; }
+.liq-ok      { background: var(--green-bg); color: var(--green); }
+.liq-pending { background: var(--amber-bg); color: var(--amber); }
+.liq-late    { background: var(--red-bg); color: var(--red); }
+.gen-btn { font-size: .72rem; font-weight: 600; color: var(--accent); background: var(--accent-light); border: none; border-radius: 6px; padding: .3rem .75rem; cursor: pointer; }
+
+/* SCROLLBAR */
+.view::-webkit-scrollbar { width: 5px; }
+.view::-webkit-scrollbar-track { background: transparent; }
+.view::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+/* CHART */
+.chart-container { position: relative; height: 180px; }
+
+/* ANIMATIONS */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.kpi-card, .tower-card, .card, .strip-card, .resena-item { animation: fadeInUp .3s ease both; }
+.kpi-card:nth-child(1) { animation-delay: .05s; }
+.kpi-card:nth-child(2) { animation-delay: .1s; }
+.kpi-card:nth-child(3) { animation-delay: .15s; }
+.kpi-card:nth-child(4) { animation-delay: .2s; }
+
+@media (max-width: 900px) {
+  .sidebar { width: 56px; }
+  .nav-item span:last-child { display: none; }
+  .brand-name, .brand-sub, .nav-label { display: none; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .towers-grid { grid-template-columns: repeat(2, 1fr); }
+  .tower-detail-strip { grid-template-columns: repeat(3, 1fr); }
+  .pricing-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── ASISTENTE ──────────────────────────────────────────── */
+.assistant-fab {
+  position: fixed; bottom: 1.75rem; right: 1.75rem; z-index: 1000;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent); color: white;
+  border: none; cursor: pointer; font-size: 1.3rem;
+  box-shadow: 0 4px 20px rgba(194,153,71,.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .2s, box-shadow .2s;
+}
+.assistant-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(194,153,71,.5); }
+.assistant-fab .fab-badge { position:absolute; top:-3px; right:-3px; width:16px; height:16px; background:#2a2a2a; border-radius:50%; border:2px solid var(--white); font-size:.6rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+.assistant-panel {
+  position: fixed; bottom: 5.5rem; right: 1.75rem; z-index: 999;
+  width: 380px; height: 520px;
+  background: var(--white); border-radius: 18px;
+  box-shadow: 0 12px 48px rgba(0,0,0,.15), 0 4px 12px rgba(0,0,0,.08);
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: scale(.92) translateY(16px); opacity: 0;
+  pointer-events: none;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), opacity .18s ease;
+}
+.assistant-panel.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+
+.asst-header {
+  background: linear-gradient(135deg, #141414 0%, #6b5320 100%);
+  padding: 1rem 1.1rem; display: flex; align-items: center; gap: .75rem; flex-shrink: 0;
+}
+.asst-avatar {
+  width: 36px; height: 36px; background: rgba(255,255,255,.15); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+}
+.asst-name { font-size: .88rem; font-weight: 700; color: white; }
+.asst-status { font-size: .7rem; color: rgba(255,255,255,.55); display:flex; align-items:center; gap:.35rem; }
+.asst-status-dot { width:6px; height:6px; background:#34D399; border-radius:50%; }
+.asst-close { margin-left:auto; background:none; border:none; color:rgba(255,255,255,.5); cursor:pointer; font-size:1.1rem; padding:.25rem; border-radius:6px; transition:color .12s; }
+.asst-close:hover { color:white; }
+
+.asst-messages { flex:1; overflow-y:auto; padding:.85rem 1rem; display:flex; flex-direction:column; gap:.65rem; }
+.asst-messages::-webkit-scrollbar { width:4px; }
+.asst-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
+
+.msg { max-width: 88%; animation: fadeInUp .2s ease; }
+.msg-bot { align-self: flex-start; }
+.msg-user { align-self: flex-end; }
+.msg-bubble {
+  padding: .6rem .85rem; border-radius: 14px; font-size: .8rem; line-height: 1.5; color: var(--text);
+}
+.msg-bot .msg-bubble { background: var(--bg); border-bottom-left-radius: 4px; }
+.msg-user .msg-bubble { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+.msg-time { font-size: .62rem; color: var(--muted); margin-top: .25rem; padding: 0 .3rem; }
+.msg-user .msg-time { text-align: right; }
+
+.typing-indicator { display:flex; gap:4px; padding:.55rem .75rem; background:var(--bg); border-radius:14px; border-bottom-left-radius:4px; width:fit-content; }
+.typing-dot { width:6px; height:6px; background:var(--muted); border-radius:50%; animation: typingBounce 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay:.2s; }
+.typing-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+.asst-suggestions { padding:.5rem .85rem .6rem; display:flex; flex-wrap:wrap; gap:.4rem; flex-shrink:0; border-top:1px solid var(--border); }
+.suggestion-chip {
+  font-size: .72rem; font-weight: 500; color: var(--accent);
+  background: var(--accent-light); border: none; border-radius: 20px;
+  padding: .3rem .75rem; cursor: pointer; transition: background .12s;
+  white-space: nowrap;
+}
+.suggestion-chip:hover { background: #DDD6FE; }
+
+.asst-input-row {
+  padding: .65rem .85rem; border-top: 1px solid var(--border);
+  display: flex; gap: .5rem; align-items: center; flex-shrink:0;
+}
+.asst-input {
+  flex:1; border: 1.5px solid var(--border); border-radius: 22px;
+  padding: .5rem 1rem; font-size: .8rem; font-family: inherit;
+  outline:none; background: var(--bg); color: var(--text);
+  transition: border-color .15s;
+}
+.asst-input:focus { border-color: var(--accent); background: var(--white); }
+.asst-send {
+  width:34px; height:34px; border-radius:50%; background:var(--accent); color:white;
+  border:none; cursor:pointer; font-size:.95rem; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition: opacity .15s;
+}
+.asst-send:hover { opacity:.85; }
+</style>
+</head>
+<body>
+<a href="/" style="position:fixed;bottom:14px;left:14px;z-index:60;color:#fff;text-decoration:none;font-size:.8rem;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:8px">← Demos</a>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem">
+      <div style="width:40px;height:40px;border-radius:50%;background:#C9A24B;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="font-size:1rem;font-weight:800;color:#111;letter-spacing:-.02em">N</span>
+      </div>
+      <div>
+        <div class="brand-name">Nómade Rentals</div>
+        <div class="brand-sub">Panel de gestión</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Vistas</div>
+    <div class="nav-item active" data-view="ceo" onclick="switchView('ceo')">
+      <span class="icon">📊</span><span>Visión ejecutiva</span>
+    </div>
+    <div class="nav-item" data-view="ops" onclick="switchView('ops')">
+      <span class="icon">⚙️</span><span>Operaciones</span>
+      <span class="alert-badge">8</span>
+    </div>
+
+    <div class="nav-label" style="margin-top:.5rem">Torres</div>
+    <div class="nav-item" data-view="tower-downtown" onclick="switchView('tower','downtown')"><span class="icon" style="font-size:.55rem">●</span><span>Downtown</span></div>
+    <div class="nav-item" data-view="tower-palermo" onclick="switchView('tower','palermo')"><span class="icon" style="font-size:.55rem">●</span><span>Palermo</span></div>
+    <div class="nav-item" data-view="tower-nunez" onclick="switchView('tower','nunez')"><span class="icon" style="font-size:.55rem">●</span><span>Nuñez</span></div>
+    <div class="nav-item" data-view="tower-belgrano" onclick="switchView('tower','belgrano')"><span class="icon" style="font-size:.55rem">●</span><span>Belgrano</span></div>
+    <div class="nav-item" data-view="tower-tigre" onclick="switchView('tower','tigre')"><span class="icon" style="font-size:.55rem">●</span><span>Torre Tigre</span></div>
+
+    <div class="nav-label" style="margin-top:.5rem">Gestión</div>
+    <div class="nav-item" data-view="precios" onclick="switchView('precios')"><span class="icon">💰</span><span>Precios</span></div>
+    <div class="nav-item" data-view="reservas" onclick="switchView('reservas')"><span class="icon">📋</span><span>Reservas</span></div>
+    <div class="nav-item" data-view="resenas" onclick="switchView('resenas')"><span class="icon">⭐</span><span>Reseñas</span></div>
+    <div class="nav-item" data-view="propietarios" onclick="switchView('propietarios')"><span class="icon">👤</span><span>Propietarios</span></div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="nav-item" style="color:rgba(255,255,255,.3)"><span class="icon">⚙️</span><span>Configuración</span></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="page-title" id="view-title">Visión Ejecutiva</span>
+      <span class="date-chip">Martes 29 de abril, 2026</span>
+    </div>
+    <div class="topbar-right">
+      <div class="currency-toggle">
+        <button class="currency-btn active" onclick="setCurrency('USD')">USD</button>
+        <button class="currency-btn" onclick="setCurrency('ARS')">ARS</button>
+      </div>
+      <button class="notif-btn" onclick="switchView('ops')">🔔<span class="notif-dot"></span></button>
+    </div>
+  </div>
+
+  <!-- ── CEO VIEW ─────────────────────────────────────────── -->
+  <div class="view active" id="view-ceo">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">RevPAR Portfolio</div>
+        <div class="kpi-value"><span class="currency-sym val-sym">$</span><span class="val-revpar">51</span></div>
+        <div class="kpi-trend up">▲ +6.4% vs. mes anterior</div>
+        <div class="kpi-sub">Benchmark BA: $40–50</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Ocupación</div>
+        <div class="kpi-value">67.4<span class="currency-sym">%</span></div>
+        <div class="kpi-trend up">▲ +3.1pp vs. mes anterior</div>
+        <div class="kpi-sub">271 unidades ocupadas hoy</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Revenue del mes</div>
+        <div class="kpi-value"><span class="currency-sym val-sym">$</span><span class="val-revenue">413</span><span class="currency-sym">K</span></div>
+        <div class="kpi-trend up">▲ +8.2% vs. abril 2025</div>
+        <div class="kpi-sub">6 torres · 271 unidades</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ADR Promedio</div>
+        <div class="kpi-value"><span class="currency-sym val-sym">$</span><span class="val-adr">76</span></div>
+        <div class="kpi-trend down">▼ −1.3% vs. mes anterior</div>
+        <div class="kpi-sub">Oportunidad: ajuste de precio</div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">📈 RevPAR últimos 30 días<span class="subtitle">Por torre · USD/noche disponible</span></div>
+        <div class="chart-container"><canvas id="revparChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔴 Alertas activas<span class="subtitle">8 pendientes</span></div>
+        <div id="alerts-ceo"></div>
+      </div>
+    </div>
+    <div style="font-size:.85rem;font-weight:700;margin-bottom:.75rem;color:var(--text)">🏢 Estado por torre <span style="font-size:.72rem;font-weight:400;color:var(--muted);margin-left:.5rem">Clic para ver detalle</span></div>
+    <div class="towers-grid" id="towers-grid"></div>
+  </div>
+
+  <!-- ── OPS VIEW ──────────────────────────────────────────── -->
+  <div class="view" id="view-ops">
+    <div class="ops-summary">
+      <div class="ops-card"><div class="ops-icon">🛬</div><div><div class="ops-val">14</div><div class="ops-lbl">Check-ins hoy</div></div></div>
+      <div class="ops-card"><div class="ops-icon">🛫</div><div><div class="ops-val">9</div><div class="ops-lbl">Check-outs hoy</div></div></div>
+      <div class="ops-card"><div class="ops-icon">⚠️</div><div><div class="ops-val" style="color:var(--red)">8</div><div class="ops-lbl">Alertas activas</div></div></div>
+      <div class="ops-card"><div class="ops-icon">🌙</div><div><div class="ops-val" style="color:var(--amber)">12</div><div class="ops-lbl">Noches huérfanas</div></div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">📅 Disponibilidad próximos 14 días
+          <span class="subtitle">
+            <span style="background:#DBEAFE;color:#1E40AF;padding:.15rem .4rem;border-radius:4px;font-size:.65rem;margin-right:.3rem">IN</span>
+            <span style="background:#F3E8FF;color:#6D28D9;padding:.15rem .4rem;border-radius:4px;font-size:.65rem;margin-right:.3rem">OUT</span>
+            <span style="background:#D1FAE5;color:#065F46;padding:.15rem .4rem;border-radius:4px;font-size:.65rem;margin-right:.3rem">&gt;70%</span>
+            <span style="background:#FEE2E2;color:#991B1B;padding:.15rem .4rem;border-radius:4px;font-size:.65rem">&lt;40%</span>
+          </span>
+        </div>
+        <div style="overflow-x:auto"><table class="heatmap-table" id="heatmap"></table></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🚨 Alertas del día</div>
+        <div id="alerts-ops"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOWER DETAIL VIEW ─────────────────────────────────── -->
+  <div class="view" id="view-tower">
+    <button class="back-btn" onclick="switchView('ceo')">← Volver al portfolio</button>
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+      <div style="font-size:1.3rem;font-weight:800;letter-spacing:-.02em" id="td-name">Downtown</div>
+      <div id="td-segment" style="background:var(--accent-light);color:var(--accent);font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:6px"></div>
+      <div id="td-status-dot" style="width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg);margin-left:.25rem"></div>
+    </div>
+    <div class="tower-detail-strip" id="td-strip"></div>
+
+    <div class="filter-row">
+      <div class="filter-tab active" onclick="filterUnits('todas',this)">Todas</div>
+      <div class="filter-tab" onclick="filterUnits('ocupadas',this)">Ocupadas</div>
+      <div class="filter-tab" onclick="filterUnits('libres',this)">Libres</div>
+      <div class="filter-tab" onclick="filterUnits('checkin',this)">Check-in hoy</div>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="unit-table-wrap">
+        <table class="unit-table" id="unit-table"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRECIOS VIEW ──────────────────────────────────────── -->
+  <div class="view" id="view-precios">
+    <div style="font-size:1rem;font-weight:700;margin-bottom:.35rem">💰 Gestión de precios</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:1.25rem">Sugerencias de precio dinámico basadas en demanda, competencia y pace de reservas</div>
+    <div class="pricing-grid" id="pricing-grid"></div>
+
+    <div class="card" style="margin-top:.25rem">
+      <div class="card-title">📊 Reglas de precio aplicadas</div>
+      <table style="width:100%;border-collapse:collapse;font-size:.8rem">
+        <thead><tr>
+          <th style="text-align:left;padding:.5rem .75rem;color:var(--muted);font-size:.7rem;font-weight:700;text-transform:uppercase;border-bottom:2px solid var(--border)">Regla</th>
+          <th style="padding:.5rem .75rem;color:var(--muted);font-size:.7rem;font-weight:700;text-transform:uppercase;border-bottom:2px solid var(--border)">Ajuste</th>
+          <th style="padding:.5rem .75rem;color:var(--muted);font-size:.7rem;font-weight:700;text-transform:uppercase;border-bottom:2px solid var(--border)">Condición</th>
+          <th style="padding:.5rem .75rem;color:var(--muted);font-size:.7rem;font-weight:700;text-transform:uppercase;border-bottom:2px solid var(--border)">Estado</th>
+        </tr></thead>
+        <tbody id="pricing-rules-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── RESERVAS VIEW ─────────────────────────────────────── -->
+  <div class="view" id="view-reservas">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div>
+        <div style="font-size:1rem;font-weight:700">📋 Reservas</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.15rem">32 reservas activas · próximos 30 días</div>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <div class="filter-tab active" style="cursor:pointer">Próximas</div>
+        <div class="filter-tab" style="cursor:pointer">En curso</div>
+        <div class="filter-tab" style="cursor:pointer">Todas</div>
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="reservas-table">
+        <thead><tr>
+          <th>Huésped</th><th>Torre · Unidad</th><th>Check-in</th><th>Check-out</th><th>Noches</th><th>Total</th><th>Fuente</th><th>Estado</th><th></th>
+        </tr></thead>
+        <tbody id="reservas-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── RESEÑAS VIEW ──────────────────────────────────────── -->
+  <div class="view" id="view-resenas">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+      <div>
+        <div style="font-size:1rem;font-weight:700">⭐ Reseñas</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.15rem">Promedio general: 4.82 · 312 reseñas en los últimos 12 meses</div>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <div class="filter-tab active" style="cursor:pointer">Recientes</div>
+        <div class="filter-tab" style="cursor:pointer">Sin respuesta</div>
+        <div class="filter-tab" style="cursor:pointer">Críticas</div>
+      </div>
+    </div>
+    <div id="resenas-ratings-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.25rem"></div>
+    <div id="resenas-list"></div>
+  </div>
+
+  <!-- ── PROPIETARIOS VIEW ─────────────────────────────────── -->
+  <div class="view" id="view-propietarios">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div>
+        <div style="font-size:1rem;font-weight:700">👤 Propietarios</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.15rem">18 propietarios · 271 unidades bajo gestión</div>
+      </div>
+      <button style="font-size:.8rem;font-weight:600;color:white;background:var(--accent);border:none;border-radius:8px;padding:.45rem 1rem;cursor:pointer">+ Generar liquidaciones</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.25rem">
+      <div style="background:var(--white);border-radius:10px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:3px solid var(--accent)">
+        <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem">Revenue total gestionado</div>
+        <div style="font-size:1.5rem;font-weight:800">$413K</div>
+        <div style="font-size:.75rem;color:var(--green)">▲ +8.2% vs. abril 2025</div>
+      </div>
+      <div style="background:var(--white);border-radius:10px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:3px solid var(--accent)">
+        <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem">Liquidaciones pendientes</div>
+        <div style="font-size:1.5rem;font-weight:800;color:var(--amber)">3</div>
+        <div style="font-size:.75rem;color:var(--muted)">Vencen el 5 de mayo</div>
+      </div>
+      <div style="background:var(--white);border-radius:10px;padding:1rem 1.25rem;box-shadow:var(--shadow);border-left:3px solid var(--accent)">
+        <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem">Comisión Nómade Rentals (mes)</div>
+        <div style="font-size:1.5rem;font-weight:800">$82.6K</div>
+        <div style="font-size:.75rem;color:var(--muted)">20% promedio portfolio</div>
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="prop-table">
+        <thead><tr>
+          <th>Propietario</th><th>Torre · Unidades</th><th>Rev. neto mes</th><th>Comisión</th><th>Ocupación</th><th>Liquidación</th><th></th>
+        </tr></thead>
+        <tbody id="prop-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── ASISTENTE FLOTANTE ─────────────────────────────────── -->
+<button class="assistant-fab" onclick="toggleAssistant()">
+  🤖
+  <span class="fab-badge">1</span>
+</button>
+
+<div class="assistant-panel" id="assistant-panel">
+  <div class="asst-header">
+    <div class="asst-avatar">🤖</div>
+    <div>
+      <div class="asst-name">Asistente Nómade Rentals</div>
+      <div class="asst-status"><span class="asst-status-dot"></span>En línea · datos en tiempo real</div>
+    </div>
+    <button class="asst-close" onclick="toggleAssistant()">✕</button>
+  </div>
+
+  <div class="asst-messages" id="asst-messages"></div>
+
+  <div class="asst-suggestions" id="asst-suggestions">
+    <button class="suggestion-chip" onclick="sendSuggestion(this)">⚠️ ¿Qué torre necesita atención?</button>
+    <button class="suggestion-chip" onclick="sendSuggestion(this)">📈 Mejor oportunidad de precio hoy</button>
+    <button class="suggestion-chip" onclick="sendSuggestion(this)">🛬 Check-ins de hoy</button>
+    <button class="suggestion-chip" onclick="sendSuggestion(this)">💰 ¿Cómo va el revenue del mes?</button>
+  </div>
+
+  <div class="asst-input-row">
+    <input class="asst-input" id="asst-input" type="text" placeholder="Preguntame lo que quieras…" onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="asst-send" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const USD_TO_ARS = 1150;
+let currency = 'USD';
+let currentTowerId = 'downtown';
+let currentFilter = 'todas';
+
+const TOWERS = [
+  { id:'downtown',   name:'Downtown',         units:45, occ:.68, adr:78,  prevOcc:.62, prevAdr:75, alerts:2, rating:4.82, segment:'Mixto',      color:'green' },
+  { id:'palermo',    name:'Palermo',           units:62, occ:.71, adr:85,  prevOcc:.69, prevAdr:82, alerts:0, rating:4.91, segment:'Turístico',  color:'green' },
+  { id:'phollywood', name:'Palermo Hollywood', units:38, occ:.63, adr:72,  prevOcc:.67, prevAdr:72, alerts:3, rating:4.76, segment:'Turístico',  color:'amber' },
+  { id:'nunez',      name:'Nuñez',             units:51, occ:.74, adr:68,  prevOcc:.71, prevAdr:66, alerts:1, rating:4.88, segment:'Corporativo',color:'green' },
+  { id:'belgrano',   name:'Belgrano',          units:47, occ:.65, adr:75,  prevOcc:.61, prevAdr:74, alerts:1, rating:4.79, segment:'Corporativo',color:'amber' },
+  { id:'tigre',      name:'Torre Tigre',    units:28, occ:.58, adr:65,  prevOcc:.63, prevAdr:64, alerts:4, rating:4.71, segment:'Turístico',  color:'red'   },
+];
+
+const ALERTS = [
+  { type:'critical', tower:'Torre Tigre',    msg:'6 unidades sin reserva en próximos 5 días',        action:'Ajustar precio' },
+  { type:'critical', tower:'Palermo Hollywood', msg:'Review 3.8★ recibida — impacta ranking en Airbnb', action:'Ver review' },
+  { type:'critical', tower:'Torre Tigre',    msg:'Pace de reservas −18% vs. mayo 2025',              action:'Revisar estrategia' },
+  { type:'critical', tower:'Torre Tigre',    msg:'Aire acondicionado unidad 4B fuera de servicio',   action:'Asignar técnico' },
+  { type:'warning',  tower:'Palermo Hollywood', msg:'3 noches huérfanas sin cubrir del 2 al 4 de mayo', action:'Activar precio gap' },
+  { type:'warning',  tower:'Downtown',          msg:'Pago pendiente de confirmación — reserva #4821',   action:'Verificar pago' },
+  { type:'warning',  tower:'Nuñez',             msg:'Contrato corporativo Samsung Argentina vence en 18 días', action:'Contactar cliente' },
+  { type:'info',     tower:'Belgrano',          msg:'Propietario Rodríguez sin liquidación de marzo',   action:'Generar liquidación' },
+];
+
+const REVPAR_HISTORY = [44,46,43,48,51,49,52,55,53,50,54,56,52,49,53,57,59,55,52,56,58,54,51,55,57,60,58,54,52,51];
+
+const OCC_MATRIX = {
+  downtown:   [.88,.92,.85,.79,.68,.65,.71,.80,.88,.90,.82,.74,.68,.72],
+  palermo:    [.95,.91,.88,.82,.75,.70,.78,.89,.93,.91,.85,.77,.71,.80],
+  phollywood: [.70,.72,.68,.60,.55,.52,.58,.65,.72,.75,.68,.60,.55,.58],
+  nunez:      [.92,.88,.85,.80,.74,.72,.78,.85,.91,.89,.82,.75,.74,.80],
+  belgrano:   [.80,.78,.72,.68,.63,.60,.65,.72,.80,.82,.74,.68,.63,.68],
+  tigre:      [.65,.60,.55,.50,.42,.38,.44,.52,.58,.62,.54,.48,.42,.45],
+};
+const CHECKIN_DAYS  = { downtown:[1,5,9],  palermo:[0,6,10],  phollywood:[2,7,11],  nunez:[1,5,10],  belgrano:[3,8,12], tigre:[0,4,9]  };
+const CHECKOUT_DAYS = { downtown:[4,8,12], palermo:[5,9,13],  phollywood:[1,6,10],  nunez:[4,8,13],  belgrano:[7,11],   tigre:[3,8,12] };
+
+// ─── TOWER UNITS DATA ─────────────────────────────────────────────────────────
+// Status per day (14 days): O=occupied, L=libre, I=check-in, X=check-out, M=maintenance
+const TOWER_UNITS = {
+  downtown: [
+    { id:'2A',  floor:2,  type:'Studio', m2:35, adr:65,  source:'air', guest:'Sarah M.',      status:['I','O','O','X','L','L','I','O','O','O','X','L','L','L'] },
+    { id:'3A',  floor:3,  type:'1 Amb',  m2:52, adr:85,  source:'bkg', guest:'Carlos R.',     status:['O','O','O','O','O','X','I','O','O','O','O','O','X','L'] },
+    { id:'4A',  floor:4,  type:'2 Amb',  m2:75, adr:110, source:'dir', guest:'Fam. López',    status:['L','L','L','I','O','O','O','O','O','O','X','L','L','L'] },
+    { id:'4B',  floor:4,  type:'Studio', m2:35, adr:65,  source:'—',   guest:'— Mant.',       status:['M','M','M','M','M','M','M','M','L','L','I','O','O','X'] },
+    { id:'5A',  floor:5,  type:'1 Amb',  m2:52, adr:88,  source:'air', guest:'James K.',      status:['O','O','X','L','I','O','O','O','O','X','L','I','O','O'] },
+    { id:'6A',  floor:6,  type:'1 Amb',  m2:55, adr:90,  source:'bkg', guest:'Anna P.',       status:['I','O','O','O','O','O','O','X','L','L','L','I','O','O'] },
+    { id:'7A',  floor:7,  type:'2 Amb',  m2:78, adr:115, source:'dir', guest:'Empresa XYZ',   status:['O','O','O','O','O','O','O','O','O','O','O','X','L','L'] },
+    { id:'8A',  floor:8,  type:'Studio', m2:38, adr:70,  source:'air', guest:'Marie D.',      status:['X','L','L','L','I','O','O','O','X','L','L','L','I','O'] },
+    { id:'9A',  floor:9,  type:'1 Amb',  m2:52, adr:92,  source:'bkg', guest:'Pedro S.',      status:['L','I','O','O','O','O','X','L','L','I','O','O','O','X'] },
+    { id:'10A', floor:10, type:'2 Amb',  m2:80, adr:120, source:'dir', guest:'Schmidt GmbH',  status:['O','O','O','X','L','L','I','O','O','O','O','O','X','L'] },
+    { id:'11A', floor:11, type:'1 Amb',  m2:55, adr:95,  source:'air', guest:'Liu W.',        status:['O','O','O','O','O','X','L','I','O','O','O','O','X','L'] },
+    { id:'12A', floor:12, type:'Studio', m2:40, adr:72,  source:'bkg', guest:'Nina B.',       status:['I','O','O','X','L','L','L','I','O','O','X','L','L','I'] },
+    { id:'13A', floor:13, type:'2 Amb',  m2:82, adr:125, source:'—',   guest:'Disponible',    status:['L','L','L','L','L','L','L','L','L','L','L','L','L','L'] },
+    { id:'13B', floor:13, type:'1 Amb',  m2:58, adr:98,  source:'air', guest:'Tom H.',        status:['O','O','O','O','O','O','O','O','O','O','X','I','O','O'] },
+  ]
+};
+
+// Generic unit data for other towers (fewer units, same pattern logic)
+['palermo','nunez','belgrano','tigre','phollywood'].forEach(tid => {
+  const t = TOWERS.find(t=>t.id===tid);
+  TOWER_UNITS[tid] = Array.from({length:8}, (_,i) => {
+    const floor = i+2;
+    const types = ['Studio','1 Amb','2 Amb'];
+    const type = types[i%3];
+    const adr = t.adr + (i%3===2?30:i%3===0?-12:0);
+    const sources = ['air','bkg','dir'];
+    const src = sources[i%3];
+    const patterns = [
+      ['O','O','O','X','L','I','O','O','O','X','L','L','I','O'],
+      ['I','O','O','O','O','X','L','L','I','O','O','O','X','L'],
+      ['L','L','I','O','O','O','O','X','L','I','O','O','O','X'],
+      ['O','X','L','L','I','O','O','O','O','O','X','L','I','O'],
+      ['X','L','I','O','O','O','X','L','L','I','O','O','O','O'],
+      ['O','O','O','O','O','O','X','I','O','O','O','X','L','L'],
+      ['L','I','O','O','X','L','L','I','O','O','O','X','L','L'],
+      ['O','O','X','I','O','O','O','O','X','L','I','O','O','O'],
+    ];
+    const guests = ['Müller K.','Ana García','Johnson T.','Rossi M.','Park J.','Dubois C.','Fernández A.','Wong L.'];
+    return { id:`${floor}A`, floor, type, m2: type==='Studio'?38:type==='1 Amb'?54:76, adr, source:src, guest:guests[i], status:patterns[i] };
+  });
+});
+
+// ─── RESERVAS DATA ────────────────────────────────────────────────────────────
+const RESERVAS = [
+  { guest:'Sarah Mitchell',    flag:'🇺🇸', tower:'Downtown',         unit:'2A',  cin:'29 abr', cout:'2 may',  nights:3,  total:195,  src:'air', status:'confirmed' },
+  { guest:'Carlos Rodríguez',  flag:'🇦🇷', tower:'Downtown',         unit:'3A',  cin:'29 abr', cout:'3 may',  nights:4,  total:340,  src:'bkg', status:'confirmed' },
+  { guest:'Empresa XYZ S.A.',  flag:'🇦🇷', tower:'Downtown',         unit:'7A',  cin:'29 abr', cout:'10 may', nights:11, total:1265, src:'dir', status:'confirmed' },
+  { guest:'Schmidt GmbH',      flag:'🇩🇪', tower:'Downtown',         unit:'10A', cin:'29 abr', cout:'2 may',  nights:3,  total:360,  src:'dir', status:'confirmed' },
+  { guest:'Yuki Tanaka',       flag:'🇯🇵', tower:'Palermo',          unit:'5B',  cin:'30 abr', cout:'4 may',  nights:4,  total:340,  src:'air', status:'confirmed' },
+  { guest:'James & Kate K.',   flag:'🇬🇧', tower:'Downtown',         unit:'5A',  cin:'1 may',  cout:'5 may',  nights:4,  total:352,  src:'air', status:'confirmed' },
+  { guest:'Anna Petrov',       flag:'🇷🇺', tower:'Downtown',         unit:'6A',  cin:'29 abr', cout:'6 may',  nights:7,  total:630,  src:'bkg', status:'confirmed' },
+  { guest:'Samsung Argentina', flag:'🇦🇷', tower:'Nuñez',            unit:'8C',  cin:'1 may',  cout:'18 may', nights:17, total:1156, src:'dir', status:'pending'   },
+  { guest:'Marie Dubois',      flag:'🇫🇷', tower:'Downtown',         unit:'8A',  cin:'3 may',  cout:'7 may',  nights:4,  total:280,  src:'air', status:'confirmed' },
+  { guest:'Reserva #4821',     flag:'🌐', tower:'Downtown',          unit:'12A', cin:'29 abr', cout:'1 may',  nights:2,  total:144,  src:'air', status:'pending'   },
+];
+
+// ─── RESEÑAS DATA ─────────────────────────────────────────────────────────────
+const RESENAS = [
+  { guest:'Sarah M.', flag:'🇺🇸', tower:'Downtown 2A', date:'27 abr 2026', stars:5, text:'Departamento impecable, vistas increíbles al Río. La atención de Nómade Rentals fue excelente en todo momento. Definitivamente volvería.', reply:'¡Muchas gracias, Sarah! Fue un placer recibirte. Te esperamos en tu próxima visita a Buenos Aires.', replied:true },
+  { guest:'Klaus M.', flag:'🇩🇪', tower:'Palermo 3A',  date:'25 abr 2026', stars:5, text:'Perfect apartment, great location and very clean. Check-in was seamless. Highly recommended for business travelers.', reply:'Thank you Klaus! We\'re delighted you had a great stay. Hope to see you again soon!', replied:true },
+  { guest:'Andrea L.', flag:'🇦🇷', tower:'Palermo Hollywood 6B', date:'24 abr 2026', stars:2, text:'El departamento estuvo bien pero el aire acondicionado no funcionaba. Tardaron 2 días en resolver el problema. Para el precio que se cobra es inaceptable.', reply:null, replied:false },
+  { guest:'Tom H.', flag:'🇬🇧', tower:'Downtown 13B', date:'22 abr 2026', stars:5, text:'Stunning apartment on the top floor. The view at night is absolutely breathtaking. Everything was spotless and the kitchen fully equipped.', reply:'Thank you Tom! The top floor really is special. We\'d love to have you back!', replied:true },
+  { guest:'Priya S.', flag:'🇮🇳', tower:'Nuñez 4A', date:'20 abr 2026', stars:4, text:'Muy buen departamento, silencioso y bien ubicado. El único detalle fue que la conexión WiFi podría ser más estable. Por lo demás, todo perfecto.', reply:null, replied:false },
+];
+
+// ─── PROPIETARIOS DATA ────────────────────────────────────────────────────────
+const PROPIETARIOS = [
+  { name:'Martín Arce',      tower:'Downtown',         units:4, revenue:18200, comision:3640, occ:71, liq:'ok'      },
+  { name:'Claudia Berardi',  tower:'Palermo',          units:6, revenue:26100, comision:5220, occ:75, liq:'ok'      },
+  { name:'Rodríguez e Hijos',tower:'Belgrano',         units:8, revenue:22400, comision:4480, occ:63, liq:'pending' },
+  { name:'Jorge Steiner',    tower:'Nuñez',            units:5, revenue:19800, comision:3960, occ:78, liq:'ok'      },
+  { name:'Ana Pereyra',      tower:'Downtown',         units:3, revenue:12600, comision:2520, occ:68, liq:'pending' },
+  { name:'Torre S.A.',    tower:'Torre Tigre',   units:12,revenue:27300, comision:5460, occ:58, liq:'late'    },
+  { name:'Fernández Trust',  tower:'Palermo Hollywood',units:5, revenue:16900, comision:3380, occ:62, liq:'ok'      },
+  { name:'Pablo Núñez',      tower:'Nuñez',            units:3, revenue:11400, comision:2280, occ:74, liq:'pending' },
+];
+
+// ─── CURRENCY ─────────────────────────────────────────────────────────────────
+function setCurrency(c) {
+  currency = c;
+  document.querySelectorAll('.currency-btn').forEach(b => b.classList.toggle('active', b.textContent === c));
+  document.querySelector('.val-revpar').textContent  = c==='USD' ? 51   : Math.round(51*USD_TO_ARS/1000)+'K';
+  document.querySelector('.val-adr').textContent     = c==='USD' ? 76   : Math.round(76*USD_TO_ARS);
+  document.querySelector('.val-revenue').textContent = c==='USD' ? 413  : Math.round(413*USD_TO_ARS/1000);
+  buildTowers();
+}
+function fmt(v) { return currency==='USD' ? '$'+Math.round(v) : '$'+Math.round(v*USD_TO_ARS/1000)+'K'; }
+function fmtU(v){ return currency==='USD' ? '$'+Math.round(v) : '$'+Math.round(v*USD_TO_ARS); }
+
+// ─── SWITCH VIEW ──────────────────────────────────────────────────────────────
+function switchView(v, param) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+  const titles = { ceo:'Visión Ejecutiva', ops:'Operaciones', tower:'Detalle de Torre',
+                   precios:'Precios', reservas:'Reservas', resenas:'Reseñas', propietarios:'Propietarios' };
+  document.getElementById('view-title').textContent = titles[v] || v;
+
+  if (v === 'tower') {
+    currentTowerId = param || 'downtown';
+    document.getElementById('view-tower').classList.add('active');
+    const navKey = 'tower-' + currentTowerId;
+    document.querySelector(`[data-view="${navKey}"]`)?.classList.add('active');
+    buildTowerDetail(currentTowerId);
+  } else {
+    document.getElementById('view-' + v).classList.add('active');
+    document.querySelector(`[data-view="${v}"]`)?.classList.add('active');
+  }
+}
+
+// ─── BUILD TOWERS ─────────────────────────────────────────────────────────────
+function revpar(t) { return t.adr * t.occ; }
+function buildTowers() {
+  const grid = document.getElementById('towers-grid');
+  grid.innerHTML = '';
+  TOWERS.forEach((t, i) => {
+    const rp = revpar(t), prevRp = t.prevOcc * t.prevAdr;
+    const rpDelta = ((rp - prevRp) / prevRp * 100).toFixed(1);
+    const occPct = Math.round(t.occ * 100);
+    const card = document.createElement('div');
+    card.className = `tower-card ${t.color}`;
+    card.style.animationDelay = (i * 0.05 + 0.2) + 's';
+    card.onclick = () => switchView('tower', t.id);
+    card.innerHTML = `
+      <div class="tower-header">
+        <div>
+          <div class="tower-name">${t.name}</div>
+          <div class="tower-units">${t.units} unidades · <span class="tower-segment">${t.segment}</span></div>
+        </div>
+        <div class="tower-status ${t.color}"></div>
+      </div>
+      <div class="tower-metrics">
+        <div class="tower-metric"><div class="tower-metric-val">${fmt(rp)}</div><div class="tower-metric-lbl">RevPAR</div></div>
+        <div class="tower-metric"><div class="tower-metric-val">${occPct}%</div><div class="tower-metric-lbl">Ocupación</div></div>
+        <div class="tower-metric"><div class="tower-metric-val">${fmt(t.adr)}</div><div class="tower-metric-lbl">ADR</div></div>
+      </div>
+      <div class="occ-bar"><div class="occ-fill" style="width:${occPct}%;background:${t.color==='green'?'var(--green)':t.color==='amber'?'var(--amber)':'var(--red)'}"></div></div>
+      <div class="tower-footer">
+        <span>⭐ ${t.rating}</span>
+        <span>${rpDelta>0?'▲':'▼'} ${Math.abs(rpDelta)}% RevPAR</span>
+        ${t.alerts>0?`<span class="tower-alerts">⚠ ${t.alerts} alerta${t.alerts>1?'s':''}</span>`:'<span style="color:var(--green)">✓ Sin alertas</span>'}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ─── BUILD TOWER DETAIL ───────────────────────────────────────────────────────
+function buildTowerDetail(tid) {
+  const t = TOWERS.find(x => x.id === tid);
+  const units = TOWER_UNITS[tid] || [];
+  currentFilter = 'todas';
+  document.querySelectorAll('.filter-tab').forEach((el,i) => el.classList.toggle('active', i===0));
+
+  // header
+  document.getElementById('td-name').textContent = t.name;
+  document.getElementById('td-segment').textContent = t.segment;
+  const dot = document.getElementById('td-status-dot');
+  dot.style.background = t.color==='green'?'var(--green)':t.color==='amber'?'var(--amber)':'var(--red)';
+  dot.style.boxShadow  = t.color==='green'?'0 0 0 3px var(--green-bg)':t.color==='amber'?'0 0 0 3px var(--amber-bg)':'0 0 0 3px var(--red-bg)';
+
+  // strip KPIs
+  const occ = Math.round(t.occ*100);
+  const freeCount = Math.round(units.length * (1 - t.occ));
+  const checkinToday = units.filter(u => u.status[0]==='I').length;
+  document.getElementById('td-strip').innerHTML = `
+    <div class="strip-card"><div class="strip-val">${occ}%</div><div class="strip-lbl">Ocupación</div></div>
+    <div class="strip-card"><div class="strip-val">${fmtU(t.adr)}</div><div class="strip-lbl">ADR noche</div></div>
+    <div class="strip-card"><div class="strip-val">${fmt(t.adr*t.occ)}</div><div class="strip-lbl">RevPAR</div></div>
+    <div class="strip-card"><div class="strip-val" style="color:var(--green)">${freeCount}</div><div class="strip-lbl">Unidades libres</div></div>
+    <div class="strip-card"><div class="strip-val" style="color:#1E40AF">${checkinToday}</div><div class="strip-lbl">Check-in hoy</div></div>`;
+
+  renderUnitTable(units);
+}
+
+function filterUnits(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const units = TOWER_UNITS[currentTowerId] || [];
+  renderUnitTable(units);
+}
+
+function renderUnitTable(allUnits) {
+  let units = allUnits;
+  if (currentFilter === 'ocupadas') units = allUnits.filter(u => ['O','I','X'].includes(u.status[0]));
+  if (currentFilter === 'libres')   units = allUnits.filter(u => u.status[0] === 'L');
+  if (currentFilter === 'checkin')  units = allUnits.filter(u => u.status[0] === 'I');
+
+  const today = new Date(2026, 3, 29);
+  const days = Array.from({length:14}, (_,i) => {
+    const d = new Date(today); d.setDate(d.getDate()+i);
+    return d;
+  });
+  const dayNames = ['Do','Lu','Ma','Mi','Ju','Vi','Sá'];
+
+  const srcBadge = s => s==='air' ? '<span class="src-air">Air</span>' : s==='bkg' ? '<span class="src-bkg">Bkg</span>' : s==='dir' ? '<span class="src-dir">Dir</span>' : '<span style="color:var(--muted);font-size:.7rem">—</span>';
+
+  let html = '<thead><tr>';
+  html += '<th class="col-unit" style="text-align:left;padding:.6rem 1rem;position:sticky;left:0;background:var(--bg);z-index:3">Unidad</th>';
+  html += '<th style="padding:.6rem .5rem">Tipo</th>';
+  html += '<th style="padding:.6rem .5rem">Fuente</th>';
+  html += '<th style="padding:.6rem .5rem">Huésped</th>';
+  days.forEach(d => {
+    const isToday = d.getDate()===29 && d.getMonth()===3;
+    html += `<th style="padding:.5rem .35rem;min-width:52px;${isToday?'color:var(--accent)':''}">${dayNames[d.getDay()]}<br><span style="font-size:.62rem;font-weight:400">${d.getDate()}/${d.getMonth()+1}</span></th>`;
+  });
+  html += '<th style="padding:.6rem .75rem">ADR</th></tr></thead><tbody>';
+
+  units.forEach(u => {
+    html += `<tr>
+      <td style="position:sticky;left:0;background:var(--white);z-index:1;padding:.5rem 1rem;border-bottom:1px solid var(--border)">
+        <div class="unit-num">${u.id}</div>
+        <div class="unit-floor">Piso ${u.floor} · ${u.m2}m²</div>
+      </td>
+      <td style="padding:.5rem .35rem;border-bottom:1px solid var(--border)"><span class="unit-type">${u.type}</span></td>
+      <td style="padding:.5rem .35rem;border-bottom:1px solid var(--border)">${srcBadge(u.source)}</td>
+      <td style="padding:.5rem .6rem;border-bottom:1px solid var(--border);font-size:.76rem;color:var(--text);max-width:100px;overflow:hidden;text-overflow:ellipsis">${u.guest}</td>`;
+
+    u.status.forEach(s => {
+      let cls, lbl;
+      if (s==='I') { cls='us-in';   lbl='IN'; }
+      else if (s==='X') { cls='us-out';  lbl='OUT'; }
+      else if (s==='O') { cls='us-occ';  lbl=fmtU(u.adr); }
+      else if (s==='M') { cls='us-mnt';  lbl='⚠'; }
+      else              { cls='us-free'; lbl='Libre'; }
+      html += `<td style="padding:.35rem .25rem;border-bottom:1px solid var(--border)"><div class="us-cell ${cls}">${lbl}</div></td>`;
+    });
+
+    html += `<td style="padding:.5rem .75rem;border-bottom:1px solid var(--border);font-weight:700;color:var(--text)">${fmtU(u.adr)}</td></tr>`;
+  });
+
+  if (!units.length) {
+    html += `<tr><td colspan="18" style="padding:2rem;text-align:center;color:var(--muted)">No hay unidades en este estado</td></tr>`;
+  }
+
+  html += '</tbody>';
+  document.getElementById('unit-table').innerHTML = html;
+}
+
+// ─── BUILD ALERTS ─────────────────────────────────────────────────────────────
+function buildAlerts(containerId, limit) {
+  const el = document.getElementById(containerId);
+  const items = limit ? ALERTS.slice(0, limit) : ALERTS;
+  el.innerHTML = items.map(a => `
+    <div class="alert-item">
+      <div class="alert-dot ${a.type}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="alert-tower">${a.tower}</div>
+        <div class="alert-msg">${a.msg}</div>
+      </div>
+      <div class="alert-action">${a.action}</div>
+    </div>`).join('');
+}
+
+// ─── BUILD HEATMAP ────────────────────────────────────────────────────────────
+function buildHeatmap() {
+  const today = new Date(2026, 3, 29);
+  const days = Array.from({length:14}, (_,i) => { const d=new Date(today); d.setDate(d.getDate()+i); return d; });
+  const dn = d => ['Do','Lu','Ma','Mi','Ju','Vi','Sá'][d.getDay()];
+  const fd = d => `${d.getDate()}/${d.getMonth()+1}`;
+  const table = document.getElementById('heatmap');
+  let html = '<thead><tr><th style="text-align:left">Torre</th>';
+  days.forEach(d => { html += `<th>${dn(d)}<br><span style="font-size:.65rem">${fd(d)}</span></th>`; });
+  html += '</tr></thead><tbody>';
+  TOWERS.forEach(t => {
+    const matrix = OCC_MATRIX[t.id], ins = CHECKIN_DAYS[t.id]||[], outs = CHECKOUT_DAYS[t.id]||[];
+    html += `<tr class="tower-row"><td onclick="switchView('tower','${t.id}')">${t.name}</td>`;
+    matrix.forEach((occ,i) => {
+      let cls, label;
+      if (ins.includes(i))   { cls='hm-in';  label='IN'; }
+      else if (outs.includes(i)) { cls='hm-out'; label='OUT'; }
+      else if (occ>=.70)     { cls='hm-high'; label=Math.round(occ*100)+'%'; }
+      else if (occ>=.45)     { cls='hm-mid';  label=Math.round(occ*100)+'%'; }
+      else                   { cls='hm-low';  label=Math.round(occ*100)+'%'; }
+      html += `<td><div class="hm-cell ${cls}">${label}</div></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+// ─── BUILD CHART ──────────────────────────────────────────────────────────────
+function buildChart() {
+  const ctx = document.getElementById('revparChart').getContext('2d');
+  const labels = Array.from({length:30}, (_,i) => {
+    const d = new Date(2026,3,29); d.setDate(d.getDate()-29+i); return `${d.getDate()}/${d.getMonth()+1}`;
+  });
+  new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[{ label:'RevPAR Portfolio', data:REVPAR_HISTORY, borderColor:'#c29947', backgroundColor:'rgba(194,153,71,.07)', borderWidth:2, pointRadius:0, pointHoverRadius:4, fill:true, tension:.4 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ mode:'index', intersect:false, callbacks:{ label:c=>`RevPAR: $${c.parsed.y}` } } },
+      scales:{ x:{ grid:{display:false}, ticks:{maxTicksLimit:6,font:{size:10},color:'#9CA3AF'} },
+               y:{ grid:{color:'#F3F4F6'}, ticks:{font:{size:10},color:'#9CA3AF',callback:v=>'$'+v} } },
+      animation:{duration:1000, easing:'easeInOutQuart'} }
+  });
+}
+
+// ─── BUILD PRECIOS ────────────────────────────────────────────────────────────
+function buildPrecios() {
+  const demands = [
+    { id:'downtown',   demand:.82, suggested:88,  reason:'Feriado 1 Mayo + ocupación >80%' },
+    { id:'palermo',    demand:.91, suggested:102, reason:'Alta demanda turística · pace +12%' },
+    { id:'phollywood', demand:.55, suggested:64,  reason:'Pace lento · 3 noches huérfanas' },
+    { id:'nunez',      demand:.88, suggested:78,  reason:'Corporativo · contrato vigente' },
+    { id:'belgrano',   demand:.68, suggested:72,  reason:'Demanda media · sin presión' },
+    { id:'tigre',      demand:.38, suggested:52,  reason:'Demanda baja · precio gap activo' },
+  ];
+  const RULES = [
+    ['Ocupación > 85%',      '+15%',   'Ocupación supera umbral',        'active'],
+    ['Fin de semana largo',  '+20%',   '1 May · feriado nacional',       'active'],
+    ['Noche huérfana (1 día)','−25%',  'Gap de 1 noche entre reservas',  'active'],
+    ['Pace lento −15%',      '−10%',   'Reservas < benchmark',           'active'],
+    ['Precio mínimo floor',  '= $55',  'Nunca debajo del mínimo',        'active'],
+    ['Precio máximo cap',    '= $180', 'Techo por tipo de unidad 2BR',   'inactive'],
+  ];
+  document.getElementById('pricing-rules-tbody').innerHTML = RULES.map(([r,a,c,s]) => {
+    const aColor = a.startsWith('+') ? 'var(--green)' : a.startsWith('-') ? 'var(--red)' : 'var(--accent)';
+    const sBg    = s === 'active' ? 'var(--green-bg)' : 'var(--border)';
+    const sColor = s === 'active' ? 'var(--green)'    : 'var(--muted)';
+    return `<tr>
+      <td style="padding:.6rem .75rem;border-bottom:1px solid var(--border);font-weight:500">${r}</td>
+      <td style="padding:.6rem .75rem;border-bottom:1px solid var(--border);text-align:center;font-weight:700;color:${aColor}">${a}</td>
+      <td style="padding:.6rem .75rem;border-bottom:1px solid var(--border);color:var(--muted)">${c}</td>
+      <td style="padding:.6rem .75rem;border-bottom:1px solid var(--border);text-align:center">
+        <span style="background:${sBg};color:${sColor};font-size:.7rem;font-weight:700;padding:.15rem .5rem;border-radius:20px">${s === 'active' ? 'Activa' : 'Inactiva'}</span>
+      </td></tr>`;
+  }).join('');
+
+  const grid = document.getElementById('pricing-grid');
+  grid.innerHTML = demands.map(d => {
+    const t = TOWERS.find(x=>x.id===d.id);
+    const up = d.suggested > t.adr;
+    const pct = Math.abs(Math.round((d.suggested-t.adr)/t.adr*100));
+    const demPct = Math.round(d.demand*100);
+    const demColor = d.demand>=.8?'var(--green)':d.demand>=.6?'var(--amber)':'var(--red)';
+    return `<div class="pricing-card">
+      <div class="pricing-tower-name">${t.name}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:.72rem">
+        <span class="demand-label" style="color:${demColor}">Demanda: ${demPct}%</span>
+        <span style="color:var(--muted)">${t.segment}</span>
+      </div>
+      <div class="demand-bar"><div class="demand-fill" style="width:${demPct}%;background:${demColor}"></div></div>
+      <div class="price-row">
+        <span style="color:var(--muted);font-size:.78rem">Precio actual</span>
+        <span class="price-current">${fmtU(t.adr)}</span>
+      </div>
+      <div class="price-row">
+        <span style="color:var(--muted);font-size:.78rem">Sugerido</span>
+        <span class="price-suggested" style="color:${up?'var(--green)':'var(--red)'}">${fmtU(d.suggested)} <span style="font-size:.72rem">(${up?'+':'−'}${pct}%)</span></span>
+      </div>
+      <div style="font-size:.7rem;color:var(--muted);margin:.4rem 0 .5rem;line-height:1.4">${d.reason}</div>
+      <button class="apply-btn" onclick="this.textContent='✓ Aplicado';this.style.background='var(--green)'">Aplicar precio sugerido</button>
+    </div>`;
+  }).join('');
+}
+
+// ─── BUILD RESERVAS ───────────────────────────────────────────────────────────
+function buildReservas() {
+  const srcBadge = s => s==='air'?'<span class="src-air">Airbnb</span>':s==='bkg'?'<span class="src-bkg">Booking</span>':'<span class="src-dir">Directo</span>';
+  const stBadge = s => s==='confirmed'?'<span class="res-status res-confirmed">Confirmada</span>':s==='pending'?'<span class="res-status res-pending">Pendiente</span>':'<span class="res-status res-cancelled">Cancelada</span>';
+  document.getElementById('reservas-tbody').innerHTML = RESERVAS.map(r => `
+    <tr>
+      <td><span class="guest-flag">${r.flag}</span> <span class="guest-name">${r.guest}</span></td>
+      <td style="color:var(--muted)">${r.tower} · <strong>${r.unit}</strong></td>
+      <td>${r.cin}</td>
+      <td>${r.cout}</td>
+      <td style="text-align:center;font-weight:600">${r.nights}</td>
+      <td style="font-weight:700">${fmtU(r.total)}</td>
+      <td>${srcBadge(r.src)}</td>
+      <td>${stBadge(r.status)}</td>
+      <td><span style="font-size:.72rem;color:var(--accent);cursor:pointer;font-weight:600">Ver →</span></td>
+    </tr>`).join('');
+}
+
+// ─── BUILD RESEÑAS ────────────────────────────────────────────────────────────
+function buildResenas() {
+  document.getElementById('resenas-ratings-grid').innerHTML =
+    [['4.91','Palermo'],['4.88','Nuñez'],['4.82','Downtown'],['4.71','Torre Tigre']].map(([rating, tower]) =>
+      `<div style="background:var(--white);border-radius:10px;padding:.85rem 1rem;box-shadow:var(--shadow);text-align:center;border-left:3px solid var(--accent)">
+        <div style="font-size:1.5rem;font-weight:800;color:var(--text)">${rating}<span style="font-size:.9rem;color:var(--muted)">★</span></div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem">${tower}</div>
+      </div>`
+    ).join('');
+
+  const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+  document.getElementById('resenas-list').innerHTML = RESENAS.map(r => `
+    <div class="resena-item">
+      <div class="resena-header">
+        <div>
+          <span class="resena-guest">${r.flag} ${r.guest}</span>
+          <span style="font-size:.72rem;color:var(--muted);margin-left:.6rem">${r.tower}</span>
+        </div>
+        <div style="text-align:right">
+          <div class="resena-stars">${stars(r.stars)}</div>
+          <div class="resena-meta">${r.date}</div>
+        </div>
+      </div>
+      <div class="resena-text">"${r.text}"</div>
+      ${r.replied
+        ? `<div class="resena-reply"><div class="resena-reply-label">Respuesta de Nómade Rentals</div>${r.reply}</div>`
+        : `<button class="reply-btn" onclick="this.closest('.resena-item').querySelector('.resena-text').insertAdjacentHTML('afterend','<div class=\\'resena-reply\\'><div class=\\'resena-reply-label\\'>Respuesta de Nómade Rentals</div>Gracias por tu comentario. Estamos trabajando para mejorar.</div>');this.remove()">Responder →</button>`
+      }
+    </div>`).join('');
+}
+
+// ─── BUILD PROPIETARIOS ───────────────────────────────────────────────────────
+function buildPropietarios() {
+  const liqBadge = s => s==='ok'?'<span class="liq-status liq-ok">Al día</span>':s==='pending'?'<span class="liq-status liq-pending">Pendiente</span>':'<span class="liq-status liq-late">Vencida</span>';
+  document.getElementById('prop-tbody').innerHTML = PROPIETARIOS.map(p => `
+    <tr>
+      <td class="prop-name">${p.name}</td>
+      <td style="color:var(--muted)">${p.tower} · <strong>${p.units} ud.</strong></td>
+      <td style="font-weight:700">${fmtU(p.revenue)}</td>
+      <td style="color:var(--muted)">${fmtU(p.comision)} <span style="font-size:.7rem">(20%)</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div style="flex:1;height:5px;background:var(--border);border-radius:3px">
+            <div style="width:${p.occ}%;height:100%;background:${p.occ>=70?'var(--green)':p.occ>=55?'var(--amber)':'var(--red)'};border-radius:3px"></div>
+          </div>
+          <span style="font-size:.75rem;font-weight:600">${p.occ}%</span>
+        </div>
+      </td>
+      <td>${liqBadge(p.liq)}</td>
+      <td><button class="gen-btn" onclick="this.textContent='✓ Generada';this.style.background='var(--green-bg)';this.style.color='var(--green)'">Generar</button></td>
+    </tr>`).join('');
+}
+
+// ─── ASISTENTE ────────────────────────────────────────────────────────────────
+let assistantOpen = false;
+let asstInitialized = false;
+
+function toggleAssistant() {
+  assistantOpen = !assistantOpen;
+  document.getElementById('assistant-panel').classList.toggle('open', assistantOpen);
+  document.querySelector('.fab-badge').style.display = 'none';
+  if (assistantOpen && !asstInitialized) {
+    asstInitialized = true;
+    addBotMsg('¡Hola! Soy el asistente de Nómade Rentals. Tengo acceso a los datos en tiempo real de tus 6 torres y 271 unidades. ¿En qué te puedo ayudar hoy?', 200);
+  }
+}
+
+function sendSuggestion(el) {
+  const text = el.textContent.replace(/^[^\w]+ ?/, '').trim();
+  addUserMsg(text);
+  el.style.display = 'none';
+  respond(text.toLowerCase());
+}
+
+function sendMessage() {
+  const input = document.getElementById('asst-input');
+  const text = input.value.trim();
+  if (!text) return;
+  addUserMsg(text);
+  input.value = '';
+  respond(text.toLowerCase());
+}
+
+function addUserMsg(text) {
+  const now = new Date().toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+  appendMsg(`<div class="msg msg-user"><div class="msg-bubble">${text}</div><div class="msg-time">${now}</div></div>`);
+}
+
+function addBotMsg(html, delay=600) {
+  // show typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'msg msg-bot';
+  typing.id = 'typing-indicator';
+  typing.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  document.getElementById('asst-messages').appendChild(typing);
+  scrollChat();
+
+  setTimeout(() => {
+    typing.remove();
+    const now = new Date().toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+    appendMsg(`<div class="msg msg-bot"><div class="msg-bubble">${html}</div><div class="msg-time">${now}</div></div>`);
+  }, delay);
+}
+
+function appendMsg(html) {
+  const container = document.getElementById('asst-messages');
+  container.insertAdjacentHTML('beforeend', html);
+  scrollChat();
+}
+
+function scrollChat() {
+  const c = document.getElementById('asst-messages');
+  setTimeout(() => { c.scrollTop = c.scrollHeight; }, 50);
+}
+
+function respond(q) {
+  // Matching por keywords
+  if (match(q, ['urgente','atención','crítico','problema','alerta','peor'])) {
+    addBotMsg(`⚠️ <strong>Torre Tigre</strong> es la torre que más atención necesita ahora mismo:<br><br>
+• <strong>6 unidades vacías</strong> en los próximos 5 días sin reserva<br>
+• Pace de reservas <strong>−18%</strong> vs. mayo 2025<br>
+• Ocupación actual: <strong>58%</strong> (la más baja del portfolio)<br>
+• 1 unidad con AC fuera de servicio (4B)<br><br>
+Recomiendo activar precios gap (−25%) para las noches huérfanas y revisar la estrategia de distribución en Airbnb. ¿Querés que te muestre el detalle de la torre?`, 950);
+  }
+  else if (match(q, ['precio','pricing','oportunidad','ajuste','cobrar'])) {
+    addBotMsg(`💰 La mayor oportunidad de precio hoy está en <strong>Palermo</strong>:<br><br>
+• Ocupación: <strong>71%</strong> · Pace: <strong>+12%</strong> vs. año anterior<br>
+• Precio actual: <strong>$85/noche</strong><br>
+• Precio sugerido: <strong>$102/noche</strong> (+20%)<br><br>
+Con el feriado del 1° de Mayo, la demanda turística está elevada. Aplicar el ajuste puede generar <strong>~$850 adicionales</strong> en los próximos 5 días solo en esa torre.<br><br>
+También Nuñez tiene margen: sugerimos subir de $68 a $78 para el segmento corporativo.`, 1100);
+  }
+  else if (match(q, ['check-in','checkin','ingreso','llegan','hoy','entrada'])) {
+    addBotMsg(`🛬 <strong>14 check-ins programados para hoy:</strong><br><br>
+• <strong>Downtown 2A</strong> — Sarah M. 🇺🇸 (3 noches · Airbnb)<br>
+• <strong>Downtown 6A</strong> — Anna P. 🇷🇺 (7 noches · Booking)<br>
+• <strong>Palermo 5B</strong> — Yuki T. 🇯🇵 (4 noches · Airbnb)<br>
+• <strong>Nuñez 8C</strong> — Samsung Arg. 🇦🇷 (17 noches · Directo)<br>
+• <em>+10 más en otras torres</em><br><br>
+⚠️ <strong>Alerta:</strong> La reserva #4821 (Downtown 12A) tiene pago pendiente de confirmación. Verificar antes de entregar acceso.`, 900);
+  }
+  else if (match(q, ['revenue','ingreso','factur','mes','plata','dinero','ganancia'])) {
+    addBotMsg(`💵 <strong>Revenue del mes (abril 2026):</strong><br><br>
+• Total portfolio: <strong>$413K USD</strong><br>
+• vs. abril 2025: <strong>▲ +8.2%</strong><br>
+• vs. mes anterior: <strong>▲ +6.4% RevPAR</strong><br><br>
+<strong>Por torre:</strong><br>
+• Palermo: $98K · Nuñez: $81K · Downtown: $74K<br>
+• Belgrano: $61K · P. Hollywood: $57K · Tigre: $42K<br><br>
+A este ritmo el mes cierra en <strong>~$560K USD</strong> (29 días restantes). El principal riesgo a la baja es Torre Tigre si no se reactiva el pace.`, 1050);
+  }
+  else if (match(q, ['downtown'])) {
+    addBotMsg(`🏙️ <strong>Downtown — Estado actual:</strong><br><br>
+• Ocupación: <strong>68%</strong> · ADR: <strong>$78/noche</strong> · RevPAR: <strong>$53</strong><br>
+• Rating Airbnb: <strong>⭐ 4.82</strong> (excelente)<br>
+• 2 alertas activas:<br>
+  — Pago pendiente reserva #4821 (Unidad 12A)<br>
+  — Unidad 4B en mantenimiento (AC)<br><br>
+• Próximos 14 días: 12 check-ins programados<br>
+• La unidad 13A (<strong>2 Amb · piso 13</strong>) está completamente libre — oportunidad para reserva directa a $125/noche.`, 850);
+  }
+  else if (match(q, ['palermo'])) {
+    addBotMsg(`🌿 <strong>Palermo — La estrella del portfolio:</strong><br><br>
+• Ocupación: <strong>71%</strong> · ADR: <strong>$85/noche</strong> · RevPAR: <strong>$60</strong><br>
+• Rating: <strong>⭐ 4.91</strong> (el más alto del portfolio)<br>
+• Sin alertas activas ✓<br>
+• Pace de reservas para mayo: <strong>+12% vs. 2025</strong><br><br>
+Es la torre con mayor potencial de suba de precio ahora mismo. Recomiendo aplicar el precio sugerido de <strong>$102/noche</strong> antes del feriado del 1° de Mayo.`, 850);
+  }
+  else if (match(q, ['tigre','brickell'])) {
+    addBotMsg(`🚨 <strong>Torre Tigre — Requiere acción urgente:</strong><br><br>
+• Ocupación: <strong>58%</strong> (debajo del breakeven estimado en 62%)<br>
+• 4 alertas activas — la mayor cantidad del portfolio<br>
+• Pace −18% vs. mayo 2025<br>
+• Unidad 4B sin AC operativo<br><br>
+<strong>Acciones recomendadas:</strong><br>
+1. Precio gap −25% para noches del 2–4 de mayo<br>
+2. Activar promoción "última hora" en Airbnb<br>
+3. Asignar técnico para unidad 4B hoy<br>
+4. Revisar fotos y descripción en Booking (CTR bajo)`, 1000);
+  }
+  else if (match(q, ['ocupaci','libre','vacío','vacio','disponib'])) {
+    addBotMsg(`📊 <strong>Ocupación actual del portfolio:</strong><br><br>
+• <strong>67.4%</strong> promedio — 271 unidades ocupadas de 402<br>
+• ▲ +3.1pp vs. mes anterior — tendencia positiva<br><br>
+<strong>Por torre:</strong><br>
+• Nuñez 74% 🟢 · Palermo 71% 🟢 · Downtown 68% 🟢<br>
+• Belgrano 65% 🟡 · P.Hollywood 63% 🟡 · Tigre 58% 🔴<br><br>
+Las <strong>12 noches huérfanas</strong> detectadas concentran el mayor riesgo de ocupación baja para la semana próxima.`, 800);
+  }
+  else if (match(q, ['reseña','review','rating','calificac','queja','comentario'])) {
+    addBotMsg(`⭐ <strong>Estado de reseñas del portfolio:</strong><br><br>
+• Promedio general: <strong>4.82 ★</strong> · 312 reseñas (últimos 12 meses)<br>
+• Palermo lidera: <strong>4.91 ★</strong><br>
+• Torre Tigre: <strong>4.71 ★</strong> (el más bajo)<br><br>
+⚠️ <strong>Urgente:</strong> Palermo Hollywood recibió una reseña de <strong>3.8★</strong> que afecta el ranking en Airbnb. El huésped mencionó problemas con el aire acondicionado. Está pendiente de respuesta pública.<br><br>
+Responder en menos de 24hs reduce el impacto en el algoritmo de Airbnb. ¿Quieres que te muestre la reseña?`, 1000);
+  }
+  else if (match(q, ['propietario','dueño','liquidaci','pago','comisi'])) {
+    addBotMsg(`👤 <strong>Estado de propietarios:</strong><br><br>
+• 18 propietarios · 271 unidades bajo gestión<br>
+• Comisión Nómade Rentals este mes: <strong>$82.6K USD</strong> (20% promedio)<br><br>
+⚠️ <strong>3 liquidaciones pendientes:</strong><br>
+• Rodríguez e Hijos (Belgrano) — vence 5 mayo<br>
+• Ana Pereyra (Downtown) — vence 5 mayo<br>
+• Torre S.A. (Tigre) — <strong>vencida</strong> ⚠️<br><br>
+Recomiendo priorizar Torre S.A. dado que también tienen la tower con peor performance. Puede ser un punto de tensión en la relación.`, 950);
+  }
+  else if (match(q, ['mayo','fin de semana','feriado','puente'])) {
+    addBotMsg(`📅 <strong>Panorama para el fin de semana largo (1–4 mayo):</strong><br><br>
+• Feriado nacional 1° de Mayo → alta demanda turística<br>
+• Palermo y Nuñez ya muestran ocupación &gt;85% para esos días<br>
+• 3 noches huérfanas detectadas en Palermo Hollywood (2–4 mayo)<br><br>
+<strong>Oportunidades:</strong><br>
+• Aplicar +20% en Palermo y Nuñez para esos días<br>
+• Precio gap −25% en P.Hollywood para cubrir las noches sueltas<br>
+• Torre Tigre: considerar paquete "feriado XL" de 4 noches mínimo`, 1000);
+  }
+  else if (match(q, ['hola','hi','buenas','buen día','buenos días'])) {
+    addBotMsg(`¡Hola! 👋 Listo para ayudarte. Hoy es martes 29 de abril — tenés <strong>14 check-ins</strong>, <strong>8 alertas activas</strong> y <strong>Torre Tigre</strong> requiere atención urgente.<br><br>¿Por dónde empezamos?`, 600);
+  }
+  else if (match(q, ['gracias','genial','perfecto','bueno','ok','dale'])) {
+    const replies = [
+      '¡Con gusto! Si necesitás algo más, acá estoy. 🙌',
+      '¡De nada! ¿Hay algo más en lo que te pueda ayudar?',
+      '¡Perfecto! Cualquier duda que surja, consultame. 💪',
+    ];
+    addBotMsg(replies[Math.floor(Math.random()*replies.length)], 500);
+  }
+  else {
+    addBotMsg(`Entendí tu consulta sobre "<em>${q.slice(0,40)}...</em>".<br><br>Puedo ayudarte con información sobre ocupación, revenue, precios, check-ins, reseñas, propietarios o el estado de cada torre. ¿Querés que profundice en alguno de esos temas?`, 800);
+  }
+}
+
+function match(q, keywords) {
+  return keywords.some(k => q.includes(k));
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+buildTowers();
+buildAlerts('alerts-ceo', 5);
+buildAlerts('alerts-ops');
+buildHeatmap();
+buildChart();
+buildPrecios();
+buildReservas();
+buildResenas();
+buildPropietarios();
+</script>
+</body>
+</html>

@@ -112,8 +112,8 @@
 
       <div class="opts">
         <div class="opt">
-          <h4>Archivo para el banco (.txt)</h4>
-          <p>Lote en formato Interbanking — cabecera del ordenante + un registro por pago. Se importa directo en el homebanking.</p>
+          <h4>Documento para pagos automáticos (.txt)</h4>
+          <p>Un registro por pago, con la cabecera del ordenante. Se importa directo en el banco y ejecuta todas las transferencias del lote de una vez.</p>
           <button class="btn btn-primary" id="btn-txt">⬇ Descargar lote .txt</button>
         </div>
         <div class="opt">
@@ -166,7 +166,7 @@ function norm(s){
 const LOOKUP = {};
 REGISTRO.forEach(r => LOOKUP[norm(r.nombre)] = r);
 
-// ── Formato Interbanking ──────────────────────────────────────────────────────
+// ── Formato de lote bancario (largo fijo 240) ────────────────────────────────
 function fmtX(v,len){ return String(v==null?"":v).slice(0,len).padEnd(len," "); }
 function fmtImporte(v){ return String(Math.round(parseFloat(v)*100)).padStart(17,"0"); }
 function pad2(n){ return String(n).padStart(2,"0"); }

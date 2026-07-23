@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Primabake® — French baking paper since 1921 · Less Impact For Earth</title>
+<link rel="icon" type="image/png" href="/primabake-logo.png">
+<link rel="apple-touch-icon" href="/primabake-logo.png">
+<meta name="description" content="Primabake® by PDL, Papeteries du Léman. French baking paper crafted since 1921: non-stick, water-resistant, oven-safe to 220°C, reusable. PFAS-free. FSC & PEFC certified.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bordeaux:#700820; --bordeaux-deep:#4C0516; --bordeaux-soft:#8E1030;
+  --gold:#C29A55; --gold-soft:#DEC489;
+  --leaf:#3E7C59;
+  --cream:#FAF6EF; --cream-2:#F3ECDF; --paper:#FFFFFF;
+  --ink:#231C1A; --muted:#6E635C; --line:#E8DFD1;
+  --shadow:0 24px 60px rgba(78,20,32,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;overflow-x:hidden}
+.serif{font-family:'Fraunces',Georgia,serif}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:700;line-height:1.05;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px}
+section{position:relative}
+.eyebrow{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;font-weight:700;color:var(--bordeaux)}
+.eyebrow.on-dark{color:var(--gold-soft)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:.94rem;padding:.85rem 1.5rem;border-radius:999px;cursor:pointer;border:1px solid transparent;transition:.18s;white-space:nowrap}
+.btn-primary{background:var(--bordeaux);color:#fff}
+.btn-primary:hover{background:var(--bordeaux-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;border-color:rgba(110,31,46,.28);color:var(--bordeaux)}
+.btn-ghost:hover{border-color:var(--bordeaux);background:rgba(110,31,46,.05)}
+.btn-gold{background:var(--gold);color:#3a2a12}
+.btn-gold:hover{background:var(--gold-soft);transform:translateY(-2px)}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:50;background:rgba(250,246,239,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:70px;gap:1rem}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:'Fraunces',serif;font-weight:900;font-size:1.35rem;color:var(--bordeaux);letter-spacing:-.02em}
+.brand .reg{font-size:.7rem;vertical-align:super;font-weight:600}
+.brand .seal{width:30px;height:30px;flex-shrink:0}
+.brand-logo{height:34px;width:auto;display:block}
+@media(max-width:520px){.brand-logo{height:28px}}
+.nav-links{display:flex;gap:1.6rem;align-items:center}
+.nav-links a{font-size:.9rem;font-weight:500;color:var(--ink);opacity:.82;transition:.15s}
+.nav-links a:hover{opacity:1;color:var(--bordeaux)}
+.nav-right{display:flex;align-items:center;gap:.9rem}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-size:.76rem;font-weight:700}
+.lang button{background:transparent;border:0;padding:.35rem .6rem;cursor:pointer;color:var(--muted)}
+.lang button.active{background:var(--bordeaux);color:#fff}
+.nav-burger{display:none;background:none;border:0;cursor:pointer;font-size:1.5rem;color:var(--bordeaux)}
+@media(max-width:900px){.nav-links{display:none}.nav-burger{display:block}.nav-cta{display:none}}
+
+/* ── HERO ── */
+.hero{padding:74px 0 84px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.badge-1921{display:inline-flex;align-items:center;gap:.55rem;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:.45rem .9rem;font-size:.78rem;font-weight:600;color:var(--bordeaux);box-shadow:0 4px 14px rgba(78,20,32,.06)}
+.hero h1{font-size:clamp(2.5rem,5.6vw,4.35rem);margin:1.3rem 0 1rem}
+.hero h1 em{font-style:italic;color:var(--bordeaux)}
+.hero-sub{font-size:1.12rem;color:var(--muted);max-width:52ch;margin-bottom:1.9rem}
+.hero-cta{display:flex;gap:.8rem;flex-wrap:wrap}
+.hero-trust{display:flex;gap:1.4rem;margin-top:2.2rem;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:.82rem}
+.hero-trust b{color:var(--ink)}
+.hero-trust .dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
+/* hero art */
+.hero-art{position:relative;aspect-ratio:1/1;max-width:460px;margin-left:auto;width:100%}
+.hero-art .disc{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fff 0%,var(--cream-2) 55%,#E7DAC6 100%);box-shadow:var(--shadow)}
+.hero-art .ring{position:absolute;inset:8%;border-radius:50%;border:1px dashed rgba(110,31,46,.25)}
+.hero-art .sheet{position:absolute;inset:20%;border-radius:14px;background:linear-gradient(135deg,#fff,#F6EFE2);box-shadow:0 20px 44px rgba(78,20,32,.16);transform:rotate(-8deg);border:1px solid #EFE6D6}
+.hero-art .sheet.b{transform:rotate(6deg);inset:22% 22% 18% 18%;opacity:.9;background:linear-gradient(135deg,#FBF5EA,#F0E7D6)}
+.hero-art .drop{position:absolute;width:64px;height:64px;left:14%;top:12%;color:var(--bordeaux)}
+.hero-art .heat{position:absolute;right:8%;bottom:16%;background:var(--bordeaux);color:#fff;border-radius:14px;padding:.7rem .95rem;text-align:center;box-shadow:0 14px 30px rgba(78,20,32,.28)}
+.hero-art .heat b{font-family:'Fraunces',serif;font-size:1.5rem;display:block;line-height:1}
+.hero-art .heat span{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.hero-art .reuse{position:absolute;left:2%;bottom:8%;background:var(--leaf);color:#fff;border-radius:14px;padding:.6rem .9rem;box-shadow:0 14px 30px rgba(62,124,89,.3);font-size:.72rem;font-weight:700}
+.hero-art .reuse b{font-family:'Fraunces',serif;font-size:1.1rem}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:34px}.hero-art{margin:0 auto;max-width:360px}}
+
+/* ── STRIP diferenciales ── */
+.strip{background:var(--bordeaux);color:#fff;padding:16px 0}
+.strip-in{display:flex;gap:2.4rem;justify-content:center;flex-wrap:wrap;font-size:.86rem;font-weight:500}
+.strip-in span{display:flex;align-items:center;gap:.5rem;opacity:.94}
+.strip-in .g{color:var(--gold-soft);font-weight:800}
+
+/* ── SECTION base ── */
+.sec{padding:88px 0}
+.sec-head{max-width:640px;margin-bottom:44px}
+.sec-head.center{margin:0 auto 50px;text-align:center}
+.sec-head h2{font-size:clamp(1.9rem,4vw,2.9rem);margin:.7rem 0 .8rem}
+.sec-head p{color:var(--muted);font-size:1.05rem}
+
+/* diferenciales cards */
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.feat{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px 22px;transition:.2s}
+.feat:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#E0D2BE}
+.feat .ic{width:46px;height:46px;color:var(--bordeaux);margin-bottom:1rem}
+.feat h3{font-size:1.16rem;margin-bottom:.4rem}
+.feat p{color:var(--muted);font-size:.92rem}
+.feat .tag{display:inline-block;margin-top:.8rem;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--leaf)}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.feat-grid{grid-template-columns:1fr}}
+
+/* ── STAR feature ── */
+.star{background:linear-gradient(135deg,var(--bordeaux-deep),var(--bordeaux) 70%);color:#fff;border-radius:28px;overflow:hidden;position:relative}
+.star-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center}
+.star-copy{padding:56px 48px}
+.star-copy h2{font-size:clamp(1.9rem,3.6vw,2.8rem);color:#fff;margin:.7rem 0 1rem}
+.star-copy h2 em{font-style:italic;color:var(--gold-soft)}
+.star-copy p{color:rgba(255,255,255,.82);font-size:1.04rem;margin-bottom:1.6rem;max-width:44ch}
+.reuse-scale{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:20px 22px;margin-bottom:1.6rem}
+.reuse-scale .rs-top{display:flex;justify-content:space-between;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.5rem}
+.reuse-bar{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--gold-soft),var(--leaf));position:relative}
+.reuse-scale .rs-lab{display:flex;justify-content:space-between;font-size:.8rem;margin-top:.6rem;color:#fff;font-weight:600}
+.reuse-scale .rs-lab b{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--gold-soft)}
+.star-visual{position:relative;min-height:380px;background:radial-gradient(circle at 60% 40%,rgba(194,154,85,.28),transparent 60%)}
+.star-visual .cycle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:230px;height:230px}
+.star-visual .cnum{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.star-visual .cnum b{font-family:'Fraunces',serif;font-size:3.4rem;color:#fff;display:block;line-height:1}
+.star-visual .cnum span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft)}
+@media(max-width:840px){.star-grid{grid-template-columns:1fr}.star-visual{min-height:260px}.star-copy{padding:40px 30px}}
+
+/* ── RANGE ── */
+.range-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.rcard{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:30px 26px;position:relative;overflow:hidden;transition:.2s}
+.rcard:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.rcard .rtop{height:6px;border-radius:999px;width:54px;margin-bottom:1.3rem}
+.rcard.r-star .rtop{background:var(--gold)}
+.rcard.classic .rtop{background:var(--bordeaux)}
+.rcard.light .rtop{background:var(--leaf)}
+.rcard h3{font-size:1.5rem;display:flex;align-items:center;gap:.5rem}
+.rcard .rsub{color:var(--muted);font-size:.86rem;margin:.3rem 0 1.1rem;min-height:2.4em}
+.rcard ul{list-style:none}
+.rcard li{font-size:.9rem;padding:.42rem 0;border-bottom:1px solid var(--line);display:flex;gap:.5rem;color:#3f3733}
+.rcard li:last-child{border-bottom:0}
+.rcard li .ck{color:var(--leaf);font-weight:800;flex-shrink:0}
+.badge-best{position:absolute;top:20px;right:-30px;background:var(--gold);color:#3a2a12;font-size:.64rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.3rem 2.4rem;transform:rotate(38deg)}
+@media(max-width:840px){.range-grid{grid-template-columns:1fr}}
+
+/* ── SPECS ── */
+.specs{background:var(--cream-2);border-radius:24px;padding:44px 40px}
+.spec-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.spec{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px}
+.spec b{font-family:'Fraunces',serif;font-size:1.9rem;color:var(--bordeaux);display:block;line-height:1}
+.spec span{font-size:.85rem;color:var(--muted);display:block;margin-top:.35rem}
+@media(max-width:720px){.spec-row{grid-template-columns:1fr 1fr}}
+
+/* ── SUSTAINABILITY ── */
+.eco{background:linear-gradient(135deg,#28402F,#1C3324);color:#fff;border-radius:28px;padding:56px 48px;position:relative;overflow:hidden}
+.eco h2{color:#fff;font-size:clamp(1.9rem,3.6vw,2.7rem);margin:.7rem 0 1rem}
+.eco h2 em{font-style:italic;color:var(--gold-soft)}
+.eco p{color:rgba(255,255,255,.82);max-width:52ch;font-size:1.04rem}
+.certs{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.8rem}
+.cert{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:.5rem 1.05rem;font-size:.82rem;font-weight:600}
+.eco .eyebrow{color:var(--gold-soft)}
+
+/* ── HERITAGE ── */
+.heritage-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl{display:flex;gap:1.2rem;padding:1rem 0;border-left:2px solid var(--line);padding-left:1.6rem;position:relative}
+.tl::before{content:'';position:absolute;left:-7px;top:1.4rem;width:12px;height:12px;border-radius:50%;background:var(--bordeaux)}
+.tl b{font-family:'Fraunces',serif;color:var(--bordeaux);font-size:1.05rem}
+.tl p{color:var(--muted);font-size:.9rem;margin-top:.15rem}
+.map-card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:34px;box-shadow:var(--shadow)}
+.map-card .fr{font-size:3rem}
+@media(max-width:840px){.heritage-grid{grid-template-columns:1fr;gap:28px}}
+
+/* ── LEAD FORM ── */
+.lead{background:var(--bordeaux);border-radius:28px;color:#fff;padding:0;overflow:hidden}
+.lead-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:0}
+.lead-copy{padding:52px 44px}
+.lead-copy h2{color:#fff;font-size:clamp(1.8rem,3.4vw,2.6rem);margin:.7rem 0 1rem}
+.lead-copy p{color:rgba(255,255,255,.82);font-size:1.02rem;margin-bottom:1.4rem}
+.lead-copy .li{display:flex;gap:.6rem;align-items:flex-start;margin:.6rem 0;font-size:.92rem;color:rgba(255,255,255,.9)}
+.lead-copy .li .ck{color:var(--gold-soft);font-weight:800}
+.lead-form{background:var(--paper);color:var(--ink);padding:44px}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.35rem}
+.field input,.field select,.field textarea{width:100%;padding:.8rem .9rem;border:1px solid var(--line);border-radius:11px;font-family:inherit;font-size:.94rem;background:var(--cream);color:var(--ink);transition:.15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--bordeaux);background:#fff}
+.field textarea{resize:vertical;min-height:70px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.form-note{font-size:.74rem;color:var(--muted);margin-top:.4rem}
+.form-ok{background:var(--leaf);color:#fff;border-radius:12px;padding:1rem 1.1rem;font-size:.92rem;font-weight:500;display:none}
+@media(max-width:840px){.lead-grid{grid-template-columns:1fr}.frow{grid-template-columns:1fr}}
+
+/* ── FOOTER ── */
+.foot{background:var(--bordeaux-deep);color:rgba(255,255,255,.72);padding:44px 0 30px;margin-top:20px}
+.foot-in{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;align-items:flex-start}
+.foot .brand{color:#fff}
+.foot small{font-size:.78rem;line-height:1.7;display:block;max-width:40ch;margin-top:.7rem}
+.foot-links{display:flex;gap:2.4rem;flex-wrap:wrap}
+.foot-col b{color:#fff;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:.7rem}
+.foot-col a{display:block;font-size:.86rem;padding:.2rem 0;opacity:.8}
+.foot-col a:hover{opacity:1}
+.foot-base{border-top:1px solid rgba(255,255,255,.14);margin-top:30px;padding-top:18px;font-size:.76rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ── ASSISTANT ── */
+#asst-fab{position:fixed;right:22px;bottom:22px;z-index:80;background:var(--bordeaux);color:#fff;border:0;border-radius:999px;padding:.9rem 1.3rem;font-family:inherit;font-weight:600;font-size:.92rem;cursor:pointer;box-shadow:0 16px 40px rgba(78,20,32,.34);display:flex;align-items:center;gap:.55rem;transition:.2s}
+#asst-fab:hover{background:var(--bordeaux-deep);transform:translateY(-2px)}
+#asst-fab .pulse{width:9px;height:9px;border-radius:50%;background:var(--gold-soft);box-shadow:0 0 0 0 rgba(222,196,137,.7);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(222,196,137,.6)}70%{box-shadow:0 0 0 10px rgba(222,196,137,0)}100%{box-shadow:0 0 0 0 rgba(222,196,137,0)}}
+#asst{position:fixed;right:22px;bottom:22px;z-index:81;width:388px;max-width:calc(100vw - 28px);height:600px;max-height:calc(100vh - 44px);background:var(--cream);border-radius:20px;box-shadow:0 30px 80px rgba(35,28,26,.34);display:none;flex-direction:column;overflow:hidden;border:1px solid var(--line)}
+#asst.open{display:flex}
+.asst-head{background:var(--bordeaux);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:.7rem}
+.asst-head .av{width:38px;height:38px;border-radius:50%;background:var(--gold);color:#3a2a12;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:900;font-size:1.1rem;flex-shrink:0}
+.asst-head .t b{display:block;font-size:.96rem;font-family:'Fraunces',serif}
+.asst-head .t span{font-size:.72rem;opacity:.82;display:flex;align-items:center;gap:.35rem}
+.asst-head .on{width:7px;height:7px;border-radius:50%;background:#7BE0A0}
+.asst-head .x{margin-left:auto;background:none;border:0;color:#fff;font-size:1.4rem;cursor:pointer;opacity:.85;line-height:1}
+.asst-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:84%;padding:.7rem .9rem;border-radius:14px;font-size:.9rem;line-height:1.45;animation:msgin .3s ease}
+@keyframes msgin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg.bot{background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start}
+.msg.user{background:var(--bordeaux);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.msg b{font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem;padding:0 18px 8px}
+.chip{background:var(--paper);border:1px solid rgba(110,31,46,.3);color:var(--bordeaux);border-radius:999px;padding:.5rem .85rem;font-size:.82rem;font-weight:500;cursor:pointer;transition:.15s;font-family:inherit}
+.chip:hover{background:var(--bordeaux);color:#fff}
+.asst-input{display:flex;gap:.5rem;padding:12px;border-top:1px solid var(--line);background:var(--paper)}
+.asst-input input{flex:1;border:1px solid var(--line);border-radius:999px;padding:.7rem 1rem;font-family:inherit;font-size:.9rem;background:var(--cream)}
+.asst-input input:focus{outline:none;border-color:var(--bordeaux)}
+.asst-input button{background:var(--bordeaux);color:#fff;border:0;border-radius:50%;width:42px;height:42px;cursor:pointer;flex-shrink:0;font-size:1.1rem}
+.asst-foot{text-align:center;font-size:.66rem;color:var(--muted);padding:0 0 10px;background:var(--paper)}
+.typing{display:flex;gap:4px;padding:.8rem}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5;animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+@media(max-width:480px){#asst{height:calc(100vh - 20px);bottom:10px;right:10px}}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<div class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#home" aria-label="Primabake">
+      <img src="/primabake-logo.png" alt="Primabake" class="brand-logo">
+    </a>
+    <nav class="nav-links">
+      <a href="#features" data-i18n="nav_why">Why Primabake</a>
+      <a href="#range" data-i18n="nav_range">Range</a>
+      <a href="#sustainability" data-i18n="nav_eco">Sustainability</a>
+      <a href="#heritage" data-i18n="nav_heritage">Heritage</a>
+      <a href="#contact" data-i18n="nav_contact">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang">
+        <button data-lang="en" class="active">EN</button>
+        <button data-lang="fr">FR</button>
+      </div>
+      <a href="#contact" class="btn btn-primary nav-cta" data-i18n="nav_cta">Become a distributor</a>
+      <button class="nav-burger" onclick="document.getElementById('contact').scrollIntoView()">≡</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero" id="home">
+  <div class="wrap hero-grid">
+    <div class="reveal">
+      <span class="badge-1921">🇫🇷 <span data-i18n="hero_badge">French papermaking since 1921</span></span>
+      <h1 data-i18n="hero_h1">The baking paper that <em>changes the rules.</em></h1>
+      <p class="hero-sub" data-i18n="hero_sub">Crafted by PDL — Papeteries du Léman in the French Alps. Non-stick, water-resistant, oven-safe to 220°C, and reusable. A century of papermaking, made for less impact on Earth.</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn btn-primary" data-i18n="hero_cta1">Become a distributor</a>
+        <button class="btn btn-ghost" onclick="Asst.open()" data-i18n="hero_cta2">💬 Talk to our assistant</button>
+      </div>
+      <div class="hero-trust">
+        <span><b>PFAS-free</b></span><span class="dot"></span>
+        <span><b>FSC</b> & <b>PEFC</b></span><span class="dot"></span>
+        <span data-i18n="hero_trust3"><b>Publier</b>, France</span><span class="dot"></span>
+        <span data-i18n="hero_trust4"><b>100+</b> years</span>
+      </div>
+    </div>
+    <div class="hero-art reveal">
+      <div class="disc"></div>
+      <div class="ring"></div>
+      <div class="sheet b"></div>
+      <div class="sheet"></div>
+      <svg class="drop" viewBox="0 0 24 24" fill="none"><path d="M12 3c3 4 6 7 6 10.5A6 6 0 016 13.5C6 10 9 7 12 3z" fill="#fff" stroke="#6E1F2E" stroke-width="1.4"/><path d="M9 13.5a3 3 0 003 3" stroke="#6E1F2E" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <div class="heat"><b>220°</b><span>C</span></div>
+      <div class="reuse">♺ <b>5–20×</b><br><span data-i18n="hero_reuse">reusable</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STRIP ═══ -->
+<div class="strip">
+  <div class="wrap strip-in">
+    <span><span class="g">✓</span> <span data-i18n="strip1">Nothing sticks</span></span>
+    <span><span class="g">✓</span> <span data-i18n="strip2">Water-resistant</span></span>
+    <span><span class="g">✓</span> <span data-i18n="strip3">Heat to 220°C</span></span>
+    <span><span class="g">✓</span> <span data-i18n="strip4">Star reusable 5–20×</span></span>
+    <span><span class="g">✓</span> <span data-i18n="strip5">PFAS-free</span></span>
+  </div>
+</div>
+
+<!-- ═══ DIFERENCIALES ═══ -->
+<section class="sec" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow" data-i18n="feat_eyebrow">Why it performs</span>
+      <h2 data-i18n="feat_h2">Four reasons professionals switch to Primabake</h2>
+      <p data-i18n="feat_p">The same eco-friendly paper the world's bakeries and private labels already trust — engineered to do more.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal">
+        <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M4 7c4-3 12-3 16 0M4 12c4-3 12-3 16 0M4 17c4-3 12-3 16 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <h3 data-i18n="f1_t">Nothing sticks</h3>
+        <p data-i18n="f1_p">Perfect release every time — no oil, no butter, no residue left on the tray.</p>
+        <span class="tag" data-i18n="f1_tag">Non-stick surface</span>
+      </div>
+      <div class="feat reveal">
+        <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M12 3c3.5 4.5 6.5 7.8 6.5 11.5a6.5 6.5 0 01-13 0C5.5 10.8 8.5 7.5 12 3z" stroke="currentColor" stroke-width="1.6"/></svg>
+        <h3 data-i18n="f2_t">Can get wet</h3>
+        <p data-i18n="f2_p">Holds together even when soaked — steam, moisture and wet doughs are no problem.</p>
+        <span class="tag" data-i18n="f2_tag">Water-resistant</span>
+      </div>
+      <div class="feat reveal">
+        <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M8 14c0-3 4-4 4-8 2 2 4 4 4 8a4 4 0 01-8 0z" stroke="currentColor" stroke-width="1.6"/><path d="M6 20h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <h3 data-i18n="f3_t">Oven-safe to 220°C</h3>
+        <p data-i18n="f3_p">High-heat resistant for oven and microwave, batch after batch, without scorching.</p>
+        <span class="tag" data-i18n="f3_tag">Heat resistant</span>
+      </div>
+      <div class="feat reveal">
+        <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 10-2.3 5.6M20 7v5h-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3 data-i18n="f4_t">Reusable 5–20×</h3>
+        <p data-i18n="f4_p">The Star line is reused 5 to 20 times depending on the sugar content of what you bake.</p>
+        <span class="tag" data-i18n="f4_tag">Star line</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STAR ═══ -->
+<section class="sec" style="padding-top:20px" id="star">
+  <div class="wrap">
+    <div class="star reveal">
+      <div class="star-grid">
+        <div class="star-copy">
+          <span class="eyebrow on-dark" data-i18n="star_eyebrow">The Star line</span>
+          <h2 data-i18n="star_h2">Bake, wipe, <em>bake again.</em></h2>
+          <p data-i18n="star_p">Star is our reusable multi-purpose baking paper for professional and household use — approved even for pretzel baking. One sheet, many bakes.</p>
+          <div class="reuse-scale">
+            <div class="rs-top"><span data-i18n="rs_low">More sugar</span><span data-i18n="rs_high">Less sugar</span></div>
+            <div class="reuse-bar"></div>
+            <div class="rs-lab"><span><b>5×</b> <span data-i18n="rs_l1">high-sugar bakes</span></span><span><b>20×</b> <span data-i18n="rs_l2">low-sugar bakes</span></span></div>
+          </div>
+          <button class="btn btn-gold" onclick="Asst.open('star')" data-i18n="star_cta">Ask how many reuses for my product</button>
+        </div>
+        <div class="star-visual">
+          <svg class="cycle" viewBox="0 0 230 230" fill="none"><circle cx="115" cy="115" r="96" stroke="rgba(255,255,255,.22)" stroke-width="2" stroke-dasharray="6 8"/><path d="M115 19a96 96 0 0190 66" stroke="#C29A55" stroke-width="3" stroke-linecap="round"/></svg>
+          <div class="cnum"><b>5–20×</b><span data-i18n="star_uses">uses per sheet</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RANGE ═══ -->
+<section class="sec" id="range">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow" data-i18n="range_eyebrow">Our range</span>
+      <h2 data-i18n="range_h2">Three papers, one standard of quality</h2>
+      <p data-i18n="range_p">Consistent batch after batch, PFAS-free, and certified across the board.</p>
+    </div>
+    <div class="range-grid">
+      <div class="rcard r-star reveal">
+        <div class="badge-best" data-i18n="range_best">Reusable</div>
+        <div class="rtop"></div>
+        <h3>Star</h3>
+        <p class="rsub" data-i18n="star_sub">Reusable multi-purpose paper for professional & household use.</p>
+        <ul>
+          <li><span class="ck">✓</span> <span data-i18n="star_li1">Reusable 5–20× by sugar content</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="star_li2">Approved for pretzel baking</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="common_li_heat">Oven & microwave to 220°C</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="common_li_nonstick">Non-stick & water-resistant</span></li>
+        </ul>
+      </div>
+      <div class="rcard classic reveal">
+        <div class="rtop"></div>
+        <h3>Classic</h3>
+        <p class="rsub" data-i18n="classic_sub">Multi-purpose baking paper for household and professional markets.</p>
+        <ul>
+          <li><span class="ck">✓</span> <span data-i18n="classic_li1">Everyday multi-purpose baking</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="common_li_heat">Oven & microwave to 220°C</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="common_li_nonstick">Non-stick & water-resistant</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="common_li_consistent">Consistent quality, batch to batch</span></li>
+        </ul>
+      </div>
+      <div class="rcard light reveal">
+        <div class="rtop"></div>
+        <h3>Light</h3>
+        <p class="rsub" data-i18n="light_sub">Single-use paper for household rolls and hot food packaging.</p>
+        <ul>
+          <li><span class="ck">✓</span> <span data-i18n="light_li1">Great anti-grease properties</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="light_li2">Ideal for hot food packaging</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="common_li_heat">Oven & microwave safe</span></li>
+          <li><span class="ck">✓</span> <span data-i18n="common_li_eco">Compostable & recyclable</span></li>
+        </ul>
+      </div>
+    </div>
+    <!-- specs -->
+    <div class="specs reveal" style="margin-top:26px">
+      <div class="spec-row">
+        <div class="spec"><b>220°C</b><span data-i18n="spec1">Max oven temperature</span></div>
+        <div class="spec"><b>5–20×</b><span data-i18n="spec2">Reuses per Star sheet</span></div>
+        <div class="spec"><b>0</b><span data-i18n="spec3">PFAS — none, ever</span></div>
+        <div class="spec"><b>100%</b><span data-i18n="spec4">Virgin pulp, food-grade</span></div>
+        <div class="spec"><b>1921</b><span data-i18n="spec5">Papermaking since</span></div>
+        <div class="spec"><b>5</b><span data-i18n="spec6">Certifications: FSC · PEFC · Kosher · Halal · FDA</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SUSTAINABILITY ═══ -->
+<section class="sec" id="sustainability">
+  <div class="wrap">
+    <div class="eco reveal">
+      <span class="eyebrow">Less Impact For Earth</span>
+      <h2 data-i18n="eco_h2">Sustainability isn't a feature. <em>It's the design.</em></h2>
+      <p data-i18n="eco_p">Primabake is made in one of the most sustainable paper plants in Publier, France — reduced waste and water use, PFAS-free formulation, compostable and recyclable. An ecological dimension built in from the very conception of the product.</p>
+      <div class="certs">
+        <span class="cert">FSC®</span><span class="cert">PEFC™</span><span class="cert">PFAS-free</span>
+        <span class="cert" data-i18n="cert_comp">Compostable</span><span class="cert" data-i18n="cert_rec">Recyclable</span>
+        <span class="cert">Kosher</span><span class="cert">Halal</span><span class="cert">FDA</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HERITAGE ═══ -->
+<section class="sec" id="heritage">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow" data-i18n="her_eyebrow">Heritage</span>
+      <h2 data-i18n="her_h2">A century of French papermaking</h2>
+    </div>
+    <div class="heritage-grid">
+      <div class="reveal">
+        <div class="timeline">
+          <div class="tl"><div><b>1921</b><p data-i18n="tl1">PDL — Papeteries du Léman begins manufacturing specialty papers in France.</p></div></div>
+          <div class="tl"><div><b data-i18n="tl2_y">Decades of R&D</b><p data-i18n="tl2">High-performance paper machines and a relentless reinvestment in research make PDL a world reference.</p></div></div>
+          <div class="tl"><div><b>Primabake®</b><p data-i18n="tl3">The next generation of natural baking paper — adopted by leading brand owners and private labels worldwide.</p></div></div>
+          <div class="tl"><div><b data-i18n="tl4_y">Today</b><p data-i18n="tl4">Produced in Publier, France, part of the Papeteries des Vosges et du Léman group — a global baking-paper leader.</p></div></div>
+        </div>
+      </div>
+      <div class="map-card reveal">
+        <div class="fr">🇫🇷</div>
+        <h3 style="margin:.6rem 0 .4rem;color:var(--bordeaux)" data-i18n="map_t">Made in the French Alps</h3>
+        <p style="color:var(--muted);font-size:.96rem" data-i18n="map_p">Our paper is manufactured on the shores of Lake Léman in Publier — where alpine water and a century of craft meet modern, high-performance production.</p>
+        <div style="display:flex;gap:1.4rem;margin-top:1.4rem">
+          <div><b class="serif" style="font-size:1.7rem;color:var(--bordeaux)">100+</b><br><span style="font-size:.78rem;color:var(--muted)" data-i18n="map_s1">years of expertise</span></div>
+          <div><b class="serif" style="font-size:1.7rem;color:var(--bordeaux)">65k t</b><br><span style="font-size:.78rem;color:var(--muted)" data-i18n="map_s2">annual capacity by 2027</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LEAD / CONTACT ═══ -->
+<section class="sec" id="contact">
+  <div class="wrap">
+    <div class="lead reveal">
+      <div class="lead-grid">
+        <div class="lead-copy">
+          <span class="eyebrow on-dark" data-i18n="lead_eyebrow">Let's work together</span>
+          <h2 data-i18n="lead_h2">Become a distributor or order direct</h2>
+          <p data-i18n="lead_p">Tell us where you are and what you need. Our team supports distributors worldwide and direct clients across France.</p>
+          <div class="li"><span class="ck">✓</span> <span data-i18n="lead_li1">Samples and technical data sheets</span></div>
+          <div class="li"><span class="ck">✓</span> <span data-i18n="lead_li2">Private-label & custom formats</span></div>
+          <div class="li"><span class="ck">✓</span> <span data-i18n="lead_li3">Distributor pricing by market</span></div>
+          <div class="li"><span class="ck">✓</span> <span data-i18n="lead_li4">A dedicated contact who speaks your language</span></div>
+        </div>
+        <div class="lead-form">
+          <form id="leadForm" onsubmit="return submitLead(event)">
+            <div class="frow">
+              <div class="field"><label data-i18n="lf_name">Full name</label><input name="name" required></div>
+              <div class="field"><label data-i18n="lf_company">Company</label><input name="company"></div>
+            </div>
+            <div class="frow">
+              <div class="field"><label data-i18n="lf_email">Email</label><input name="email" type="email" required></div>
+              <div class="field"><label data-i18n="lf_country">Country</label><input name="country" required></div>
+            </div>
+            <div class="field">
+              <label data-i18n="lf_role">I am a…</label>
+              <select name="role">
+                <option data-i18n="lf_role1">Distributor outside France</option>
+                <option data-i18n="lf_role2">Distributor in France</option>
+                <option data-i18n="lf_role3">Direct client in France</option>
+                <option data-i18n="lf_role4">Brand owner / private label</option>
+              </select>
+            </div>
+            <div class="field"><label data-i18n="lf_msg">What do you need?</label><textarea name="message" data-i18n-ph="lf_msg_ph" placeholder="Volumes, formats, target market…"></textarea></div>
+            <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center" data-i18n="lf_submit">Request contact</button>
+            <p class="form-note" data-i18n="lf_note">Demo form — in production this feeds Primabake's CRM and notifies the right sales contact.</p>
+          </form>
+          <div class="form-ok" id="formOk"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-in">
+      <div>
+        <img src="/primabake-logo.png" alt="Primabake" style="height:30px;width:auto;filter:brightness(0) invert(1);opacity:.94">
+        <small data-i18n="foot_about">Baking paper by PDL — Papeteries du Léman. French papermaking since 1921. Non-stick, water-resistant, reusable, PFAS-free. Less Impact For Earth.</small>
+      </div>
+      <div class="foot-links">
+        <div class="foot-col">
+          <b data-i18n="foot_prod">Products</b>
+          <a href="#range">Star</a><a href="#range">Classic</a><a href="#range">Light</a>
+        </div>
+        <div class="foot-col">
+          <b data-i18n="foot_comp">Company</b>
+          <a href="#heritage" data-i18n="foot_her">Heritage</a><a href="#sustainability" data-i18n="foot_eco">Sustainability</a><a href="#contact" data-i18n="foot_cont">Contact</a>
+        </div>
+        <div class="foot-col">
+          <b data-i18n="foot_reach">Reach us</b>
+          <a href="#contact" data-i18n="foot_dist">Become a distributor</a>
+          <a href="#" onclick="Asst.open();return false" data-i18n="foot_asst">Sales assistant</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© 2026 Primabake® · PDL, Papeteries du Léman · Publier, France</span>
+      <span data-i18n="foot_demo">Demo site built by Scalabl — fictional presentation, not the official Primabake website.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ ASSISTANT ═══ -->
+<button id="asst-fab" onclick="Asst.open()"><span class="pulse"></span> <span data-i18n="fab">Sales assistant</span></button>
+<div id="asst" aria-live="polite">
+  <div class="asst-head">
+    <div class="av">P</div>
+    <div class="t"><b>Prima</b><span><span class="on"></span> <span data-i18n="asst_status">Sales assistant · online</span></span></div>
+    <button class="x" onclick="Asst.close()">×</button>
+  </div>
+  <div class="asst-body" id="asstBody"></div>
+  <div class="chips" id="asstChips"></div>
+  <div class="asst-input">
+    <input id="asstInput" data-i18n-ph="asst_ph" placeholder="Ask about the paper…" onkeydown="if(event.key==='Enter')Asst.send()">
+    <button onclick="Asst.send()">→</button>
+  </div>
+  <div class="asst-foot" data-i18n="asst_foot">Prima · guided demo assistant by Scalabl</div>
+</div>
+
+<script>
+/* ══════════ i18n ══════════ */
+const I18N = {
+  en:{
+    nav_why:"Why Primabake",nav_range:"Range",nav_eco:"Sustainability",nav_heritage:"Heritage",nav_contact:"Contact",nav_cta:"Become a distributor",
+    hero_badge:"French papermaking since 1921",
+    hero_h1:'The baking paper that <em>changes the rules.</em>',
+    hero_sub:"Crafted by PDL — Papeteries du Léman in the French Alps. Non-stick, water-resistant, oven-safe to 220°C, and reusable. A century of papermaking, made for less impact on Earth.",
+    hero_cta1:"Become a distributor",hero_cta2:"💬 Talk to our assistant",hero_trust3:"<b>Publier</b>, France",hero_trust4:"<b>100+</b> years",hero_reuse:"reusable",
+    strip1:"Nothing sticks",strip2:"Water-resistant",strip3:"Heat to 220°C",strip4:"Star reusable 5–20×",strip5:"PFAS-free",
+    feat_eyebrow:"Why it performs",feat_h2:"Four reasons professionals switch to Primabake",feat_p:"The same eco-friendly paper the world's bakeries and private labels already trust — engineered to do more.",
+    f1_t:"Nothing sticks",f1_p:"Perfect release every time — no oil, no butter, no residue left on the tray.",f1_tag:"Non-stick surface",
+    f2_t:"Can get wet",f2_p:"Holds together even when soaked — steam, moisture and wet doughs are no problem.",f2_tag:"Water-resistant",
+    f3_t:"Oven-safe to 220°C",f3_p:"High-heat resistant for oven and microwave, batch after batch, without scorching.",f3_tag:"Heat resistant",
+    f4_t:"Reusable 5–20×",f4_p:"The Star line is reused 5 to 20 times depending on the sugar content of what you bake.",f4_tag:"Star line",
+    star_eyebrow:"The Star line",star_h2:'Bake, wipe, <em>bake again.</em>',star_p:"Star is our reusable multi-purpose baking paper for professional and household use — approved even for pretzel baking. One sheet, many bakes.",
+    rs_low:"More sugar",rs_high:"Less sugar",rs_l1:"high-sugar bakes",rs_l2:"low-sugar bakes",star_cta:"Ask how many reuses for my product",star_uses:"uses per sheet",
+    range_eyebrow:"Our range",range_h2:"Three papers, one standard of quality",range_p:"Consistent batch after batch, PFAS-free, and certified across the board.",range_best:"Reusable",
+    star_sub:"Reusable multi-purpose paper for professional & household use.",star_li1:"Reusable 5–20× by sugar content",star_li2:"Approved for pretzel baking",
+    classic_sub:"Multi-purpose baking paper for household and professional markets.",classic_li1:"Everyday multi-purpose baking",
+    light_sub:"Single-use paper for household rolls and hot food packaging.",light_li1:"Great anti-grease properties",light_li2:"Ideal for hot food packaging",
+    common_li_heat:"Oven & microwave to 220°C",common_li_nonstick:"Non-stick & water-resistant",common_li_consistent:"Consistent quality, batch to batch",common_li_eco:"Compostable & recyclable",
+    spec1:"Max oven temperature",spec2:"Reuses per Star sheet",spec3:"PFAS — none, ever",spec4:"Virgin pulp, food-grade",spec5:"Papermaking since",spec6:"Certifications: FSC · PEFC · Kosher · Halal · FDA",
+    eco_h2:"Sustainability isn't a feature. <em>It's the design.</em>",eco_p:"Primabake is made in one of the most sustainable paper plants in Publier, France — reduced waste and water use, PFAS-free formulation, compostable and recyclable. An ecological dimension built in from the very conception of the product.",cert_comp:"Compostable",cert_rec:"Recyclable",
+    her_eyebrow:"Heritage",her_h2:"A century of French papermaking",
+    tl1:"PDL — Papeteries du Léman begins manufacturing specialty papers in France.",tl2_y:"Decades of R&D",tl2:"High-performance paper machines and a relentless reinvestment in research make PDL a world reference.",tl3:"The next generation of natural baking paper — adopted by leading brand owners and private labels worldwide.",tl4_y:"Today",tl4:"Produced in Publier, France, part of the Papeteries des Vosges et du Léman group — a global baking-paper leader.",
+    map_t:"Made in the French Alps",map_p:"Our paper is manufactured on the shores of Lake Léman in Publier — where alpine water and a century of craft meet modern, high-performance production.",map_s1:"years of expertise",map_s2:"annual capacity by 2027",
+    lead_eyebrow:"Let's work together",lead_h2:"Become a distributor or order direct",lead_p:"Tell us where you are and what you need. Our team supports distributors worldwide and direct clients across France.",
+    lead_li1:"Samples and technical data sheets",lead_li2:"Private-label & custom formats",lead_li3:"Distributor pricing by market",lead_li4:"A dedicated contact who speaks your language",
+    lf_name:"Full name",lf_company:"Company",lf_email:"Email",lf_country:"Country",lf_role:"I am a…",lf_role1:"Distributor outside France",lf_role2:"Distributor in France",lf_role3:"Direct client in France",lf_role4:"Brand owner / private label",lf_msg:"What do you need?",lf_msg_ph:"Volumes, formats, target market…",lf_submit:"Request contact",lf_note:"Demo form — in production this feeds Primabake's CRM and notifies the right sales contact.",
+    foot_about:"Baking paper by PDL — Papeteries du Léman. French papermaking since 1921. Non-stick, water-resistant, reusable, PFAS-free. Less Impact For Earth.",foot_prod:"Products",foot_comp:"Company",foot_her:"Heritage",foot_eco:"Sustainability",foot_cont:"Contact",foot_reach:"Reach us",foot_dist:"Become a distributor",foot_asst:"Sales assistant",foot_demo:"Demo site built by Scalabl — fictional presentation, not the official Primabake website.",
+    fab:"Sales assistant",asst_status:"Sales assistant · online",asst_ph:"Ask about the paper…",asst_foot:"Prima · guided demo assistant by Scalabl"
+  },
+  fr:{
+    nav_why:"Pourquoi Primabake",nav_range:"Gamme",nav_eco:"Durabilité",nav_heritage:"Histoire",nav_contact:"Contact",nav_cta:"Devenir distributeur",
+    hero_badge:"Papeterie française depuis 1921",
+    hero_h1:"Le papier cuisson qui <em>change les règles.</em>",
+    hero_sub:"Conçu par PDL — Papeteries du Léman, dans les Alpes françaises. Antiadhésif, résistant à l'eau, résistant au four jusqu'à 220 °C et réutilisable. Un siècle de savoir-faire, pour moins d'impact sur la Terre.",
+    hero_cta1:"Devenir distributeur",hero_cta2:"💬 Parler à notre assistant",hero_trust3:"<b>Publier</b>, France",hero_trust4:"<b>100+</b> ans",hero_reuse:"réutilisable",
+    strip1:"Rien n'accroche",strip2:"Résistant à l'eau",strip3:"Résiste à 220 °C",strip4:"Star réutilisable 5–20×",strip5:"Sans PFAS",
+    feat_eyebrow:"La performance",feat_h2:"Quatre raisons d'adopter Primabake",feat_p:"Le papier éco-responsable auquel les boulangeries et les marques distributeur font déjà confiance — conçu pour faire plus.",
+    f1_t:"Rien n'accroche",f1_p:"Un démoulage parfait à chaque fois — sans huile, sans beurre, sans résidu sur la plaque.",f1_tag:"Surface antiadhésive",
+    f2_t:"Peut être mouillé",f2_p:"Il ne se déchire pas, même détrempé — vapeur, humidité et pâtes liquides ne posent aucun problème.",f2_tag:"Résistant à l'eau",
+    f3_t:"Résiste à 220 °C",f3_p:"Haute résistance à la chaleur, au four comme au micro-ondes, fournée après fournée, sans brûler.",f3_tag:"Résistant à la chaleur",
+    f4_t:"Réutilisable 5–20×",f4_p:"La gamme Star se réutilise 5 à 20 fois selon la teneur en sucre de ce que vous cuisez.",f4_tag:"Gamme Star",
+    star_eyebrow:"La gamme Star",star_h2:"Cuire, essuyer, <em>recommencer.</em>",star_p:"Star est notre papier cuisson multi-usage réutilisable, pour les professionnels et la maison — homologué même pour la cuisson des bretzels. Une feuille, plusieurs fournées.",
+    rs_low:"Plus de sucre",rs_high:"Moins de sucre",rs_l1:"cuissons sucrées",rs_l2:"cuissons peu sucrées",star_cta:"Combien de réutilisations pour mon produit ?",star_uses:"utilisations par feuille",
+    range_eyebrow:"Notre gamme",range_h2:"Trois papiers, un seul niveau de qualité",range_p:"Constant fournée après fournée, sans PFAS, et certifié sur toute la ligne.",range_best:"Réutilisable",
+    star_sub:"Papier multi-usage réutilisable, professionnel et domestique.",star_li1:"Réutilisable 5–20× selon le sucre",star_li2:"Homologué pour les bretzels",
+    classic_sub:"Papier cuisson multi-usage pour les marchés domestique et professionnel.",classic_li1:"Cuisson multi-usage au quotidien",
+    light_sub:"Papier à usage unique pour rouleaux domestiques et emballage de plats chauds.",light_li1:"Excellentes propriétés anti-graisse",light_li2:"Idéal pour l'emballage de plats chauds",
+    common_li_heat:"Four & micro-ondes jusqu'à 220 °C",common_li_nonstick:"Antiadhésif & résistant à l'eau",common_li_consistent:"Qualité constante, fournée après fournée",common_li_eco:"Compostable & recyclable",
+    spec1:"Température four max.",spec2:"Réutilisations par feuille Star",spec3:"PFAS — jamais",spec4:"Pâte vierge, contact alimentaire",spec5:"Papeterie depuis",spec6:"Certifications : FSC · PEFC · Kosher · Halal · FDA",
+    eco_h2:"La durabilité n'est pas une option. <em>C'est la conception.</em>",eco_p:"Primabake est fabriqué dans l'une des papeteries les plus durables, à Publier, en France — moins de déchets et d'eau, formulation sans PFAS, compostable et recyclable. Une dimension écologique intégrée dès la conception du produit.",cert_comp:"Compostable",cert_rec:"Recyclable",
+    her_eyebrow:"Histoire",her_h2:"Un siècle de papeterie française",
+    tl1:"PDL — Papeteries du Léman commence à fabriquer des papiers spéciaux en France.",tl2_y:"Décennies de R&D",tl2:"Des machines à papier haute performance et un réinvestissement constant dans la recherche font de PDL une référence mondiale.",tl3:"La nouvelle génération de papier cuisson naturel — adopté par les grandes marques et marques distributeur du monde entier.",tl4_y:"Aujourd'hui",tl4:"Produit à Publier, France, au sein du groupe Papeteries des Vosges et du Léman — leader mondial du papier cuisson.",
+    map_t:"Fabriqué dans les Alpes françaises",map_p:"Notre papier est fabriqué au bord du lac Léman, à Publier — là où l'eau alpine et un siècle de savoir-faire rencontrent une production moderne et performante.",map_s1:"ans d'expertise",map_s2:"capacité annuelle d'ici 2027",
+    lead_eyebrow:"Travaillons ensemble",lead_h2:"Devenez distributeur ou commandez en direct",lead_p:"Dites-nous où vous êtes et ce dont vous avez besoin. Notre équipe accompagne les distributeurs partout dans le monde et les clients directs en France.",
+    lead_li1:"Échantillons et fiches techniques",lead_li2:"Marque distributeur & formats sur mesure",lead_li3:"Tarifs distributeur par marché",lead_li4:"Un contact dédié qui parle votre langue",
+    lf_name:"Nom complet",lf_company:"Société",lf_email:"E-mail",lf_country:"Pays",lf_role:"Je suis…",lf_role1:"Distributeur hors de France",lf_role2:"Distributeur en France",lf_role3:"Client direct en France",lf_role4:"Marque / marque distributeur",lf_msg:"De quoi avez-vous besoin ?",lf_msg_ph:"Volumes, formats, marché visé…",lf_submit:"Demander un contact",lf_note:"Formulaire de démo — en production, il alimente le CRM de Primabake et notifie le bon commercial.",
+    foot_about:"Papier cuisson par PDL — Papeteries du Léman. Papeterie française depuis 1921. Antiadhésif, résistant à l'eau, réutilisable, sans PFAS. Less Impact For Earth.",foot_prod:"Produits",foot_comp:"Société",foot_her:"Histoire",foot_eco:"Durabilité",foot_cont:"Contact",foot_reach:"Nous contacter",foot_dist:"Devenir distributeur",foot_asst:"Assistant commercial",foot_demo:"Site de démonstration réalisé par Scalabl — présentation fictive, ce n'est pas le site officiel Primabake.",
+    fab:"Assistant commercial",asst_status:"Assistant commercial · en ligne",asst_ph:"Une question sur le papier…",asst_foot:"Prima · assistant de démo guidé par Scalabl"
+  }
+};
+let LANG="en";
+function applyLang(l){
+  LANG=l;document.documentElement.lang=l;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(I18N[l][k]!=null)el.innerHTML=I18N[l][k];});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{const k=el.getAttribute('data-i18n-ph');if(I18N[l][k]!=null)el.placeholder=I18N[l][k];});
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>applyLang(b.dataset.lang));
+
+/* ══════════ reveal on scroll ══════════ */
+const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ══════════ lead form ══════════ */
+function submitLead(e){
+  e.preventDefault();
+  const f=e.target,d=Object.fromEntries(new FormData(f));
+  try{const all=JSON.parse(localStorage.getItem('primabake_leads')||'[]');all.push({...d,ts:new Date().toISOString()});localStorage.setItem('primabake_leads',JSON.stringify(all));}catch(_){}
+  f.style.display='none';
+  const ok=document.getElementById('formOk');
+  ok.style.display='block';
+  ok.textContent=LANG==='fr'
+    ? `Merci ${d.name.split(' ')[0]||''} ! Votre demande est enregistrée. Un contact Primabake vous répondra pour ${d.country||'votre marché'}.`
+    : `Thank you ${d.name.split(' ')[0]||''}! Your request is registered. A Primabake contact will follow up for ${d.country||'your market'}.`;
+  return false;
+}
+
+/* ══════════ ASSISTANT (guided demo) ══════════ */
+const KB={
+  en:{
+    greet:"Bonjour 👋 I'm Prima, your Primabake sales assistant. I can help distributors and direct clients find the right paper, check specs, or start a quote. How can I help?",
+    chips_start:["I'm a distributor","I'm a client in France","Which paper for me?","Is it reusable?","Get samples"],
+    dist:"Wonderful. Primabake supplies distributors worldwide and across France. We offer distributor pricing by market, private-label formats, samples and full technical data sheets. Which country would you serve?",
+    client_fr:"Parfait — we ship to direct clients across France. Star (reusable) and Classic are the most popular for direct orders. Would you like samples or a quote?",
+    reuse:"Yes! The <b>Star</b> line is reusable <b>5 to 20 times</b> — the exact number depends on the sugar content of what you bake: high-sugar recipes toward 5×, low-sugar toward 20×. Classic and Light are single/multi-use. Want me to estimate for your product?",
+    temp:"Primabake is oven- and microwave-safe up to <b>220°C</b>, batch after batch, without scorching.",
+    nonstick:"Every Primabake paper is <b>non-stick</b> — perfect release with no oil or butter — and <b>water-resistant</b>, so it holds up to steam, moisture and wet doughs.",
+    eco:"Primabake is <b>PFAS-free</b>, FSC & PEFC certified, compostable and recyclable, made in one of the most sustainable plants in Publier, France. 'Less Impact For Earth.'",
+    finder_q:"Happy to help you choose. What matters most?",
+    finder_chips:["Reusable & professional","Everyday all-purpose","Hot-food packaging"],
+    rec_star:"→ Go with <b>Star</b>: reusable 5–20×, professional-grade, even approved for pretzels. Shall I note you'd like Star samples?",
+    rec_classic:"→ <b>Classic</b> is your paper: multi-purpose for home and pro, non-stick, water-resistant, oven-safe to 220°C. Want a quote?",
+    rec_light:"→ <b>Light</b> is ideal: single-use with great anti-grease properties for hot-food packaging. Want samples?",
+    samples:"Great — I'll open the contact form so a Primabake rep can send samples and pricing for your market. One moment…",
+    fallback:"I can help with product choice, reuses, temperature (220°C), certifications, samples or becoming a distributor. Ask away — or tap a suggestion.",
+    country_ack:(c)=>`Noted — ${c}. I'll pass this to the team for that market. Let's capture your details so a rep can send pricing and samples.`,
+    to_form:"Opening the contact form for you 👇"
+  },
+  fr:{
+    greet:"Bonjour 👋 Je suis Prima, votre assistante commerciale Primabake. J'aide les distributeurs et les clients directs à choisir le bon papier, vérifier les specs ou démarrer un devis. Comment puis-je vous aider ?",
+    chips_start:["Je suis distributeur","Je suis client en France","Quel papier pour moi ?","Est-il réutilisable ?","Recevoir des échantillons"],
+    dist:"Avec plaisir. Primabake fournit des distributeurs partout dans le monde et en France : tarifs par marché, formats marque distributeur, échantillons et fiches techniques. Quel pays souhaitez-vous couvrir ?",
+    client_fr:"Parfait — nous livrons les clients directs partout en France. Star (réutilisable) et Classic sont les plus demandés. Souhaitez-vous des échantillons ou un devis ?",
+    reuse:"Oui ! La gamme <b>Star</b> est réutilisable <b>5 à 20 fois</b> — le nombre exact dépend de la teneur en sucre : recettes très sucrées vers 5×, peu sucrées vers 20×. Classic et Light sont à usage unique/multiple. Je fais une estimation pour votre produit ?",
+    temp:"Primabake résiste au four et au micro-ondes jusqu'à <b>220 °C</b>, fournée après fournée, sans brûler.",
+    nonstick:"Tous les papiers Primabake sont <b>antiadhésifs</b> — démoulage parfait sans huile ni beurre — et <b>résistants à l'eau</b>, face à la vapeur, l'humidité et les pâtes liquides.",
+    eco:"Primabake est <b>sans PFAS</b>, certifié FSC & PEFC, compostable et recyclable, fabriqué dans l'une des papeteries les plus durables à Publier, France. « Less Impact For Earth ».",
+    finder_q:"Je vous aide à choisir. Qu'est-ce qui compte le plus ?",
+    finder_chips:["Réutilisable & pro","Multi-usage quotidien","Emballage plats chauds"],
+    rec_star:"→ Choisissez <b>Star</b> : réutilisable 5–20×, qualité pro, homologué même pour les bretzels. Je note une demande d'échantillons Star ?",
+    rec_classic:"→ <b>Classic</b> est fait pour vous : multi-usage maison et pro, antiadhésif, résistant à l'eau, four jusqu'à 220 °C. Un devis ?",
+    rec_light:"→ <b>Light</b> est idéal : usage unique, excellentes propriétés anti-graisse pour l'emballage de plats chauds. Des échantillons ?",
+    samples:"Parfait — j'ouvre le formulaire pour qu'un commercial Primabake vous envoie échantillons et tarifs. Un instant…",
+    fallback:"Je peux aider sur le choix du papier, les réutilisations, la température (220 °C), les certifications, les échantillons ou devenir distributeur. Posez votre question — ou touchez une suggestion.",
+    country_ack:(c)=>`C'est noté — ${c}. Je transmets à l'équipe pour ce marché. Capturons vos coordonnées pour l'envoi des tarifs et échantillons.`,
+    to_form:"J'ouvre le formulaire de contact pour vous 👇"
+  }
+};
+const Asst={
+  started:false,
+  open(intent){document.getElementById('asst').classList.add('open');document.getElementById('asst-fab').style.display='none';if(!this.started){this.started=true;this.boot(intent);}},
+  close(){document.getElementById('asst').classList.remove('open');document.getElementById('asst-fab').style.display='flex';},
+  boot(intent){const k=KB[LANG];this.bot(k.greet);this.chips(k.chips_start);if(intent==='star'){setTimeout(()=>this.route('reuse'),400);}},
+  bot(html){const b=document.getElementById('asstBody');const d=document.createElement('div');d.className='msg bot';d.innerHTML=html;b.appendChild(d);b.scrollTop=b.scrollHeight;},
+  user(txt){const b=document.getElementById('asstBody');const d=document.createElement('div');d.className='msg user';d.textContent=txt;b.appendChild(d);b.scrollTop=b.scrollHeight;},
+  typing(){const b=document.getElementById('asstBody');const d=document.createElement('div');d.className='msg bot typing';d.id='typing';d.innerHTML='<span></span><span></span><span></span>';b.appendChild(d);b.scrollTop=b.scrollHeight;},
+  untyping(){const t=document.getElementById('typing');if(t)t.remove();},
+  chips(arr){const c=document.getElementById('asstChips');c.innerHTML='';(arr||[]).forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.onclick=()=>{this.user(t);this.chips([]);this.handle(t);};c.appendChild(b);});},
+  reply(html,chips){this.typing();setTimeout(()=>{this.untyping();this.bot(html);if(chips)this.chips(chips);},520);},
+  send(){const i=document.getElementById('asstInput');const t=i.value.trim();if(!t)return;i.value='';this.user(t);this.chips([]);this.handle(t);},
+  route(key){const k=KB[LANG];if(k[key])this.reply(typeof k[key]==='function'?k[key]():k[key]);},
+  toForm(){this.reply(KB[LANG].to_form);setTimeout(()=>{this.close();document.getElementById('contact').scrollIntoView({behavior:'smooth'});document.querySelector('#leadForm [name=name]').focus();},700);},
+  handle(t){
+    const k=KB[LANG],s=t.toLowerCase();
+    const has=(...w)=>w.some(x=>s.includes(x));
+    if(has('sample','échantillon','echantillon','quote','devis','pricing','tarif','prix')){this.reply(k.samples);this.toForm();return;}
+    if(has('distrib')){this.reply(k.dist);return;}
+    if(has('client','france','direct')){this.reply(k.client_fr,[LANG==='fr'?'Recevoir des échantillons':'Get samples',LANG==='fr'?'Quel papier ?':'Which paper?']);return;}
+    if(has('reus','réutil','reutil','veces','fois','star')){this.reply(k.reuse,[LANG==='fr'?'Recevoir des échantillons':'Get samples']);return;}
+    if(has('temp','220','heat','chaleur','four','oven','micro')){this.reply(k.temp);return;}
+    if(has('stick','adhes','adhés','wet','mouill','water','eau')){this.reply(k.nonstick);return;}
+    if(has('pfas','eco','écolo','ecolo','sustain','durab','cert','fsc','pefc','compost','recycl')){this.reply(k.eco);return;}
+    if(has('which','recommend','choose','choix','quel','finder')){this.reply(k.finder_q,k.finder_chips);return;}
+    if(has('réutilisable & pro','reusable & professional','pro')){this.reply(k.rec_star,[LANG==='fr'?'Recevoir des échantillons':'Get samples']);return;}
+    if(has('everyday','all-purpose','quotidien','multi-usage')){this.reply(k.rec_classic,[LANG==='fr'?'Devis':'Get a quote']);return;}
+    if(has('hot-food','plats chauds','packaging','light')){this.reply(k.rec_light,[LANG==='fr'?'Recevoir des échantillons':'Get samples']);return;}
+    if(has('hello','hi','bonjour','salut','hola')){this.reply(k.greet,k.chips_start);return;}
+    // country guess: if the message is short and looks like a place after distributor context
+    this.reply(k.fallback,k.chips_start);
+  }
+};
+
+applyLang('en');
+</script>
+</body>
+</html>
